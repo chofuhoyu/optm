@@ -1,0 +1,45 @@
+% ============================================================
+%  第2章 数学基础 — 示例笔记
+%  写法一：整页总结（推荐用于章末）
+% ============================================================
+
+\notefullpage{
+  \section*{第2章 数学基础 — 必背公式}
+
+  \subsection*{梯度与 Hessian 矩阵}
+  \begin{align*}
+    \nabla f(x) &= \left[\frac{\partial f}{\partial x_1}, \dots, \frac{\partial f}{\partial x_n}\right]^T \\[4pt]
+    \nabla^2 f(x) &= \begin{bmatrix}
+      \frac{\partial^2 f}{\partial x_1^2} & \cdots & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\
+      \vdots & \ddots & \vdots \\
+      \frac{\partial^2 f}{\partial x_n \partial x_1} & \cdots & \frac{\partial^2 f}{\partial x_n^2}
+    \end{bmatrix}
+  \end{align*}
+
+  \subsection*{Taylor 展开}
+  \begin{align*}
+    f(x+d) = f(x) + \nabla f(x)^T d + \frac{1}{2} d^T \nabla^2 f(x) d + o(\|d\|^2)
+  \end{align*}
+
+  \subsection*{方向导数}
+  \begin{align*}
+    D_d f(x) = \lim_{t \to 0^+} \frac{f(x+td) - f(x)}{t} = \nabla f(x)^T d
+  \end{align*}
+}
+
+% ============================================================
+%  写法二：单个笔记格（混在幻灯片网格里）
+%  复制下面这段到 chapters.tex 的某个 \slidegrid 之前/之间
+% ============================================================
+% 在 chapters.tex 中，可以把某个 \slidegrid{...}{...}{...}{...}{...}{...}{...}{...}
+% 替换为混合网格，比如最后一行两个格子换成笔记：
+%
+% \noindent
+% \begin{tabular}{@{}c c@{}}
+%   \scell{2数学基础}{1} & \scell{2数学基础}{2} \\
+%   \scell{2数学基础}{3} & \scell{2数学基础}{4} \\
+%   \scell{2数学基础}{5} & \scell{2数学基础}{6} \\
+%   \ncell{\textbf{梯度：} $\nabla f(x)$ \\[2pt] 一元: $f'(x)$ \\ 多元: 偏导构成的向量} &
+%   \scell{2数学基础}{7} \\
+% \end{tabular}
+% \clearpage
