@@ -5,12 +5,20 @@
 
 \subsection{9.1 约束优化方法的两大流派}
 
-第8章的方法适用于\emph{无约束}问题。加上约束后，有两类思路：
+第8章的方法适用于\emph{无约束}问题。一旦加上等式或不等式约束，下降方向的选择就必须兼顾"能不能走"（可行性）。由此分出两条路：
 
 \begin{itemize}
-  \item \textbf{可行方向法}：始终保持在可行域内，从可行点出发沿下降可行方向移动。每次迭代先找方向（不能跑出可行域），再定步长（确保不越界）。代表：Zoutendijk 法、Rosen 梯度投影法。
-  \item \textbf{罚函数法}：将约束问题\emph{转化为一系列无约束问题}。对违反约束的行为加以惩罚，惩罚力度越来越大，迫使无约束问题的解趋向原约束问题的解。代表：外点法（SUMT）、内点法（障碍法）、乘子法。
+  \item \textbf{可行方向法}：始终保持在可行域内，每次迭代找\emph{下降可行方向}——既要让目标下降，又不能跑出可行域。代表：Zoutendijk 法、Rosen 梯度投影法。
+  \item \textbf{罚函数法}：将约束问题\emph{转化为一系列无约束问题}。对违反约束的行为加以惩罚，惩罚力度逐轮加大，迫使无约束问题的解趋向原约束问题的解。代表：外点法（SUMT）、内点法（障碍法）、乘子法。
 \end{itemize}
+
+\medskip
+PPT第12章开篇给出了可行方向法的引入动机和基本框架，下面两页是理解整个可行方向法的入口。
+\medskip
+\refslide{12可行方向法}{2}{12.1}
+\medskip
+\refslide{12可行方向法}{3}{12.2}
+\medskip
 
 \subsection{9.2 可行方向法通用框架}
 
@@ -20,54 +28,112 @@
   \item 同时 $d$ 是\emph{可行方向}：对充分小的 $\lambda > 0$，$x^{(k)} + \lambda d$ 仍在可行域内
 \end{enumerate}
 
-\emph{积极约束}（active constraints）——当前取等号的不等式约束——是限制可行方向的关键。非积极约束在局部可以忽略。
+\emph{积极约束}（active constraints）——当前取等号的不等式约束——决定了可行方向的范围：
+\begin{itemize}
+  \item 对于积极不等式约束 $g_i(x) \le 0$（此时 $g_i(x)=0$），可行方向要求 $\nabla g_i(x)^T d \le 0$（不能指向域外）
+  \item 对于等式约束 $h_j(x)=0$，可行方向要求 $\nabla h_j(x)^T d = 0$（必须沿切向）
+  \item 非积极约束（$g_i(x) < 0$）在局部可以忽略——只要步长足够小就不会碰到边界
+\end{itemize}
 
-\medskip
-\refslide{12可行方向法}{2}{12.1}
-\medskip
-\refslide{12可行方向法}{3}{12.2}
-\medskip
+\textbf{通用算法框架}：
+\begin{enumerate}
+  \item 给定初始可行点 $x^{(0)}$，令 $k=0$
+  \item 确定 $x^{(k)}$ 处的积极约束集 $I_k$
+  \item 求解子问题得到下降可行方向 $d^{(k)}$
+  \item 沿 $d^{(k)}$ 做一维搜索，找到能保持可行性的最大步长
+  \item 更新 $x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$
+  \item 若满足 KKT 条件则停止，否则 $k \leftarrow k+1$ 回第2步
+\end{enumerate}
+
+不同的可行方向法，区别在于\emph{第3步如何确定搜索方向}。
 
 \subsection{9.3 Rosen 梯度投影法}
 
+\subsubsection{核心思想}
+
 Rosen 法的核心思想：将\emph{负梯度方向投影到约束的切空间上}，得到既下降又（局部）可行的方向。
+
+\textbf{为什么要投影？} 负梯度 $-\nabla f$ 是下降最快的方向，但它可能指向可行域外部——直接沿负梯度走会违反约束。我们把 $-\nabla f$ 投影到约束的切空间（所有可行方向所在的空间），得到的投影方向既保留了下降性，又保证了局部可行性。
 
 \begin{defbox}
 \textbf{投影矩阵}
 
-设积极约束的系数矩阵为 $M$（每行是一个积极约束的梯度 $\nabla g_i(x)^T$，仅对线性约束）。则投影矩阵为：
+设积极约束的系数矩阵为 $M$（每行是一个积极约束的梯度 $\nabla g_i(x)^T$，仅对\emph{线性}约束）。则投影矩阵为：
 \[
 P = I - M^T (M M^T)^{-1} M
 \]
-$P$ 把任意向量投影到约束的\emph{切空间}（null space of $M$）上。
+$P$ 是把任意向量\emph{正交投影到约束切空间}（$M$ 的零空间）上的投影算子。
 
-搜索方向：$d = -P \nabla f$（负梯度在切线空间上的投影）。
+搜索方向：$d = -P \nabla f$（负梯度在切线空间上的正交投影）。
 \end{defbox}
 
+\subsubsection{投影矩阵的具体算例}
+
+\textbf{问题}：设有一条约束 $x_1 + x_2 = 0$（一维直线），求投影矩阵，并验证投影效果。
+
+\textbf{解}：积极约束系数矩阵 $M = [1 \quad 1]$。
+
+\begin{enumerate}
+  \item 计算 $MM^T = [1\ 1] \begin{bmatrix}1\\1\end{bmatrix} = [2]$，即 $2\times 1 = 2$
+  \item $(MM^T)^{-1} = [\frac{1}{2}]$
+  \item $M^T(MM^T)^{-1}M = \begin{bmatrix}1\\1\end{bmatrix} \cdot \frac{1}{2} \cdot [1\quad 1] = \frac{1}{2}\begin{bmatrix}1&1\\1&1\end{bmatrix} = \begin{bmatrix}0.5&0.5\\0.5&0.5\end{bmatrix}$
+  \item $P = I - M^T(MM^T)^{-1}M = \begin{bmatrix}1&0\\0&1\end{bmatrix} - \begin{bmatrix}0.5&0.5\\0.5&0.5\end{bmatrix} = \begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}$
+\end{enumerate}
+
+\textbf{验证}：约束 $x_1+x_2=0$ 的切空间是 $\{d: d_1+d_2=0\}$，即沿 $(1,-1)$ 方向。
+\begin{itemize}
+  \item $P \begin{bmatrix}1\\-1\end{bmatrix} = \begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}\begin{bmatrix}1\\-1\end{bmatrix} = \begin{bmatrix}1\\-1\end{bmatrix}$ ——切向量保持不变
+  \item $P \begin{bmatrix}1\\1\end{bmatrix} = \begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}\begin{bmatrix}1\\1\end{bmatrix} = \begin{bmatrix}0\\0\end{bmatrix}$ ——法向量被消灭
+\end{itemize}
+这正是投影算子的性质：切空间内的向量原样保留，法向量（梯度方向）被归零。
+
+\begin{notebox}
+\textbf{投影矩阵的几何直觉}：$P \nabla f = 0$ 意味着梯度完全落在约束法向量的张成空间中——此时 $-\nabla f$ 没有"切向分量"可走，说明当前点已是（局部）约束最优，这就是 KKT 条件的几何解释。$P \nabla f \neq 0$ 意味着梯度在切方向上有分量，沿 $-P\nabla f$ 移动可以下降且不立即违反约束。
+\end{notebox}
+
+\medskip
+PPT这两页分别介绍了Rosen法的概念和投影方向的具体推导过程。
 \medskip
 \refslide{12可行方向法}{42}{12.36}
 \medskip
+\refslide{12可行方向法}{44}{12.38}
+\medskip
 
-\begin{notebox}
-\textbf{投影矩阵的几何直觉}：$P \nabla f = 0$ 意味着梯度完全落在约束法向量的张成空间中——这是 KKT 条件的等价表述。$P \nabla f \neq 0$ 意味着梯度在切线方向上有分量，沿此分量移动可以下降而不立即违反约束。
-\end{notebox}
+\subsubsection{积极约束集的维护（关键难点）}
 
-\subsubsection{积极约束集的维护}
+Rosen 法最精巧之处在于\emph{何时加入约束、何时移除约束}。这不是一个"有了投影矩阵就万事大吉"的方法——积极约束集会随着迭代变化。
 
-Rosen 法的难点在于\emph{何时加入约束、何时移除约束}：
-\begin{itemize}
-  \item 若步长被某个新的不等式约束限制，将其加入积极集
-  \item 若 $d = 0$（无法在当前积极集内下降），检查 KKT 乘子符号。若有 $\lambda_i < 0$，表示对应的约束不必是积极的——将其从积极集中移除，重新计算 $P$
-\end{itemize}
+\textbf{加入}：一维搜索时，若步长 $\lambda$ 被某个之前非积极的不等式约束 $g_i$ 所限制（即 $x + \lambda d$ 使 $g_i$ 从 $<0$ 变为 $=0$），将该约束\emph{加入}积极集 $M$，重新计算 $P$。
+
+\textbf{移除}：若 $d = -P\nabla f = 0$（投影梯度为零，当前积极集内无法再下降），检查 KKT 乘子 $\lambda = -(MM^T)^{-1}M \nabla f$。若存在 $\lambda_i < 0$，说明第 $i$ 个约束其实是"假的"积极约束——去掉它反而可以继续下降。将 $\lambda_i < 0$ 对应的约束从积极集中\emph{移除}，回到前一步重新计算 $P$。
+
+\textbf{因果逻辑}：$\lambda_i < 0$ 的几何含义是该约束的法向量与目标下降方向"同向"——约束在"推"着我们往错误的方向走。去掉它，目标函数才能继续下降。若所有 $\lambda_i \ge 0$，则满足 KKT 必要条件，当前点即局部最优。
+
+\medskip
+PPT给出了Rosen法完整的算法流程，包括积极约束集增删的判断逻辑。
+\medskip
+\refslide{12可行方向法}{46}{12.40}
+\medskip
 
 \subsection{9.4 Zoutendijk 可行方向法}
 
-Zoutendijk 法用线性规划子问题来找方向：在满足所有下降和可行方向约束的条件下，选择使目标函数下降最快的方向。这是求解 LP 子问题来确定搜索方向。
+Zoutendijk 法用\emph{线性规划子问题}来找方向：在满足所有下降条件和可行方向条件的前提下，选择使目标函数沿该方向下降最快的方向。本质是把"找方向"变成一个 LP 求解。
+
+对线性约束情况，子问题是：
+\[
+\begin{aligned}
+\min\ & \nabla f(x^{(k)})^T d \\
+\text{s.t.}\ & \nabla g_i(x^{(k)})^T d \le 0 \quad (i \in I_k) \\
+& -1 \le d_j \le 1 \quad (\text{归一化防止无界})
+\end{aligned}
+\]
+
+Zoutendijk 法适用范围广，但每步都要解一个 LP，计算成本比 Rosen 法高。考试重点在 Rosen 法。
 
 \subsection{9.5 真题示例：第五题——Rosen 梯度投影法}
 
 \begin{notebox}
-\textbf{【2025 真题·第五题】}
+\textbf{【2025 真题·第五题】（完整保留）}
 \[
 \begin{aligned}
 \min\ & x_1^2 + 2x_2^2 - x_1 x_2 + x_3^2 + x_3 \\
@@ -82,69 +148,119 @@ Zoutendijk 法用线性规划子问题来找方向：在满足所有下降和可
 
 \subsubsection{化简与初始点}
 
-观察目标函数：$\frac{\partial f}{\partial x_3} = 2x_3 + 1$。在可行域内 $x_3 \ge 0$，故 $x_3 = 0$ 处 $f$ 随 $x_3$ 增大而增大，最优解处 $x_3^* = 0$。问题化为二维。
+目标函数对 $x_3$ 的偏导数：$\frac{\partial f}{\partial x_3} = 2x_3 + 1$。在可行域内 $x_3 \ge 0$，故 $\frac{\partial f}{\partial x_3} > 0$（$x_3$ 增大则 $f$ 增大），最优解必在 $x_3^* = 0$ 处。问题化为二维。
 
-取初始可行点 $X^{(0)} = (2,2,2)^T$。此时前两个约束取等号（积极）。
+取初始可行点 $X^{(0)} = (2,2,2)^T$。验证：$x_1+x_2=4 \neq 6$——不对！实际取 $X^{(0)} = (2,4,0)^T$ 更合适。
 
+取 $X^{(0)} = (2,2,2)^T$ 验证约束：$x_1+x_2=4 \neq 6$，该点不可行。重新选：设 $x_3=0$，$x_1+x_2=6$，取对称点 $x_1=x_2=3$。检查 $-3+3+0=0 \le 2$，可行。故取 $X^{(0)} = (3,3,0)^T$。
+
+在 $X^{(0)}$ 处，$x_1+x_2=6$（等式，始终积极），$x_3=0$（积极）。故积极约束有两个：
 \[
-\nabla f = (2x_1-x_2,\ 4x_2-x_1,\ 2x_3+1)^T,\quad
-\nabla f^{(0)} = (2,\ 6,\ 5)^T
+h_1: x_1+x_2-6=0,\quad g_1: -x_3 \le 0\ \text{（即 }x_3 \ge 0\text{）}
 \]
 
-积极约束系数矩阵（取等号的行）：
+积极约束系数矩阵（取梯度）：
 \[
-M = \begin{pmatrix} 1 & 1 & 0 \\ -1 & 1 & 0 \end{pmatrix}
+\nabla h_1 = (1,1,0)^T,\quad \nabla(-x_3) = (0,0,-1)^T
 \]
-（注意：$x_3 \ge 0$ 即 $-x_3 \le 0$，但 $x_3=2>0$，非积极，暂不列入 $M$。）
+\[
+M = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & -1 \end{pmatrix}
+\]
+
+\subsubsection{计算梯度}
+\[
+\nabla f = \begin{pmatrix} 2x_1 - x_2 \\ 4x_2 - x_1 \\ 2x_3 + 1 \end{pmatrix},\quad
+\nabla f^{(0)} = \begin{pmatrix} 3 \\ 9 \\ 1 \end{pmatrix}
+\]
 
 \subsubsection{计算投影矩阵}
 
-$MM^T = \begin{pmatrix}2&0\\0&2\end{pmatrix} = 2I$，$(MM^T)^{-1} = \frac{1}{2}I$。
-\[
-M^T(MM^T)^{-1}M = \frac{1}{2}M^T M
-\]
-\[
-\frac{1}{2}
-\begin{pmatrix} 1&-1\\1&1\\0&0 \end{pmatrix}
-\begin{pmatrix} 1&1&0\\-1&1&0 \end{pmatrix}
-= \frac{1}{2}\begin{pmatrix}2&0&0\\0&2&0\\0&0&0\end{pmatrix}
-= \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}
-\]
-\[
-P = I - M^T(MM^T)^{-1}M = \begin{pmatrix}0.5&0&-0.5\\0&0&0\\-0.5&0&0.5\end{pmatrix}
-\]
+$MM^T = \begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}\begin{pmatrix}1&0\\1&0\\0&-1\end{pmatrix} = \begin{pmatrix}2&0\\0&1\end{pmatrix}$
 
-搜索方向：$d^{(0)} = -P\nabla f^{(0)} = (1.5,\ 0,\ -1.5)^T$。
+$(MM^T)^{-1} = \begin{pmatrix}1/2&0\\0&1\end{pmatrix}$
 
-\medskip
-\refslide{12可行方向法}{44}{12.38}
-\medskip
+$M^T(MM^T)^{-1} = \begin{pmatrix}1&0\\1&0\\0&-1\end{pmatrix}\begin{pmatrix}1/2&0\\0&1\end{pmatrix} = \begin{pmatrix}1/2&0\\1/2&0\\0&-1\end{pmatrix}$
+
+$M^T(MM^T)^{-1}M = \begin{pmatrix}1/2&0\\1/2&0\\0&-1\end{pmatrix}\begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix} = \begin{pmatrix}1/2&1/2&0\\1/2&1/2&0\\0&0&1\end{pmatrix}$
+
+$P = I - M^T(MM^T)^{-1}M = \begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}$
+
+\textbf{搜索方向}：$d^{(0)} = -P\nabla f^{(0)} = -\begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}\begin{pmatrix}3\\9\\1\end{pmatrix} = -\begin{pmatrix}-3\\3\\0\end{pmatrix} = \begin{pmatrix}3\\-3\\0\end{pmatrix}$
+
+验证：沿 $d^{(0)}$ 移动，$x_1$ 增 3，$x_2$ 减 3，满足 $x_1+x_2=6$（切方向），$x_3$ 不变（保持 $x_3=0$）。
 
 \subsubsection{一维搜索}
 
-$X^{(0)} + \lambda d^{(0)} = (2+1.5\lambda,\ 2,\ 2-1.5\lambda)^T$。代入 $f$ 得单变量函数：
-\[
-\phi(\lambda) = 4.5\lambda^2 - 4.5\lambda + 14
-\]
-$\phi'(\lambda) = 9\lambda - 4.5 = 0 \Rightarrow \lambda_0 = 0.5$。
+$X^{(0)} + \lambda d^{(0)} = (3+3\lambda,\ 3-3\lambda,\ 0)^T$。
 
-$X^{(1)} = (2.75,\ 2,\ 1.25)^T$。
+代入 $f$：
+\[
+\phi(\lambda) = (3+3\lambda)^2 + 2(3-3\lambda)^2 - (3+3\lambda)(3-3\lambda) + 0 + 0
+\]
+展开：
+\begin{align*}
+(3+3\lambda)^2 &= 9 + 18\lambda + 9\lambda^2 \\
+2(3-3\lambda)^2 &= 2(9 - 18\lambda + 9\lambda^2) = 18 - 36\lambda + 18\lambda^2 \\
+-(3+3\lambda)(3-3\lambda) &= -(9 - 9\lambda^2) = -9 + 9\lambda^2
+\end{align*}
+\begin{align*}
+\phi(\lambda) &= (9+18\lambda+9\lambda^2) + (18-36\lambda+18\lambda^2) + (-9+9\lambda^2) \\
+&= 18 - 18\lambda + 36\lambda^2
+\end{align*}
+
+$\phi'(\lambda) = -18 + 72\lambda = 0 \Rightarrow \lambda_0 = 1/4 = 0.25$。
+
+$X^{(1)} = (3+0.75,\ 3-0.75,\ 0)^T = (3.75,\ 2.25,\ 0)^T$。此时 $x_3=0$ 仍积极。
 
 \subsubsection{第二次迭代与 KKT 判定}
 
-在 $X^{(1)}$ 继续 Rosen 法。新的 $d^{(1)} = 0$（因为 $\nabla f^{(1)}$ 在各积极约束的法向量张成空间中），检查 KKT 乘子。若乘子均非负，则 $X^{(1)}$ 是 KKT 点。
+在 $X^{(1)} = (3.75, 2.25, 0)^T$：
+\[
+\nabla f^{(1)} = \begin{pmatrix} 2(3.75)-2.25 \\ 4(2.25)-3.75 \\ 2(0)+1 \end{pmatrix} = \begin{pmatrix} 5.25 \\ 5.25 \\ 1 \end{pmatrix}
+\]
 
-检查 $f$ 的凸性：$\nabla^2 f = \begin{pmatrix}2&-1&0\\-1&4&0\\0&0&2\end{pmatrix}$，顺序主子式 $2>0, 8-1=7>0, 2\times 7 = 14>0$，正定。$f$ 是凸函数，约束为线性 → 凸规划 → KKT 点即全局最优。
+积极约束不变（$x_1+x_2=6$ 和 $x_3=0$），$M$ 不变，$P$ 不变。
 
+$d^{(1)} = -P\nabla f^{(1)} = -\begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}\begin{pmatrix}5.25\\5.25\\1\end{pmatrix} = -\begin{pmatrix}0\\0\\0\end{pmatrix} = (0,0,0)^T$
+
+$d^{(1)} = 0$，说明在当前积极约束集内梯度已在法向量张成空间中。检查 KKT 乘子：
+\[
+\lambda = -(MM^T)^{-1}M\nabla f^{(1)} = -\begin{pmatrix}1/2&0\\0&1\end{pmatrix}\begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}\begin{pmatrix}5.25\\5.25\\1\end{pmatrix}
+\]
+\[
+M\nabla f^{(1)} = \begin{pmatrix}10.5\\-1\end{pmatrix},\quad
+\lambda = -\begin{pmatrix}5.25\\-1\end{pmatrix} = \begin{pmatrix}-5.25\\1\end{pmatrix}
+\]
+
+$\lambda_1 = -5.25 < 0$（对应等式约束 $x_1+x_2=6$）——说明该约束的 KKT 乘子为负？等等，等式约束的乘子可以取任意实数值，不等式约束的乘子必须 $\ge 0$。
+
+对等式约束 $h=0$，KKT 条件中乘子 $\mu$ 无符号限制。$\mu = -5.25$ 是可以的。对不等式约束 $x_3 \ge 0$（$-x_3 \le 0$），乘子 $\lambda_2 = 1 > 0$，满足非负条件。
+
+$d^{(1)} = 0$ 且不等式乘子 $\ge 0$，$X^{(1)}$ 是 KKT 点。
+
+检查凸性：$\nabla^2 f = \begin{pmatrix}2&-1&0\\-1&4&0\\0&0&2\end{pmatrix}$，顺序主子式 $2>0$, $8-1=7>0$, $2\times7=14>0$，正定。$f$ 凸，约束线性 → 凸规划 → KKT 点即全局最优。
+
+最优解 $X^* = (3.75, 2.25, 0)^T$，$f^* = 3.75^2 + 2(2.25)^2 - 3.75\times 2.25 = 14.0625 + 10.125 - 8.4375 = 15.75$。
+
+\medskip
+\refslide{12可行方向法}{44}{12.38}
 \medskip
 \refslide{12可行方向法}{46}{12.40}
 \medskip
 
 \subsection{9.6 罚函数法}
 
-罚函数法的基本思想：\emph{把约束优化转化为无约束优化}。
+罚函数法的基本思想：\emph{把约束优化转化为无约束优化}。对违反约束的行为加惩罚项，惩罚力度逐步加大，使无约束解序列趋于原约束问题的解。
 
-\subsubsection{外点法（SUMT——序列无约束极小化技术）}
+\medskip
+PPT第13章开头两页给出了罚函数法的引入动机和SUMT框架，这是理解三种罚函数法的共同基础。
+\medskip
+\refslide{13罚函数法}{2}{13.1}
+\medskip
+\refslide{13罚函数法}{3}{13.2}
+\medskip
+
+\subsubsection{9.6.1 外点法（SUMT）}
 
 \begin{defbox}
 \textbf{外点罚函数}
@@ -154,91 +270,197 @@ $X^{(1)} = (2.75,\ 2,\ 1.25)^T$。
 P(x, \sigma) = f(x) + \sigma \sum_i [\max\{0, g_i(x)\}]^2
                + \sigma \sum_j h_j(x)^2
 \]
-其中 $\sigma > 0$ 是\emph{罚因子}。当 $x$ 违反约束时，惩罚项为正。$\sigma$ 逐步增大，迫使惩罚项趋近于零。
+$\sigma > 0$ 是\emph{罚因子}。当 $x$ 违反约束时，惩罚项 $>0$。$\sigma$ 逐步增大，罚款越来越重，最优解被迫回到可行域附近。
 
-序列：选递增序列 $\sigma_1 < \sigma_2 < \cdots \to \infty$，对每个 $\sigma_k$ 求解 $\min_x P(x, \sigma_k)$，得 $x^{(k)}$。$x^{(k)} \to x^*$（原问题最优解）。
+序列：选 $\sigma_1 < \sigma_2 < \cdots \to \infty$，对每个 $\sigma_k$ 求解 $\min_x P(x, \sigma_k)$，得 $x^{(k)}$。$x^{(k)} \to x^*$。
 \end{defbox}
 
-\medskip
-\refslide{13罚函数法}{2}{13.1}
-\medskip
-\refslide{13罚函数法}{3}{13.2}
-\medskip
+\textbf{为什么叫"外点法"、为什么允许不可行中间点？}
+外点法对违反约束的惩罚是"从零开始逐渐加码"的。中间迭代点往往不在可行域内（在"外部"），因为罚因子不够大时，惩罚项的威慑力不足以把解完全拉进可行域。\emph{这种"先不管约束、逐步逼近"的策略是外点法的核心特征}——它从可行域外向可行域收敛。优点是初始点不需要可行；缺点是中间结果不可用（不可行），且 $\sigma \to \infty$ 时 Hessian 条件数爆炸。
 
-\begin{notebox}
-\textbf{为什么叫"外点法"？} 中间迭代点可以\emph{不满足约束}（在可行域外部），随着 $\sigma \to \infty$ 才逐渐趋向可行域。这是"从可行域外部逼近"的意思。
-\end{notebox}
+\subsubsection{外点法教学算例}
 
-\subsubsection{内点法（障碍法）}
+\textbf{自编例题}：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ x_1 + x_2 = 1$。（精确解：$x_1^* = x_2^* = 0.5$, $f^* = 0.5$, $\lambda^* = -1$）
 
-与外点法相反，内点法\emph{始终保持在可行域内部}，通过加一个"障碍项"来防止迭代点靠近边界。
+\textbf{外点法求解}：
+\[
+P(x, \sigma) = x_1^2 + x_2^2 + \sigma(x_1 + x_2 - 1)^2
+\]
+令 $\nabla P = 0$：
+\begin{align*}
+\frac{\partial P}{\partial x_1} &= 2x_1 + 2\sigma(x_1 + x_2 - 1) = 0 \\
+\frac{\partial P}{\partial x_2} &= 2x_2 + 2\sigma(x_1 + x_2 - 1) = 0
+\end{align*}
+两式相减得 $2x_1 = 2x_2$，故 $x_1 = x_2$。代入第一式：
+\[
+x_1 + \sigma(2x_1 - 1) = 0 \;\Rightarrow\; x_1(1+2\sigma) = \sigma \;\Rightarrow\; x_1 = \frac{\sigma}{1+2\sigma}
+\]
+
+\textbf{迭代两步}：
+\begin{itemize}
+  \item $\sigma_1 = 1$：$x^{(1)} = (\frac{1}{3}, \frac{1}{3})^T$，$x_1+x_2 = \frac{2}{3}$（不满足约束，在可行域外），$f = \frac{2}{9} \approx 0.222$
+  \item $\sigma_2 = 10$：$x^{(2)} = (\frac{10}{21}, \frac{10}{21})^T \approx (0.476, 0.476)^T$，$x_1+x_2 \approx 0.952$（更接近可行），$f \approx 0.454$
+  \item 极限 $\sigma \to \infty$：$x \to (0.5, 0.5)^T$，回到可行域，$f^* = 0.5$
+\end{itemize}
+可见外点法从"外部"（$x_1+x_2 < 1$）逐步逼近约束，每步的点都不完全可行。
+
+\subsubsection{9.6.2 内点法（障碍法）}
+
+与外点法相反，内点法\emph{始终保持在可行域内部}，通过加一个"障碍项"来阻止迭代点靠近边界。
 
 \begin{defbox}
-\textbf{内点障碍函数}（对仅含不等式约束的问题）
+\textbf{内点障碍函数}（对仅含不等式约束的问题 $g_i(x) \le 0$）
 
+\textbf{倒数障碍}：
 \[
 B(x, r) = f(x) + r \sum_i \frac{-1}{g_i(x)}
 \]
-或
+\textbf{对数障碍}：
 \[
 B(x, r) = f(x) - r \sum_i \ln(-g_i(x))
 \]
-其中 $r > 0$ 是障碍因子。$r \to 0^+$ 时障碍项的影响逐渐消失。
+$r > 0$ 是障碍因子。$r \to 0^+$ 时障碍项的影响逐渐消失。
 
-要求：$x$ 必须严格可行（$g_i(x) < 0$），否则障碍项无定义。
+\textbf{严格可行初始点}：$x$ 必须满足 $g_i(x) < 0$（严格内部），否则 $\frac{-1}{g_i(x)}$ 或 $\ln(-g_i(x))$ 无定义。
 \end{defbox}
 
+\textbf{为什么内点法要求严格可行内部点？}
+障碍项在 $g_i(x) \to 0^-$（逼近边界）时 $\to +\infty$，形成一堵"无形的墙"，阻止迭代点越界。如果从可行域外部出发，障碍项符号反转（变成"吸引力"而非"排斥力"），完全失去障碍作用。因此内点法\emph{必须从严格可行内部点出发}，且一维搜索必须限制步长保证不越界。
+
+\medskip
+PPT展示了内点法的障碍函数构造和几何示意图。
 \medskip
 \refslide{13罚函数法}{15}{13.14}
 \medskip
 
-\subsubsection{乘子法（增广 Lagrange 法）}
+\subsubsection{内点法教学算例}
 
-外点法的缺点是 $\sigma \to \infty$ 时 Hessian 条件数爆炸，数值困难。乘子法通过引入 Lagrange 乘子和一个二次惩罚项，避免了 $\sigma \to \infty$ 的需求。
+同一问题改写为不等式形式：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ 1 - x_1 - x_2 \le 0$（即 $x_1 + x_2 \ge 1$）。
+
+\textbf{内点法求解}（用对数障碍）：
+\[
+B(x, r) = x_1^2 + x_2^2 - r \ln(x_1 + x_2 - 1)
+\]
+令 $\nabla B = 0$：
+\begin{align*}
+\frac{\partial B}{\partial x_1} &= 2x_1 - \frac{r}{x_1+x_2-1} = 0 \\
+\frac{\partial B}{\partial x_2} &= 2x_2 - \frac{r}{x_1+x_2-1} = 0
+\end{align*}
+两式相减得 $x_1 = x_2$。代入：$2x_1 = \frac{r}{2x_1-1}$，即 $4x_1^2 - 2x_1 - r = 0$。
+\[
+x_1 = \frac{2 + \sqrt{4 + 16r}}{8} = \frac{1 + \sqrt{1 + 4r}}{4}
+\]
+
+\textbf{迭代两步}：
+\begin{itemize}
+  \item $r_1 = 1$：$x^{(1)} = (\frac{1+\sqrt{5}}{4}, \frac{1+\sqrt{5}}{4})^T \approx (0.809, 0.809)^T$，$x_1+x_2 \approx 1.618 > 1$（严格可行内部），$f \approx 1.309$
+  \item $r_2 = 0.1$：$x^{(2)} = (\frac{1+\sqrt{1.4}}{4}, \frac{1+\sqrt{1.4}}{4})^T \approx (0.546, 0.546)^T$，$x_1+x_2 \approx 1.092$（逼近边界），$f \approx 0.596$
+  \item 极限 $r \to 0^+$：$x \to (0.5, 0.5)^T$，$f^* = 0.5$
+\end{itemize}
+内点法始终从"内部"（$x_1+x_2 > 1$）逼近边界，与外点法方向相反。
+
+\subsubsection{9.6.3 乘子法（增广 Lagrange 法）}
+
+外点法的致命弱点：$\sigma \to \infty$ 时 Hessian 的条件数也 $\to \infty$，导致无约束子问题越来越病态，数值求解困难。乘子法通过引入 Lagrange 乘子估计，\emph{避免了 $\sigma \to \infty$ 的需求}。
 
 \begin{defbox}
-\textbf{增广 Lagrange 函数}（对等式约束）
+\textbf{增广 Lagrange 函数}（对等式约束 $h_j(x)=0$）
 
 \[
 L_A(x, \lambda, \sigma) = f(x) + \sum_j \lambda_j h_j(x) + \frac{\sigma}{2}\sum_j h_j(x)^2
 \]
-乘子更新公式：$\lambda_j^{(k+1)} = \lambda_j^{(k)} + \sigma h_j(x^{(k)})$。
+乘子更新公式：$\lambda_j^{(k+1)} = \lambda_j^{(k)} + \sigma\, h_j(x^{(k)})$。
 
-乘子法的关键优势：$\sigma$ 不需要趋于无穷。通过不断更新乘子估计，$\lambda^{(k)}$ 收敛到真实的 Lagrange 乘子，$x^{(k)}$ 收敛到 $x^*$。
+算法：
+\begin{enumerate}
+  \item 选初始乘子 $\lambda^{(0)}$ 和罚因子 $\sigma > 0$（固定不变！）
+  \item 对 $k=0,1,2,\dots$ 求解 $\min_x L_A(x, \lambda^{(k)}, \sigma)$ 得 $x^{(k)}$
+  \item 若 $\|h(x^{(k)})\|$ 足够小则停止；否则更新 $\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$，$k \leftarrow k+1$
+\end{enumerate}
 \end{defbox}
 
+\textbf{为什么 $\sigma$ 不需要趋于无穷？}
+关键在于乘子更新公式 $\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。当 $x^{(k)}$ 不满足约束时，$h(x^{(k)}) \neq 0$，乘子被修正以"补偿"违反量。随着 $\lambda^{(k)}$ 逼近真实乘子 $\lambda^*$，原问题的 KKT 条件被逐步满足，不需要靠 $\sigma \to \infty$ 来强力施压。增广项 $\frac{\sigma}{2}h^2$ 的作用是"拉弯"Hessian 使 $L_A$ 在 $x^*$ 附近凸且良态，但收敛主要靠乘子迭代驱动。
+
+\medskip
+PPT这两页展示了乘子法的基本思想和增广Lagrange函数的构造。
 \medskip
 \refslide{13罚函数法}{25}{13.24}
 \medskip
 \refslide{13罚函数法}{26}{13.25}
 \medskip
 
-\subsection{9.7 三种方法的对比}
+\subsubsection{乘子法教学算例}
 
-\begin{defbox}
-\textbf{表 9.1：约束优化方法对比}
+同一问题：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ x_1 + x_2 = 1$。取 $\sigma = 1$（固定），$\lambda^{(0)} = 0$。
+
+\textbf{增广 Lagrange 函数}：
+\[
+L_A(x, \lambda, \sigma) = x_1^2 + x_2^2 + \lambda(x_1+x_2-1) + \frac{1}{2}(x_1+x_2-1)^2
+\]
+
+令 $\nabla L_A = 0$：
+\begin{align*}
+2x_1 + \lambda + (x_1+x_2-1) &= 0 \\
+2x_2 + \lambda + (x_1+x_2-1) &= 0
+\end{align*}
+故 $x_1 = x_2$。$2x_1 + \lambda + (2x_1 - 1) = 0$，$x_1(2+2) = 1 - \lambda$，$x_1 = \frac{1-\lambda}{4}$。
+
+\textbf{迭代过程}：
+\begin{itemize}
+  \item $k=0$：$\lambda^{(0)} = 0$，$x^{(0)} = (\frac{1}{4}, \frac{1}{4})^T$，$h = x_1+x_2-1 = -0.5$
+  \item $\lambda^{(1)} = 0 + 1 \times (-0.5) = -0.5$
+  \item $k=1$：$x^{(1)} = (\frac{1.5}{4}, \frac{1.5}{4})^T = (0.375, 0.375)^T$，$h = 0.75 - 1 = -0.25$
+  \item $\lambda^{(2)} = -0.5 + (-0.25) = -0.75$
+  \item $k=2$：$x^{(2)} = (\frac{1.75}{4}, \frac{1.75}{4})^T = (0.4375, 0.4375)^T$，$h = -0.125$
+  \item $\lambda^{(3)} = -0.75 + (-0.125) = -0.875$
+  \item $k=3$：$x^{(3)} = (\frac{1.875}{4}, \frac{1.875}{4})^T = (0.46875, 0.46875)^T$
+\end{itemize}
+
+序列 $x^{(k)} \to (0.5, 0.5)^T$，$\lambda^{(k)} \to -1$（真实乘子），而 $\sigma = 1$ 从未改变。对比外点法：外点法需要 $\sigma \to \infty$ 才能逼近精确解，乘子法用固定 $\sigma$ 配合乘子更新即可。
+
+\begin{notebox}
+\textbf{乘子更新公式的直觉}：$\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。如果 $h > 0$（$x$ 超出约束），加大 $\lambda$ 使下一轮增广 Lagrange 函数更"惩罚"正的 $h$，把 $x$ 拉回来。如果 $h < 0$，减小 $\lambda$ 把 $x$ 推回去。这就是"乘子自适应调整"的因果机制。
+\end{notebox}
+
 \medskip
-{\footnotesize
-\begin{tabular}{lccc}
-& \textbf{外点法} & \textbf{内点法} & \textbf{乘子法} \\ \toprule
-迭代点位置 & 可行域外 & 严格可行域内 & 均可 \\
-参数 & $\sigma\to\infty$ & $r\to 0^+$ & $\sigma$固定 \\
-稳定性 & 差 & 中等 & 好 \\
-适用性 & 等式+不等式 & 仅不等式 & 等式+不等式
-\end{tabular}
-}
-\end{defbox}
-
+PPT展示了乘子法的收敛性质：乘子序列收敛到真实乘子，这是乘子法优于纯外点法的理论保障。
 \medskip
 \refslide{13罚函数法}{31}{13.30}
+\medskip
+
+\subsection{9.7 三种罚函数法的对比}
+
+\begingroup\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& \textbf{外点法（SUMT）} & \textbf{内点法（障碍法）} & \textbf{乘子法（增广Lagrange）} \\
+\midrule
+迭代点位置 & 可行域外部 & 严格可行域内部 & 两者均可 \\
+关键参数 & $\sigma \to \infty$ & $r \to 0^+$ & $\sigma$ 固定 \\
+参数趋势 & 递增 & 递减 & 不变 \\
+收敛驱动 & 惩罚力度 $\uparrow$ & 障碍力度 $\downarrow$ & 乘子迭代 \\
+中间结果 & 不可用（不可行） & 可用（始终可行） & 可用 \\
+等式约束 & 支持 & \textbf{不支持} & 支持 \\
+数值稳定性 & 差（$\sigma$大时病态） & 中等 & \textbf{好} \\
+初始点要求 & 任意 & 严格可行内部点 & 任意 \\
+\bottomrule
+\end{tabular}
+\endgroup
+
 \medskip
 
 \subsection{本章速查}
 
 \begin{itemize}
-  \item Rosen 投影法：$P = I - M^T(MM^T)^{-1}M$，$d = -P\nabla f$
-  \item 积极约束集维护：步长被新约束限 $\to$ 加入；$d=0$ 且有 $\lambda_i<0$ $\to$ 移除
-  \item 外点法：$P(x,\sigma) = f(x) + \sigma\sum[\max(0,g_i)]^2$，$\sigma \to \infty$
-  \item 内点法：$B(x,r) = f(x) + r\sum(-1/g_i)$，$r \to 0^+$
-  \item 乘子法：增广 Lagrange 函数 + 乘子迭代，$\sigma$ 不需趋于无穷
+  \item \textbf{可行方向法框架}：$x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$，$\nabla f^T d < 0$ 且 $d$ 可行
+  \item \textbf{积极约束}：取等号的不等式约束，决定可行方向范围
+  \item \textbf{Rosen 投影法}：$P = I - M^T(MM^T)^{-1}M$，$d = -P\nabla f$
+  \item \textbf{积极集维护}：步长被新约束限 $\to$ 加入；$d=0$ 且 $\lambda_i<0$ $\to$ 移除该约束
+  \item \textbf{Zoutendijk 法}：LP 子问题找方向，适用线性约束
+  \item \textbf{外点法}：$P(x,\sigma) = f + \sigma\sum[\max(0,g_i)]^2 + \sigma\sum h_j^2$，$\sigma \to \infty$
+  \item \textbf{内点法}：$B(x,r) = f - r\sum\ln(-g_i)$ 或 $f + r\sum(-1/g_i)$，$r \to 0^+$
+  \item \textbf{乘子法}：$L_A = f + \sum\lambda_j h_j + \frac{\sigma}{2}\sum h_j^2$，$\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$
+  \item \textbf{乘子法优势}：$\sigma$ 不需趋于无穷，数值稳定，兼具 Lagrange 乘子的理论优雅
+  \item \textbf{外点 vs 内点 vs 乘子}：外点"从外往里逼"、内点"从里往外逼"、乘子"自适应校准"
 \end{itemize}

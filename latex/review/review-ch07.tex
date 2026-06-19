@@ -5,9 +5,9 @@
 
 \subsection{7.1 从线性对偶到非线性对偶}
 
-第3章讲的线性规划对偶，结论非常漂亮：强对偶定理成立，对偶间隙为零。到了非线性规划，事情变得复杂——强对偶不总是成立。
+第3章讲线性规划对偶，结论非常漂亮：强对偶定理成立，对偶间隙为零。到了非线性规划，事情变得复杂——强对偶不总是成立，对偶间隙可能大于零。
 
-非线性对偶的核心工具是 \textbf{Lagrange 对偶函数}。思路：把约束"价格化"（乘子），问在没有约束的情况下，目标+惩罚的最坏情况是什么。
+非线性对偶的核心工具是 \textbf{Lagrange 对偶函数}。思路：把约束"价格化"（乘子），问在乘子固定的情况下，无约束问题的最坏（最小）情况是什么。这个下确界（inf）给出了原问题最优值的一个下界。
 
 \subsection{7.2 Lagrange 对偶函数}
 
@@ -24,103 +24,166 @@
 \begin{defbox}
 \textbf{定义 7.1（Lagrange 对偶函数）}
 
-给定乘子 $\lambda \ge 0$（对不等式约束）和 $\mu$（对等式约束），定义 Lagrange 对偶函数：
+对不等式约束引入乘子 $\lambda_i \ge 0$，对等式约束引入乘子 $\mu_j$（无符号限制），定义 Lagrange 函数：
 \[
-\theta(\lambda, \mu) = \inf_{x \in X} \left\{ f(x) + \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p \mu_j h_j(x) \right\}
+L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p \mu_j h_j(x)
 \]
-即在乘子给定的情况下，对 $x$ 取下确界。对偶函数提供了原问题最优值的下界。
+则 \textbf{Lagrange 对偶函数} 为：
+\[
+\theta(\lambda,\mu) = \inf_{x \in X} L(x,\lambda,\mu)
+\]
+即在乘子\emph{固定}的条件下，对 $x$ 取下确界。
 \end{defbox}
 
 \medskip
-\refslide{7最优性条件}{34}{7.22}
-\medskip
-\refslide{7最优性条件}{35}{7.23}
-\medskip
-
-\begin{notebox}
-\textbf{为什么要取下确界？} 原问题是带约束的 $\min$。取下确界相当于"放松了所有约束，但用乘子给予奖惩"——得到的值是原问题的一个下界。乘子不同，下界也不同。
-\end{notebox}
-
-\subsection{7.3 弱对偶定理（恒成立）}
-
-\begin{defbox}
-\textbf{定理 7.1（弱对偶定理）}
-
-设 $x$ 是原问题的任意可行解，$(\lambda, \mu)$ 是任意对偶乘子（$\lambda \ge 0$）。则恒有：
-\[
-f(x) \ge \theta(\lambda, \mu)
-\]
-因此：
-\[
-\min\ f(x) \ge \max_{\lambda \ge 0,\ \mu}\ \theta(\lambda, \mu)
-\]
-即：原最优值 $\ge$ 对偶最优值。这个差值称为\emph{对偶间隙}。
-\end{defbox}
-
-\medskip
-\refslide{7最优性条件}{36}{7.24}
-\medskip
-
-\textbf{弱对偶不需要任何条件}——不需要凸性，不需要约束规格，永远成立。
-
-\subsection{7.4 强对偶定理（需要条件）}
-
-\begin{defbox}
-\textbf{定理 7.2（强对偶定理）}
-
-若原问题为凸规划（$f$ 凸，$g_i$ 凸，$h_j$ 仿射）且 Slater 条件成立（存在严格可行点使 $g_i(x) < 0$），则：
-\[
-\min\ f(x) = \max_{\lambda \ge 0,\ \mu}\ \theta(\lambda, \mu)
-\]
-且对偶问题的最优解（乘子）就是原问题 KKT 条件中的乘子。
-\end{defbox}
-
-\medskip
-\refslide{7最优性条件}{48}{7.32}
-\medskip
-
-\subsection{7.5 真题示例：第六题(3)(4)——非线性对偶与变量消元}
-
-回到第六题：
-\[
-\min\ x_1^2 + x_2^2,\quad \text{s.t.}\ (x_1-1)^3 - x_2^2 = 0
-\]
-
-\subsubsection{(3) 变量消元法的正确性}
-
-有人尝试：从约束解出 $x_2^2 = (x_1-1)^3$，代入目标函数得：
-\[
-\min\ x_1^2 + (x_1-1)^3
-\]
-这种做法正确吗？
-
-\textbf{错误！} 遗漏了隐含条件。$x_2^2 = (x_1-1)^3$ 意味着左边 $x_2^2 \ge 0$，所以右边也必须 $\ge 0$：
-\[
-(x_1-1)^3 \ge 0 \quad\Rightarrow\quad x_1 \ge 1
-\]
-代入后的一元问题必须加上 $x_1 \ge 1$：
-\[
-\min\ x_1^2 + (x_1-1)^3,\quad x_1 \ge 1
-\]
-$g(x_1) = x_1^2 + (x_1-1)^3$，$g'(x_1) = 2x_1 + 3(x_1-1)^2 > 0$（当 $x_1 \ge 1$），故 $x_1=1$ 时取最小：$f^* = 1$，$x^* = (1, 0)^T$。若无 $x_1 \ge 1$，原表达式 $x_1^2 + (x_1-1)^3$ 当 $x_1 \to -\infty$ 时 $\to -\infty$，无下界——这就是遗漏隐含约束的后果。
-
+PPT第51页给出了Lagrange对偶的一个具体计算示例，我们在下面用自编例子展示完整的手算过程。
 \medskip
 \refslide{7最优性条件}{51}{7.35}
 \medskip
 
-\subsubsection{(4) 对偶规划}
+\begin{notebox}
+\textbf{为什么取 inf？} 原问题是"在约束条件下最小化 $f(x)$"。引入乘子后，我们\emph{解除}了约束，但用乘子施加惩罚：$g_i(x) \le 0$ 若被违反（$g_i > 0$），则 $\lambda_i g_i$ 为正惩罚项；若满足（$g_i \le 0$），则 $\lambda_i g_i \le 0$ 反而是奖励。取 $\inf_x$ 意味着：在乘子固定时，寻找使"目标 + 惩罚"最小的 $x$。这本质上是把原问题"放松"为一个无约束问题——由于去掉约束后容许的 $x$ 更多，最小值只可能更小（或相等），从而提供了原最优值的下界。乘子不同，下界也不同；最优的下界就是\emph{对偶问题}要寻找的。
+\end{notebox}
 
-构造 Lagrange 对偶函数（仅一个等式约束，乘子为 $\mu$）：
+\subsection{7.3 自编教学例1：手算对偶函数（凸问题，强对偶成立）}
+
+\textbf{原问题：}
 \[
-L(x, \mu) = x_1^2 + x_2^2 + \mu[(x_1-1)^3 - x_2^2]
+\min\ x^2,\quad \text{s.t.}\ x \ge 1
 \]
 
-对偶函数 $\theta(\mu) = \inf_x L(x, \mu)$：
+这是一个凸规划（目标凸，约束 $1-x \le 0$ 中 $g(x)=1-x$ 是凸的（线性））。
+
+\textbf{Step 1：写 Lagrange 函数。} 将约束改写为标准形式 $g(x) \le 0$：
+\[
+g(x) = 1 - x \le 0
+\]
+引入乘子 $\lambda \ge 0$：
+\[
+L(x,\lambda) = x^2 + \lambda(1-x) = x^2 - \lambda x + \lambda
+\]
+
+\textbf{Step 2：对 $x$ 取下确界，得对偶函数 $\theta(\lambda)$。}
+固定 $\lambda \ge 0$，$L(x,\lambda)$ 是 $x$ 的二次函数（开口向上），求驻点：
+\[
+\frac{\partial L}{\partial x} = 2x - \lambda = 0 \quad\Rightarrow\quad x = \frac{\lambda}{2}
+\]
+代入得：
+\[
+\theta(\lambda) = \Bigl(\frac{\lambda}{2}\Bigr)^2 - \lambda\Bigl(\frac{\lambda}{2}\Bigr) + \lambda
+= \frac{\lambda^2}{4} - \frac{\lambda^2}{2} + \lambda
+= \lambda - \frac{\lambda^2}{4}
+\]
+（因为二次系数 $>0$，驻点即全局最小，$\inf$ 就是 $\min$。）
+
+\textbf{Step 3：写出对偶规划。} 对偶问题是最大化 $\theta(\lambda)$：
+\[
+\max_{\lambda \ge 0}\ \theta(\lambda) = \max_{\lambda \ge 0}\ \bigl(\lambda - \tfrac{\lambda^2}{4}\bigr)
+\]
+求导：$\theta'(\lambda) = 1 - \lambda/2 = 0 \Rightarrow \lambda^* = 2$（满足 $\lambda \ge 0$）。
+\[
+\theta^* = \theta(2) = 2 - \frac{4}{4} = 1
+\]
+
+\textbf{Step 4：验证。} 原问题显然有 $x^* = 1$，$f^* = 1$。对偶最优值 $\theta^* = 1$。
+\[
+f^* = \theta^* = 1 \quad\Rightarrow\quad \text{强对偶成立（对偶间隙为零）}
+\]
+原因：问题是凸规划且 Slater 条件成立（存在 $x=2$ 使 $g(2)=1-2=-1<0$）。
+
+\medskip
+PPT第36页讲的就是弱对偶定理：原最优值永远不小于对偶值。我们的例子中 $1 \ge 1$，等式刚好成立（因为凸性保证了强对偶）。
+\medskip
+\refslide{7最优性条件}{52}{7.36}
+\medskip
+
+\subsection{7.4 弱对偶定理（永恒成立）}
+
+\begin{defbox}
+\textbf{定理 7.1（弱对偶定理）}
+
+设 $x$ 是原问题的任意可行解，$(\lambda,\mu)$ 是任意对偶乘子（$\lambda \ge 0$）。则恒有：
+\[
+f(x) \ge \theta(\lambda,\mu)
+\]
+因此：
+\[
+\inf\{\,f(x) \mid \text{可行}\,\} \;\ge\; \sup_{\lambda \ge 0,\,\mu}\ \theta(\lambda,\mu)
+\]
+即：原最优值 $\ge$ 对偶最优值。差值称为\emph{对偶间隙}。
+\end{defbox}
+
+\textbf{弱对偶不需要任何条件}——不需要凸性，不需要约束规格，对任意 $f,g_i,h_j$ 都成立。证明仅用到 $\lambda_i \ge 0$ 和 $g_i(x) \le 0$ 这两个不等式方向一致：
+
+对可行 $x$：$g_i(x) \le 0$ 且 $\lambda_i \ge 0$，故 $\lambda_i g_i(x) \le 0$；$h_j(x)=0$ 故 $\mu_j h_j(x)=0$。于是：
+\[
+L(x,\lambda,\mu) = f(x) + \underbrace{\sum\lambda_i g_i(x)}_{\le 0}
+                      + \underbrace{\sum\mu_j h_j(x)}_{=0}
+                  \le f(x)
+\]
+再对左边取 $\inf_x$（下确界只可能更小）：$\theta(\lambda,\mu) \le L(x,\lambda,\mu) \le f(x)$。得证。
+
+\medskip
+PPT第24页给出了弱对偶定理的完整证明框架，上面给出的就是其核心推理。
+\medskip
+\refslide{7最优性条件}{36}{7.24}
+\medskip
+
+\subsection{7.5 强对偶定理（需要条件）}
+
+\begin{defbox}
+\textbf{定理 7.2（强对偶定理）}
+
+若原问题为凸规划（$f$ 凸，每个 $g_i$ 凸，每个 $h_j$ 仿射）且 Slater 条件成立（存在严格可行点使所有 $g_i(x)<0$），则：
+\[
+\min\ f(x) \;=\; \max_{\lambda \ge 0,\,\mu}\ \theta(\lambda,\mu)
+\]
+且对偶问题的最优乘子就是原问题 KKT 条件中的乘子。
+\end{defbox}
+
+\textbf{为什么强对偶需要条件？} 弱对偶的证明只用了"$\lambda_i g_i \le 0$"这个不等式，它对任意函数都成立。但要让等号成立，需要原问题和对偶问题之间没有"间隙"——这本质上是一个\emph{分离超平面}的存在性问题：把原问题的最优值和对偶变量的可行集分离开。凸性保证了分离超平面的存在（Hahn-Banach 定理的推论），Slater 条件保证了分离是严格的（避免退化）。
+
+\textbf{自编例1满足条件}：$f(x)=x^2$ 凸，$g(x)=1-x$ 线性（凸），Slater 成立，故强对偶成立（我们已验证 $f^*=\theta^*=1$）。
+
+\medskip
+PPT第55页给出了强对偶定理的表述。PPT第39页也涉及相关内容——强对偶保证了对偶方法可用于求解原问题的最优值。
+\medskip
+\refslide{7最优性条件}{55}{7.39}
+\medskip
+
+\begin{notebox}
+\textbf{约束规格的角色}：Slater 条件排除了"约束只在边界上可行"的退化情形。若无 Slater 条件，即使凸问题强对偶也可能失败。例如：$\min\ x$ s.t.\ $x^2 \le 0$（唯一可行点 $x=0$）——虽然凸，但无严格内点，对偶可能出现问题。
+\end{notebox}
+
+\medskip
+PPT第32页展示了Lagrange对偶的一般理论框架和对偶形式。
+\medskip
+\refslide{7最优性条件}{48}{7.32}
+\medskip
+
+\subsection{7.6 自编教学例2：非凸问题与对偶间隙}
+
+\textbf{原问题：}
+\[
+\min\ x^2,\quad \text{s.t.}\ x^3 = 1
+\]
+约束 $x^3 = 1$ 等价于 $x = 1$（实数范围内），故可行域仅一个点，$x^* = 1$，$f^* = 1$。
+
+但注意：等式约束 $h(x)=1-x^3=0$ 中 $h(x)$ 不是仿射函数——问题不满足凸规划条件。
+
+\textbf{构造 Lagrange 对偶。} 等式约束引入乘子 $\mu$（无符号限制）：
+\[
+L(x,\mu) = x^2 + \mu(1 - x^3) = -\mu x^3 + x^2 + \mu
+\]
+对偶函数 $\theta(\mu) = \inf_{x \in \mathbb{R}} L(x,\mu)$。分情形讨论：
+
 \begin{itemize}
-  \item 若 $\mu = 0$：$L(x,0) = x_1^2 + x_2^2$，下确界为 $0$
-  \item 若 $\mu \neq 0$：当 $x_2 \to \infty$ 时（暂忽略约束），$x_2^2 - \mu x_2^2 = (1-\mu)x_2^2$。若 $1-\mu < 0$（即 $\mu > 1$），$x_2^2$ 前面系数为负，$\to -\infty$；更仔细的分析表明对所有 $\mu \neq 0$，下确界都是 $-\infty$
+  \item \textbf{$\mu = 0$：} $L(x,0) = x^2$，$\inf_x x^2 = 0$，故 $\theta(0) = 0$。
+  \item \textbf{$\mu > 0$：} 当 $x \to +\infty$ 时，$-\mu x^3$ 主导且趋于 $-\infty$，故 $\theta(\mu) = -\infty$。
+  \item \textbf{$\mu < 0$：} 当 $x \to -\infty$ 时，$x^3 \to -\infty$，$-\mu x^3 = |\mu|x^3 \to -\infty$，故 $\theta(\mu) = -\infty$。
 \end{itemize}
-故：
+
+因此：
 \[
 \theta(\mu) = \begin{cases}
 0, & \mu = 0 \\
@@ -128,24 +191,125 @@ L(x, \mu) = x_1^2 + x_2^2 + \mu[(x_1-1)^3 - x_2^2]
 \end{cases}
 \]
 
-对偶规划：$\max\ \theta(\mu) = 0$。
+\textbf{对偶规划：} $\displaystyle\max_{\mu}\ \theta(\mu) = 0$，最优值 $\theta^* = 0$。
+
+\textbf{结论：} 原最优值 $f^* = 1$，对偶最优值 $\theta^* = 0$，\textbf{对偶间隙 = 1}。
 
 \begin{notebox}
-\textbf{注意}：原最优值 $f^* = 1$，对偶最优值 $= 0$。对偶间隙 $= 1$。为什么强对偶不成立？因为这个问题\emph{不是凸的}——约束 $(x_1-1)^3 - x_2^2 = 0$ 并非凸约束。弱对偶成立（$1 > 0$），强对偶不成立（间隙不为零）。
+\textbf{为什么会这样？} 核心原因是 $x^3$ 这个三次项：当我们在 Lagrange 函数中解除约束后，$-\mu x^3$ 项使得无论 $\mu$ 取何非零值，三次主导项都会将 $L(x,\mu)$ 拉向 $-\infty$。只有 $\mu=0$ 时对偶函数有限，但此时等价于完全忽略约束——对偶函数退化，无法提供紧的下界。
+
+这正是\emph{非凸性}导致对偶间隙的根本机制：非凸约束使得 Lagrange 放松后的下确界比原问题的最优值"低太多"。
+\end{notebox}
+
+\subsection{7.7 变量消元法的陷阱}
+
+在处理等式约束时，有人会想：直接从约束解出一个变量代入目标函数，不就变成无约束问题了吗？
+
+\textbf{这是最常见的一种错误。} 原因：等式约束可能隐含不等式限制。
+
+\textbf{典型陷阱}——考虑约束 $x_2^2 = (x_1-1)^3$。如果"解出" $x_2^2$ 代入目标函数，表面上消除了 $x_2$，但实际上丢失了关键信息：
+\[
+x_2^2 = (x_1-1)^3 \quad\Rightarrow\quad (x_1-1)^3 \ge 0 \quad\Rightarrow\quad x_1 \ge 1
+\]
+因为左边 $x_2^2$ 是非负的，右边也必须是。这个 $x_1 \ge 1$ 是\emph{隐含不等式约束}——若不写出来，一元化后的目标可能在 $x_1 < 1$ 处取得更小值，但那是不可行的。
+
+\textbf{正确做法：} 变量消元后，必须显式加上所有隐含的不等式条件。
+
+\subsection{7.8 真题第六题(3)(4)——变量消元与对偶规划}
+
+\begin{examquestion}{6}
+\vspace{-4pt}
+\[
+\min\ x_1^2 + x_2^2,\quad \text{s.t.}\ (x_1-1)^3 - x_2^2 = 0
+\]
+(3) 用变量消元法求解，并指出常见的错误做法；
+(4) 写出 Lagrange 对偶规划，求对偶最优值，说明对偶间隙。
+\end{examquestion}
+
+\subsubsection{(3) 变量消元法的正确与错误}
+
+\textbf{错误做法（考试常见扣分点）：} 从约束直接解出 $x_2^2 = (x_1-1)^3$，代入目标得：
+\[
+\min\ x_1^2 + (x_1-1)^3
+\]
+然后对 $x_1$ 求导找极小——\textbf{错！} 遗漏了隐含条件。
+
+\textbf{正确做法：} 注意到 $x_2^2 \ge 0$ 恒成立，因此：
+\[
+(x_1-1)^3 = x_2^2 \ge 0 \quad\Rightarrow\quad x_1 - 1 \ge 0 \quad\Rightarrow\quad x_1 \ge 1
+\]
+变量消元后的正确问题是：
+\[
+\min\ x_1^2 + (x_1-1)^3,\quad \text{s.t.}\ x_1 \ge 1
+\]
+令 $g(x_1) = x_1^2 + (x_1-1)^3$，则：
+\[
+g'(x_1) = 2x_1 + 3(x_1-1)^2 > 0 \quad (\text{当 } x_1 \ge 1)
+\]
+故 $g$ 在 $[1, +\infty)$ 上严格递增，最小值在 $x_1 = 1$ 处取得：
+\[
+f^* = g(1) = 1^2 + 0^3 = 1,\quad x^* = (1, 0)^T
+\]
+
+\textbf{若遗漏 $x_1 \ge 1$ 会怎样？} $x_1^2 + (x_1-1)^3$ 当 $x_1 \to -\infty$ 时，三次项主导且系数为正，$x_1^3 \to -\infty$，但注意 $(x_1-1)^3$ 当 $x_1$ 为大的负数时 $x_1^2$ 是正的，$(x_1-1)^3$ 也是很大的负数……实际上当 $x_1 \to -\infty$：$x_1^2$ 正二次增长，$(x_1-1)^3 \approx x_1^3$ 是三次负增长，三次主导，所以表达式 $\to -\infty$。无下界——这就是遗漏隐含约束的灾难性后果。
+
+\subsubsection{(4) 对偶规划}
+
+约束为等式 $h(x) = (x_1-1)^3 - x_2^2 = 0$，引入乘子 $\mu$（无符号限制）：
+\[
+L(x,\mu) = x_1^2 + x_2^2 + \mu\bigl[(x_1-1)^3 - x_2^2\bigr]
+\]
+
+整理：
+\[
+L(x,\mu) = x_1^2 + \mu(x_1-1)^3 + (1-\mu)x_2^2
+\]
+
+对偶函数 $\theta(\mu) = \inf_{x} L(x,\mu)$：
+
+\begin{itemize}
+  \item \textbf{关于 $x_1$：} $x_1^2 + \mu(x_1-1)^3$。当 $\mu \neq 0$，若 $x_1 \to +\infty$（$\mu>0$）或 $x_1 \to -\infty$（$\mu<0$），三次项主导；更精细的分析表明除 $\mu=0$ 外，关于 $x_1$ 的 inf 都是 $-\infty$。当 $\mu=0$：$x_1^2$ 的 inf 是 0。
+
+  \item \textbf{关于 $x_2$：} $(1-\mu)x_2^2$。若 $1-\mu < 0$（即 $\mu > 1$），当 $x_2 \to \infty$ 时 $\to -\infty$。若 $1-\mu \ge 0$（即 $\mu \le 1$），最小值为 0（在 $x_2=0$ 处）。
+\end{itemize}
+
+综合考虑——当 $\mu = 0$ 时两项的 inf 都是 0，故 $\theta(0) = 0$。对任意 $\mu \neq 0$，至少有一项可以拉向 $-\infty$（$\mu<0$ 时 $x_1$ 项，$\mu \in (0,1]$ 时 $x_1$ 项，$\mu>1$ 时两项均可），故 $\theta(\mu) = -\infty$。
+
+\[
+\theta(\mu) = \begin{cases}
+0, & \mu = 0 \\
+-\infty, & \mu \neq 0
+\end{cases}
+\]
+
+\textbf{对偶规划：} $\displaystyle\max_{\mu}\ \theta(\mu) = 0$。
+
+\textbf{结论：}
+\[
+\text{原最优值 } f^* = 1,\quad \text{对偶最优值 } \theta^* = 0,\quad \text{对偶间隙 } = 1
+\]
+
+\begin{notebox}
+\textbf{为什么强对偶不成立？} 约束 $(x_1-1)^3 - x_2^2 = 0$ 中，$(x_1-1)^3$ 不是 $x_1$ 的凸函数（它是奇函数形状，有拐点），因此整个问题\emph{不是凸规划}。弱对偶仍然成立（$1 > 0$，确实 $f^* \ge \theta^*$），但强对偶不成立。
+
+这个考题的设计意图正是要说明：一旦离开凸规划的领地，对偶间隙就可能出现。
 \end{notebox}
 
 \medskip
-\refslide{7最优性条件}{52}{7.36}
+PPT第22-23页覆盖了二阶条件，第34页覆盖了一般约束下的最优性条件基础——理解KKT条件后才能深入对偶理论。
 \medskip
-\refslide{7最优性条件}{55}{7.39}
+\refslide{7最优性条件}{34}{7.22}
+\medskip
+\refslide{7最优性条件}{35}{7.23}
 \medskip
 
 \subsection{本章速查}
 
 \begin{itemize}
-  \item Lagrange 对偶函数：$\theta(\lambda,\mu) = \inf_{x\in X} \{f(x) + \sum\lambda_i g_i(x) + \sum\mu_j h_j(x)\}$
-  \item 弱对偶定理：$f(x) \ge \theta(\lambda,\mu)$，永恒成立
-  \item 强对偶定理：需凸规划 + 约束规格，原最优值 = 对偶最优值
-  \item 对偶间隙：原-对偶最优值之差，非凸问题可能 $>0$
-  \item 变量消元陷阱：必须保留隐含不等式约束（如 $x^2 \ge 0$ 带来的 $x_1 \ge 1$）
+  \item Lagrange 对偶函数：$\theta(\lambda,\mu) = \inf_{x\in X} \{\,f(x) + \sum\lambda_i g_i(x) + \sum\mu_j h_j(x)\,\}$
+  \item 弱对偶定理：$f(x) \ge \theta(\lambda,\mu)$ 恒成立（无须任何条件），证明核心是 $\lambda_i g_i(x) \le 0$
+  \item 强对偶定理：需要凸规划（$f$ 凸，$g_i$ 凸，$h_j$ 仿射）+ 约束规格（如 Slater），保证 $f^* = \theta^*$
+  \item 对偶间隙：原最优值 $-$ 对偶最优值，非凸问题可能 $>0$
+  \item 变量消元陷阱：必须保留隐含不等式约束（如 $x^2 \ge 0$ 等非负约束自动传递）
+  \item 考试核心手法：对偶函数分 $\mu=0$ 和 $\mu\neq0$ 讨论 inf，三次项主导导致 $-\infty$ 是典型考点
 \end{itemize}
