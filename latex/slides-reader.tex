@@ -85,24 +85,24 @@
 }
 
 % ============================================================
-%  \leafgridcell — 内部用
+%  \leafgridcell — 内部用：#1=文件名, #2=页码, #3=章节号
 % ============================================================
-\newcommand{\leafgridcell}[2]{%
+\newcommand{\leafgridcell}[3]{%
   \ifnum#2=0
     \emptycell
   \else
-    \refslide{#1}{#2}{#2}%
+    \refslide{#1}{#2}{#3.#2}%
   \fi
 }
 
 % ============================================================
-%  \leafslidepair{文件}{p1}{p2} — 一页两张幻灯片
+%  \leafslidepair{文件}{p1}{p2}{章节号} — 一页两张幻灯片
 %  页码填 0 表示空白
 % ============================================================
-\newcommand{\leafslidepair}[3]{%
+\newcommand{\leafslidepair}[4]{%
   \vspace{1mm}%
-  \noindent\leafgridcell{#1}{#2}\par
-  \vspace{2mm}\noindent\leafgridcell{#1}{#3}\par
+  \noindent\leafgridcell{#1}{#2}{#4}\par
+  \vspace{2mm}\noindent\leafgridcell{#1}{#3}{#4}\par
   \clearpage
 }
 
@@ -130,8 +130,13 @@
 \ExplSyntaxOn
 \int_new:N \l_slides_count_int
 \tl_new:N \l_slides_prev_tl
+\tl_new:N \l_chapter_num_tl
 
 \cs_new:Npn \slidesdata #1#2 {
+  % 从章节名提取章节号（如 "2数学基础" → "2"）
+  \regex_extract_once:nnN {^(\d+)} {#1} \l_tmpa_seq
+  \seq_pop:NN \l_tmpa_seq \l_tmpa_tl           % 丢弃完整匹配
+  \seq_pop:NN \l_tmpa_seq \l_chapter_num_tl    % 捕获组1 = 章节号
   \clist_set:Nn \l_tmpa_clist {#2}
   \int_zero:N \l_slides_count_int
   \clist_map_inline:Nn \l_tmpa_clist {
@@ -139,11 +144,11 @@
     \int_compare:nNnTF { \int_mod:nn { \l_slides_count_int } { 2 } } = { 1 } {
       \tl_set:Nn \l_slides_prev_tl {##1}
     } {
-      \leafslidepair{#1}{\l_slides_prev_tl}{##1}
+      \leafslidepair{#1}{\l_slides_prev_tl}{##1}{\l_chapter_num_tl}
     }
   }
   \int_compare:nNnT { \int_mod:nn { \l_slides_count_int } { 2 } } = { 1 } {
-    \leafslidepair{#1}{\l_slides_prev_tl}{0}
+    \leafslidepair{#1}{\l_slides_prev_tl}{0}{\l_chapter_num_tl}
   }
 }
 
