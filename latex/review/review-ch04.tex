@@ -45,15 +45,16 @@
 
 \begin{notebox}
 \textbf{原始单纯形 vs 对偶单纯形对比}：
-\[
-\begin{array}{l|c|c}
-& \text{原始单纯形} & \text{对偶单纯形} \\ \hline
-\text{先选什么} & \text{进基变量（最大正检验数）} & \text{离基变量（最负 $b$ 值）} \\
-\text{后选什么} & \text{离基（最小比值）} & \text{进基（最小 $\sigma_j/|a_{rj}|$）} \\
-\text{比值在哪算} & \text{进基列中计算} & \text{离基行中计算} \\
-\text{状态变化} & \text{保持原始可行，趋向对偶可行} & \text{保持对偶可行，趋向原始可行}
-\end{array}
-\]
+\medskip
+{\small
+\begin{tabular}{lcc}
+& \textbf{原始单纯形} & \textbf{对偶单纯形} \\ \toprule
+先选什么 & 进基（最大正检验数） & 离基（最负 $b$ 值） \\
+后选什么 & 离基（最小比值） & 进基（$\min\sigma_j/|a_{rj}|$） \\
+比值位置 & 进基列 & 离基行 \\
+状态变化 & 原始可行 $\to$ 对偶可行 & 对偶可行 $\to$ 原始可行
+\end{tabular}
+}
 \end{notebox}
 
 \subsection{4.3 灵敏度分析}

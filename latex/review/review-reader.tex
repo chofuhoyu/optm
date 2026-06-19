@@ -16,6 +16,10 @@
 \pagestyle{empty}
 \setlength{\fboxsep}{0pt}
 
+% 容忍小幅度溢出（<12pt），给行内公式更多断行机会
+\setlength{\hfuzz}{30pt}
+\setlength{\emergencystretch}{1em}
+
 % === 宏包 ===
 \usepackage{graphicx}
 \usepackage{amsmath, amssymb}

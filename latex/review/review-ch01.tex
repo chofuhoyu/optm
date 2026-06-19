@@ -13,10 +13,10 @@
 一般形式的线性规划问题写为：
 \[
 \begin{aligned}
-\min\ (\text{或}\max)\ & c_1 x_1 + c_2 x_2 + \cdots + c_n x_n \\
-\text{s.t.}\ & a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n \le b_i,\quad i\in I_1 \\
-& a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n \ge b_i,\quad i\in I_2 \\
-& a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n = b_i,\quad i\in I_3 \\
+\min\ (\text{或}\max)\ & \sum_{j=1}^n c_j x_j \\
+\text{s.t.}\ & \sum_{j=1}^n a_{ij} x_j \le b_i,\quad i\in I_1 \\
+& \sum_{j=1}^n a_{ij} x_j \ge b_i,\quad i\in I_2 \\
+& \sum_{j=1}^n a_{ij} x_j = b_i,\quad i\in I_3 \\
 & x_j \ge 0,\quad j\in J
 \end{aligned}
 \]

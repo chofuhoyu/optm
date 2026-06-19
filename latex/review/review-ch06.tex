@@ -39,7 +39,11 @@ L(x, \lambda) = f(x) + \sum_{i=1}^m \lambda_i h_i(x)
 
 考虑一般约束问题：
 \[
-\min\ f(x),\quad \text{s.t.}\ g_i(x) \le 0\ (i=1,\dots,m),\ h_j(x)=0\ (j=1,\dots,p)
+\begin{aligned}
+\min\ & f(x) \\
+\text{s.t.}\ & g_i(x) \le 0 \quad (i=1,\dots,m) \\
+& h_j(x) = 0 \quad (j=1,\dots,p)
+\end{aligned}
 \]
 
 \begin{defbox}
@@ -106,17 +110,16 @@ KKT 条件在 FJ 条件的基础上\emph{加上约束规格}（constraint qualif
 
 \begin{defbox}
 \textbf{表 6.1：FJ 与 KKT 的区别}
-
-\[
-\begin{array}{l|l|l}
-& \text{FJ 条件} & \text{KKT 条件} \\ \hline
-\lambda_0 & \ge 0\text{，可以为 }0 & \text{归一化为 }1\ (\lambda_0 \neq 0) \\
-\text{约束规格} & \text{不需要} & \text{必须满足} \\
-\text{适用性} & \text{所有局部极小点} & \text{仅满足约束规格的局部极小点} \\
-\text{信息量} & \text{可能退化（$\lambda_0=0$）} & \text{始终包含梯度信息} \\
-\text{考试地位} & \text{更一般的理论框架} & \text{实际求解的主要工具}
-\end{array}
-\]
+\medskip
+{\small
+\begin{tabular}{lcc}
+& \textbf{FJ} & \textbf{KKT} \\ \toprule
+$\lambda_0$ & $\ge 0$，可为零 & 归一化为 $1$ \\
+约束规格 & 不需要 & 必须满足 \\
+适用局部极小点 & 所有 & 仅满足约束规格的 \\
+信息量 & $\lambda_0=0$时退化 & 始终含梯度信息
+\end{tabular}
+}
 \end{defbox}
 
 \medskip

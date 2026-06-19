@@ -101,7 +101,10 @@ M = \begin{pmatrix} 1 & 1 & 0 \\ -1 & 1 & 0 \end{pmatrix}
 
 $MM^T = \begin{pmatrix}2&0\\0&2\end{pmatrix} = 2I$，$(MM^T)^{-1} = \frac{1}{2}I$。
 \[
-M^T(MM^T)^{-1}M = \frac{1}{2}M^T M = \frac{1}{2}
+M^T(MM^T)^{-1}M = \frac{1}{2}M^T M
+\]
+\[
+\frac{1}{2}
 \begin{pmatrix} 1&-1\\1&1\\0&0 \end{pmatrix}
 \begin{pmatrix} 1&1&0\\-1&1&0 \end{pmatrix}
 = \frac{1}{2}\begin{pmatrix}2&0&0\\0&2&0\\0&0&0\end{pmatrix}
@@ -148,7 +151,8 @@ $X^{(1)} = (2.75,\ 2,\ 1.25)^T$。
 
 对约束问题 $\min\{f(x) \mid g_i(x) \le 0,\ h_j(x)=0\}$，构造罚函数：
 \[
-P(x, \sigma) = f(x) + \sigma \left(\sum_i [\max\{0, g_i(x)\}]^2 + \sum_j h_j(x)^2 \right)
+P(x, \sigma) = f(x) + \sigma \sum_i [\max\{0, g_i(x)\}]^2
+               + \sigma \sum_j h_j(x)^2
 \]
 其中 $\sigma > 0$ 是\emph{罚因子}。当 $x$ 违反约束时，惩罚项为正。$\sigma$ 逐步增大，迫使惩罚项趋近于零。
 
@@ -173,7 +177,11 @@ P(x, \sigma) = f(x) + \sigma \left(\sum_i [\max\{0, g_i(x)\}]^2 + \sum_j h_j(x)^
 \textbf{内点障碍函数}（对仅含不等式约束的问题）
 
 \[
-B(x, r) = f(x) + r \sum_i \left(-\frac{1}{g_i(x)}\right) \quad\text{或}\quad f(x) - r \sum_i \ln(-g_i(x))
+B(x, r) = f(x) + r \sum_i \frac{-1}{g_i(x)}
+\]
+或
+\[
+B(x, r) = f(x) - r \sum_i \ln(-g_i(x))
 \]
 其中 $r > 0$ 是障碍因子。$r \to 0^+$ 时障碍项的影响逐渐消失。
 
@@ -209,15 +217,16 @@ L_A(x, \lambda, \sigma) = f(x) + \sum_j \lambda_j h_j(x) + \frac{\sigma}{2}\sum_
 
 \begin{defbox}
 \textbf{表 9.1：约束优化方法对比}
-\[
-\begin{array}{l|c|c|c}
-& \text{外点法} & \text{内点法} & \text{乘子法} \\ \hline
-\text{迭代点位置} & \text{可行域外} & \text{严格可行域内} & \text{均可} \\
-\text{参数趋势} & \sigma \to \infty & r \to 0^+ & \sigma\text{ 固定} \\
-\text{数值稳定性} & \text{差（条件数大）} & \text{中等} & \text{好} \\
-\text{适用性} & \text{等式+不等式} & \text{仅不等式} & \text{等式+不等式}
-\end{array}
-\]
+\medskip
+{\footnotesize
+\begin{tabular}{lccc}
+& \textbf{外点法} & \textbf{内点法} & \textbf{乘子法} \\ \toprule
+迭代点位置 & 可行域外 & 严格可行域内 & 均可 \\
+参数 & $\sigma\to\infty$ & $r\to 0^+$ & $\sigma$固定 \\
+稳定性 & 差 & 中等 & 好 \\
+适用性 & 等式+不等式 & 仅不等式 & 等式+不等式
+\end{tabular}
+}
 \end{defbox}
 
 \medskip
