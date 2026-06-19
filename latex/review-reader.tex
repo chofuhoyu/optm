@@ -32,7 +32,7 @@
   \fbox{%
     \begin{tikzpicture}[baseline=(img.south)]
       \node[inner sep=0] (img) {%
-        \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, keepaspectratio]%
+        \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=0.40\textheight, keepaspectratio]%
           {../material/#1.pdf}%
       };
       \node[fill=black, text=white, font=\tiny\bfseries,
