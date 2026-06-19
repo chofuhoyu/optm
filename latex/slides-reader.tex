@@ -2,7 +2,7 @@
 % ============================================================
 %  Leaf5 专属排版 — 1680×1264 屏幕
 %  每页 2 张幻灯片（上下排列），适合 e-ink 阅读
-%  老师幻灯片 → 单线框 (\scell)
+%  老师幻灯片 → 单线框 (\refslide)
 %  自己笔记   → 双线框 (\ncell)
 % ============================================================
 \documentclass[12pt]{ctexart}
@@ -15,6 +15,7 @@
 ]{geometry}
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
+\setlength{\fboxsep}{0pt}
 
 % === 宏包 ===
 \usepackage{graphicx}
@@ -22,6 +23,7 @@
 \usepackage{pgffor}
 \usepackage{xcolor}
 \usepackage{amsmath, amssymb}
+\usepackage{tikz}
 
 % ============================================================
 %  单元格尺寸：每页 2 张（上下各一）
@@ -34,20 +36,24 @@
 \setlength{\leafcellheight}{0.46\textheight}
 
 % ============================================================
-%  \scell{文件名}{页码} — 老师幻灯片（单线框）
+%  \refslide{文件名}{页码}{标签} — 老师幻灯片（单线框 + 右上角页码标签）
+%  高度 = (textheight - fbox边框4×fboxrule - 4pt间距 - headroom) / 2
 % ============================================================
-\newcommand{\scell}[2]{%
-  \fbox{%
-    \begin{minipage}[t][\leafcellheight][c]{\dimexpr\leafcellwidth-2\fboxsep-2\fboxrule\relax}
-      \centering
-      \vspace{0pt}%
-      \includegraphics[%
-        page=#2,%
-        width=\dimexpr\leafcellwidth-2\fboxsep-2\fboxrule-6mm\relax,%
-        height=\dimexpr\leafcellheight-2\fboxsep-2\fboxrule-3mm\relax,%
-        keepaspectratio%
-      ]{../material/#1.pdf}%
-    \end{minipage}%
+\newlength{\refslideheadroom}
+\setlength{\refslideheadroom}{16pt}
+\newcommand{\refslide}[3]{%
+  \centerline{%
+    \fbox{%
+      \begin{tikzpicture}[baseline=(img.south)]
+        \node[inner sep=0] (img) {%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
+            {../material/#1.pdf}%
+        };
+        \node[fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
+              inner sep=1.5pt, outer sep=0pt,
+              anchor=north east] at (img.north east) {#3};
+      \end{tikzpicture}%
+    }%
   }%
 }
 
@@ -85,7 +91,7 @@
   \ifnum#2=0
     \emptycell
   \else
-    \scell{#1}{#2}%
+    \refslide{#1}{#2}{#2}%
   \fi
 }
 
