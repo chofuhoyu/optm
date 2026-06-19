@@ -26,3 +26,6 @@ Thumbs.db
 
 # Playwright MCP
 .playwright-mcp/
+
+# Compiled PDFs
+latex/*.pdf
