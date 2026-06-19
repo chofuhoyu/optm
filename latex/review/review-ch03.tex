@@ -1,0 +1,178 @@
+% ============================================================
+%  第3章：对偶理论
+% ============================================================
+\section{第3章 \quad 对偶理论}
+
+\subsection{3.1 什么是对偶}
+
+每一个线性规划问题（称为\emph{原问题}，Primal）天然对应着另一个线性规划问题（称为\emph{对偶问题}，Dual）。对偶不是凭空造的——它从 Lagrange 乘子的角度自然产生：对每个约束赋予一个"价格"（对偶变量），问"在什么价格下，用约束资源换目标下降最划算"。
+
+对偶的用途极广：
+\begin{itemize}
+  \item 一个问题的对偶有时比原问题更易求解
+  \item 弱/强对偶定理为最优性提供了验证工具（互补松弛条件）
+  \item 灵敏度分析直接建立在原-对偶关系上
+\end{itemize}
+
+\subsection{3.2 对偶关系表}
+
+从任意形式的 LP 构造它的对偶，只需查表。
+
+\begin{defbox}
+\textbf{表 3.1：原-对偶对应关系}
+\[
+\begin{array}{c|c}
+\text{原问题（极小化 $\min$）} & \text{对偶问题（极大化 $\max$）} \\ \hline
+\text{约束 } i \text{ 是 } \le  & \text{变量 } w_i \ge 0 \\
+\text{约束 } i \text{ 是 } \ge  & \text{变量 } w_i \le 0 \\
+\text{约束 } i \text{ 是 } =    & \text{变量 } w_i \text{ 为自由变量} \\
+\text{变量 } x_j \ge 0          & \text{约束 } j \text{ 是 } \le  \\
+\text{变量 } x_j \le 0          & \text{约束 } j \text{ 是 } \ge  \\
+\text{变量 } x_j \text{ 自由}   & \text{约束 } j \text{ 是 } =  \\
+\end{array}
+\]
+\end{defbox}
+
+\medskip
+\refslide{6对偶理论}{3}{6.1}
+\medskip
+\refslide{6对偶理论}{6}{6.4}
+\medskip
+
+\begin{notebox}
+\textbf{记忆技巧}：原问题 $\min$ $\to$ 对偶 $\max$。原约束不等号↔对偶变量符号方向一致（$\le$ → $\ge 0$），原变量符号↔对偶约束不等号方向相反（$x_j \ge 0$ → 约束 $\le$）。考试中建议\emph{直接背表}，不要现推——容易出错。
+\end{notebox}
+
+\subsection{3.3 弱对偶定理}
+
+\begin{defbox}
+\textbf{定理 3.1（弱对偶定理）}
+
+设 $x$ 是原问题（$\min\ c^T x$）的任意可行解，$w$ 是对偶问题（$\max\ b^T w$）的任意可行解。则恒有：
+\[
+c^T x \ge b^T w
+\]
+即：原问题的目标值永远\emph{不会小于}对偶的目标值。
+\end{defbox}
+
+\medskip
+\refslide{6对偶理论}{10}{6.8}
+\medskip
+
+\textbf{推论}：
+\begin{itemize}
+  \item 若原问题无下界（$\min \to -\infty$），则对偶必无可行解
+  \item 若对偶无上界（$\max \to +\infty$），则原问题必无可行解
+  \item 若找到 $c^T x^* = b^T w^*$，则 $x^*$ 和 $w^*$ 分别是原问题和对偶的最优解（最优性充分条件）
+\end{itemize}
+
+\begin{notebox}
+\textbf{弱对偶的几何解释}：对偶问题的最优值是从"下方"逼近原问题最优值的。原最优值 $\ge$ 对偶最优值。这个差值称为\emph{对偶间隙}（duality gap）。对于线性规划，强对偶定理告诉我们间隙为零。
+\end{notebox}
+
+\subsection{3.4 强对偶定理}
+
+\begin{defbox}
+\textbf{定理 3.2（强对偶定理）}
+
+设原问题和对偶问题均可行。则两者都有最优解，且最优值相等：
+\[
+\min\ c^T x = \max\ b^T w
+\]
+\end{defbox}
+
+\medskip
+\refslide{6对偶理论}{11}{6.9}
+\medskip
+
+强对偶定理是线性规划的核心定理之一。它告诉我们：原问题的最优值恰好等于对偶问题的最优值，没有间隙。这是单纯形法能同时给出原最优解和对偶最优解的原因——最优单纯形表中，$z_j - c_j$ 行给出检验数，而基变量的检验数对应的 $c_B^T B^{-1}$ 恰是对偶最优解。
+
+\subsection{3.5 互补松弛条件}
+
+\begin{defbox}
+\textbf{定理 3.3（互补松弛条件）}
+
+设 $x^*$ 和 $w^*$ 分别是原问题和对偶问题的可行解。它们是各自问题的最优解\emph{当且仅当}：
+\[
+\begin{aligned}
+&\text{(1)}\quad w_i^* \cdot (b_i - a_i^T x^*) = 0 \quad \forall i \\
+&\text{(2)}\quad x_j^* \cdot (c_j - w^{*T} a_j) = 0 \quad \forall j
+\end{aligned}
+\]
+\end{defbox}
+
+\medskip
+\refslide{6对偶理论}{15}{6.10}
+\medskip
+
+\begin{notebox}
+\textbf{互补松弛的含义}：
+\begin{itemize}
+  \item 若某个对偶变量 $w_i^* > 0$，则对应的原约束必须是紧的（$a_i^T x^* = b_i$，等式成立）。
+  \item 若原约束是松的（$a_i^T x^* < b_i$），则对应的对偶变量 $w_i^* = 0$。
+  \item 这是"互补"的含义——一个为正，另一个必须为零。
+\end{itemize}
+
+\textbf{考试怎么用？} 已知原（或对偶）最优解，用互补松弛条件反推另一侧的最优解。只需要代入已知值，解方程组即可，不用重新跑单纯形法。
+\end{notebox}
+
+\subsection{3.6 对偶的经济解释：影子价格}
+
+对偶变量 $w_i$ 的绝对值有明确的经济含义——它是第 $i$ 种资源的\emph{影子价格}：如果增加一单位 $b_i$，最优目标值会改变多少（$w_i = \partial z^* / \partial b_i$）。这在灵敏度分析中直接使用。
+
+\subsection{3.7 真题示例：第一题(2)——构造对偶规划}
+
+\begin{notebox}
+\textbf{【2025 真题·第一题(2)】} 写出以下 LP 的对偶规划：
+\[
+\begin{aligned}
+\min\ & 2x_1 - x_2 + x_3 \\
+\text{s.t.}\ & 3x_1 + x_2 + x_3 \le 6 \\
+& x_1 - x_2 + 2x_3 \ge 1 \\
+& x_1 + x_2 - x_3 \le 2 \\
+& x_1, x_2, x_3 \ge 0
+\end{aligned}
+\]
+\end{notebox}
+
+\medskip
+
+\textbf{逐步构造对偶}：
+
+原问题是 $\min$，有 3 个约束和 3 个变量。对偶是 $\max$，有 3 个变量 $w_1,w_2,w_3$ 和 3 个约束。
+
+对照原-对偶关系表：
+\begin{itemize}
+  \item 约束1：$3x_1+x_2+x_3 \le 6$，$\le$ 型 → $w_1 \ge 0$
+  \item 约束2：$x_1-x_2+2x_3 \ge 1$，$\ge$ 型 → $w_2 \le 0$
+  \item 约束3：$x_1+x_2-x_3 \le 2$，$\le$ 型 → $w_3 \ge 0$
+\end{itemize}
+原变量 $x_1,x_2,x_3 \ge 0$ → 对偶约束都是 $\le$ 型。
+
+\textbf{对偶目标}：右端项 $b=(6,1,2)^T$ 做对偶目标系数 → $\max\ 6w_1 + w_2 + 2w_3$。
+
+\textbf{对偶约束}：原目标系数 $(2,-1,1)$ 做对偶右端。约束矩阵转置。得：
+\[
+\begin{aligned}
+\max\ & 6w_1 + w_2 + 2w_3 \\
+\text{s.t.}\ & 3w_1 + w_2 + w_3 \le 2 \qquad (\text{对应 } x_1)\\
+& w_1 - w_2 + w_3 \le -1 \qquad (\text{对应 } x_2, \text{原 } c_2=-1)\\
+& w_1 + 2w_2 - w_3 \le 1 \qquad (\text{对应 } x_3)\\
+& w_1 \le 0,\ w_2 \ge 0,\ w_3 \le 0
+\end{aligned}
+\]
+
+\medskip
+\refslide{6对偶理论}{6}{6.4}
+\medskip
+\refslide{6对偶理论}{10}{6.8}
+\medskip
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item 原-对偶关系表（$\min\leftrightarrow\max$；不等号↔变量符号；变量符号↔不等号反向）
+  \item 弱对偶：$c^T x \ge b^T w$（恒成立，不需要任何条件）
+  \item 强对偶：原和对偶均可行 → 最优值相等（LP 特有）
+  \item 互补松弛：$w_i(b_i-a_i^T x)=0$ 且 $x_j(c_j-w^T a_j)=0$（最优性充要条件）
+\end{itemize}

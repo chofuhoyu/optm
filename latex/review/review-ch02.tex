@@ -1,0 +1,303 @@
+% ============================================================
+%  第2章：单纯形法
+% ============================================================
+\section{第2章 \quad 单纯形法}
+
+\subsection{2.1 为什么要学单纯形法}
+
+第1章告诉我们：标准型 LP 的最优解一定可以在基本可行解（BFS，即极点）上找到。理论上，只需枚举所有 $\binom{n}{m}$ 个 BFS，挑出最优的即可。但 $\binom{50}{25} \approx 10^{14}$，枚举不现实。
+
+单纯形法（Simplex Method）是一种\emph{聪明地}遍历 BFS 的方法：从某个初始 BFS 出发，沿着可行域的棱\emph{只往下降方向}走到相邻的 BFS，直到无法继续下降。每一步只检查少数几个选项，而非全部。
+
+\begin{notebox}
+\textbf{核心思想}：在顶点间跳跃，每一步都必须让目标函数值\emph{严格下降}（或至少不增）。
+\end{notebox}
+
+\medskip
+\refslide{5单纯形方法}{2}{5.1}
+\medskip
+
+\subsection{2.2 检验数的含义}
+
+设当前基为 $B$（$m\times m$），非基矩阵为 $N$。将 $A = [B \mid N]$，$x = (x_B, x_N)^T$，$c = (c_B, c_N)^T$。约束 $Ax=b$ 可写为：
+\[
+Bx_B + Nx_N = b \quad\Rightarrow\quad x_B = B^{-1}b - B^{-1}Nx_N
+\]
+代入目标函数：
+\[
+z = c_B^T x_B + c_N^T x_N = c_B^T B^{-1}b + (c_N^T - c_B^T B^{-1}N)x_N
+\]
+令 $z_0 = c_B^T B^{-1}b$（当前目标值），则：
+\[
+z = z_0 + \sum_{j\in\text{非基}} (c_j - c_B^T B^{-1}a_j)\, x_j
+\]
+
+\begin{defbox}
+\textbf{定义 2.1（检验数）}
+
+非基变量 $x_j$ 的\emph{检验数}（reduced cost）定义为：
+\[
+\sigma_j = z_j - c_j = c_B^T B^{-1} a_j - c_j
+\]
+其中 $z_j = c_B^T B^{-1} a_j$ 是引入一单位 $x_j$ 的"机会成本"。
+
+\textbf{最优性条件}（对 $\min$ 问题）：若所有 $\sigma_j \le 0$，则当前 BFS 为最优解。
+\end{defbox}
+
+\medskip
+\refslide{5单纯形方法}{3}{5.2}
+\medskip
+
+\begin{notebox}
+\textbf{检验数的直觉}：$\sigma_j$ 衡量的是——如果让非基变量 $x_j$ 从 0 增加 1 单位，目标函数会改变多少。对 $\min$ 问题，$\sigma_j \le 0$ 意味着增大任何非基变量都会使目标增大（变差），所以无法进一步下降——已达最优。$\sigma_j > 0$ 意味着增大 $x_j$ 还能改善目标，应该让它进基。
+\end{notebox}
+
+\subsection{2.3 单纯形表}
+
+单纯形表是手工执行单纯形法的标准工具。设基变量 $x_{B_1},\dots,x_{B_m}$。
+
+\begin{defbox}
+\textbf{单纯形表的结构}
+\[
+\begin{array}{c|cccccc|c}
+\text{基} & x_1 & x_2 & \cdots & x_j & \cdots & x_n & b \\ \hline
+x_{B_1} & \bar{a}_{11} & \bar{a}_{12} & \cdots & \bar{a}_{1j} & \cdots & \bar{a}_{1n} & \bar{b}_1 \\
+x_{B_2} & \bar{a}_{21} & \bar{a}_{22} & \cdots & \bar{a}_{2j} & \cdots & \bar{a}_{2n} & \bar{b}_2 \\
+\vdots  & \vdots  & \vdots  & \ddots & \vdots  & \ddots & \vdots  & \vdots  \\
+x_{B_m} & \bar{a}_{m1} & \bar{a}_{m2} & \cdots & \bar{a}_{mj} & \cdots & \bar{a}_{mn} & \bar{b}_m \\ \hline
+\sigma_j & \sigma_1 & \sigma_2 & \cdots & \sigma_j & \cdots & \sigma_n & -z_0
+\end{array}
+\]
+其中 $\bar{A} = B^{-1}A$，$\bar{b} = B^{-1}b$。末行为检验数，末行最后一格是当前目标值的相反数。
+\end{defbox}
+
+\medskip
+\refslide{5单纯形方法}{4}{5.3}
+\medskip
+
+\begin{notebox}
+\textbf{表中规律}：每个基变量对应的列一定是单位向量（如 $x_4$ 为基变量，其列为 $(1,0,0)^T$），且其检验数恒为 0。$b$ 列给出当前 BFS 的各基变量取值。
+\end{notebox}
+
+\subsection{2.4 单纯形迭代：进基、离基、转轴}
+
+假设当前 BFS 非退化，一次迭代由三步组成：
+
+\begin{defbox}
+\textbf{方法 2.1（单纯形法一次迭代）}
+
+\begin{enumerate}
+  \item \textbf{进基选择}：在检验数行中，找\emph{最大的正检验数}对应的非基变量 $x_k$ 进基。若无正检验数，已最优。
+  \item \textbf{离基选择（最小比值原则）}：在 $x_k$ 列中，对所有 $\bar{a}_{ik} > 0$ 的行计算 $\theta_i = \bar{b}_i / \bar{a}_{ik}$。取最小 $\theta_i$ 对应的基变量 $x_r$ 离基。若该列无正系数，问题无下界。
+  \item \textbf{转轴运算（pivot）}：以 $\bar{a}_{rk}$ 为主元，进行行变换使 $x_k$ 列变成单位向量（第 $r$ 行位置为 1，其余为 0），同时更新检验数行。
+\end{enumerate}
+\end{defbox}
+
+\medskip
+\refslide{5单纯形方法}{5}{5.4}
+\medskip
+\refslide{5单纯形方法}{6}{5.5}
+\medskip
+
+\begin{notebox}
+\textbf{最小比值的几何直觉}：$b_i/a_{ik}$ 是沿着 $x_k$ 正方向走\emph{多远}会碰到第 $i$ 个约束边界。取最小值确保我们停在可行域内——超过最近边界就跑出去了。这就是为什么取最小正比值。
+\end{notebox}
+
+\subsection{2.5 初始基本可行解的问题}
+
+单纯形法需要一个初始 BFS 才能开始。但标准化后的矩阵 $A$ 不一定包含单位子阵。
+
+\textbf{什么时候直接有？} 全部是 $\le$ 约束 + $b\ge 0$：加的松弛变量列恰好组成单位阵，对应的松弛变量就是初始基变量，初始 BFS = $(0,\dots,0,b_1,\dots,b_m)^T$。
+
+\textbf{什么时候没有？} 约束中有 $\ge$ 或 $=$：剩余变量列是 $-1$（不能当单位向量），等式约束没有自然添加的变量。
+
+\medskip
+\refslide{5单纯形方法}{15}{5.8}
+\medskip
+
+\subsection{2.6 大M法（Big-M Method）}
+
+\subsubsection{核心动机}
+
+当约束矩阵没有现成的单位子阵时，\emph{人为添加}单位列：在每个缺基变量的行引入\emph{人工变量}（系数 $+1$）。为迫使这些"假的"变量在最优解中为 0，目标函数中对每个人工变量加极大的惩罚系数 $M$（对 $\min$ 问题）。
+
+\begin{defbox}
+\textbf{方法 2.2（大M法）}
+
+\begin{enumerate}
+  \item 每个缺少基变量（即该行无 $+1$ 列）的约束引入人工变量 $x_a \ge 0$，系数 $+1$
+  \item 目标函数加 $M \cdot x_a$：$\min\ c^T x + M\sum x_a$
+  \item 以人工变量+原有松弛变量为初始基，建初始单纯形表
+  \item 正常执行单纯形法。$M$ 极大 → 算法优先赶走人工变量
+  \item 最优时人工变量取值 0 → 得原问题最优解；否则原问题无可行解
+\end{enumerate}
+\end{defbox}
+
+\medskip
+\refslide{5单纯形方法}{48}{5.30}
+\medskip
+\refslide{5单纯形方法}{49}{5.31}
+\medskip
+
+\subsubsection{两阶段法简介}
+
+两阶段法是大M法的替代方案。第一阶段：目标设为 $\min\sum x_a$（最小化人工变量之和），得原问题初始 BFS（如果最优值=0）；第二阶段：去掉人工变量，从该 BFS 出发求解原问题。优点：避免 $M$ 带来的数值问题。考试中大M法更常见。
+
+\subsection{2.7 真题示例：第一题(1)——大M法完整求解}
+
+回到第一题的标准型（见第1章 1.2.3 节）。我们用大M法手工求解全过程。
+
+\subsubsection{引入人工变量}
+
+标准型：
+\[
+\begin{aligned}
+\min\ & 2x_1 - x_2 + x_3 \\
+\text{s.t.}\ & 3x_1 + x_2 + x_3 + x_4 = 6 \\
+& x_1 - x_2 + 2x_3 - x_5 = 1 \\
+& x_1 + x_2 - x_3 + x_6 = 2 \\
+& x_j \ge 0,\ j=1,\dots,6
+\end{aligned}
+\]
+
+第二个约束中 $x_5$ 系数为 $-1$（不是 $+1$），缺基变量。引入人工变量 $x_7 \ge 0$：
+\[
+x_1 - x_2 + 2x_3 - x_5 + x_7 = 1
+\]
+目标函数加 $Mx_7$：
+\[
+\min\ 2x_1 - x_2 + x_3 + Mx_7
+\]
+初始基变量：$x_4$（第1约束松弛）、$x_7$（第2约束人工）、$x_6$（第3约束松弛）。初始 BFS：$X = (0,0,0,6,0,2,1)^T$。
+
+\subsubsection{初始单纯形表}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{center}
+\textbf{表 2.1：第一题初始单纯形表}
+\[
+\begin{array}{c|ccccccc|c}
+\text{基} & x_1 & x_2 & x_3 & x_4 & x_5 & x_6 & x_7 & b \\ \toprule
+x_4 & 3  & 1  & 1  & 1 & 0  & 0 & 0 & 6 \\
+x_7 & 1  & -1 & 2  & 0 & -1 & 0 & 1 & 1 \\
+x_6 & 1  & 1  & -1 & 0 & 0  & 1 & 0 & 2 \\ \midrule
+z_j-c_j & -2+M & 1-M & -1+2M & 0 & -M & 0 & 0 &
+\end{array}
+\]
+\end{center}
+\endgroup
+
+\textbf{检验数计算}（$c_B = (0, M, 0)$）：
+\begin{align*}
+\sigma_1 &= 0\cdot 3 + M\cdot 1 + 0\cdot 1 - 2 = M - 2 \\
+\sigma_2 &= 0\cdot 1 + M\cdot(-1) + 0\cdot 1 - (-1) = 1 - M \\
+\sigma_3 &= 0\cdot 1 + M\cdot 2 + 0\cdot(-1) - 1 = 2M - 1 \\
+\sigma_5 &= 0\cdot 0 + M\cdot(-1) + 0\cdot 0 - 0 = -M
+\end{align*}
+
+\subsubsection{第一次迭代}
+
+\textbf{进基}：检验数最大者为 $x_3$（$2M-1$，$M$ 系数最大）。\\
+\textbf{离基}：计算比值（只看 $x_3$ 列正系数）：
+\[
+\theta_{x_4}=6/1=6,\quad \theta_{x_7}=1/2=0.5,\quad \theta_{x_6}\text{ 系数为负，跳过}
+\]
+$\min=0.5$，$x_7$ 离基。主元 $\bar{a}_{23}=2$。
+
+\textbf{转轴}：第2行除以 2，再用此行消去其他行的 $x_3$ 列。因为 $x_7$ 是人工变量且已离基，可从表中直接删去其列。
+
+\medskip
+\refslide{5单纯形方法}{16}{5.9}
+\medskip
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{center}
+\textbf{表 2.2：第一次迭代后（$x_7$ 列已删除）}
+\[
+\begin{array}{c|cccccc|c}
+\text{基} & x_1 & x_2 & x_3 & x_4 & x_5 & x_6 & b \\ \toprule
+x_4 & 2.5 & 1.5 & 0 & 1 & 0.5  & 0 & 5.5 \\
+x_3 & 0.5 & -0.5& 1 & 0 & -0.5 & 0 & 0.5 \\
+x_6 & 1.5 & 0.5 & 0 & 0 & -0.5 & 1 & 2.5 \\ \midrule
+z_j-c_j & -1.5 & 0.5 & 0 & 0 & -0.5 & 0 &
+\end{array}
+\]
+\end{center}
+\endgroup
+
+检验数行：$x_2$ 对应 $0.5 > 0$，未达最优。
+
+\subsubsection{第二次迭代}
+
+\textbf{进基}：$x_2$（检验数 $0.5 > 0$）。\\
+\textbf{离基}：比值（只看 $x_2$ 列正系数）：
+\[
+\theta_{x_4}=5.5/1.5=11/3,\quad \theta_{x_6}=2.5/0.5=5
+\]
+（$x_3$ 行系数为负，跳过）。$\min = 11/3$，$x_4$ 离基。主元 $\bar{a}_{12}=1.5$。
+
+\textbf{转轴}后得最优表：
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{center}
+\textbf{表 2.3：最优单纯形表}
+\[
+\begin{array}{c|cccccc|c}
+\text{基} & x_1 & x_2 & x_3 & x_4 & x_5 & x_6 & b \\ \toprule
+x_2 & 5/3 & 1 & 0 & 2/3  & 1/3  & 0 & 11/3 \\
+x_3 & 4/3 & 0 & 1 & 1/3  & -1/3 & 0 & 7/3  \\
+x_6 & 2/3 & 0 & 0 & -1/3 & -2/3 & 1 & 2/3  \\ \midrule
+z_j-c_j & -7/3 & 0 & 0 & -1/3 & -2/3 & 0 &
+\end{array}
+\]
+\end{center}
+\endgroup
+
+所有检验数 $\le 0$，已达最优。读出最优解：
+\[
+x_1^* = 0,\quad x_2^* = \frac{11}{3},\quad x_3^* = \frac{7}{3},\quad x_4^* = 0,\quad x_5^* = 0,\quad x_6^* = \frac{2}{3}
+\]
+最优值 $z^* = 2\cdot 0 - 11/3 + 7/3 = -4/3$。
+
+\medskip
+\refslide{5单纯形方法}{24}{5.10}
+\medskip
+
+\begin{notebox}
+\textbf{三种终止判定}：
+\begin{enumerate}
+  \item 所有检验数 $\le 0$ 且基变量中无人工变量 → 得到最优解
+  \item 某检验数 $>0$ 但该列所有系数 $\le 0$ → 问题无界（无下界）
+  \item 所有检验数 $\le 0$ 但某个人工变量仍为正 → 原问题无可行解
+\end{enumerate}
+\end{notebox}
+
+\subsection{2.8 Bland 规则（防循环）}
+
+退化时（某个基变量 = 0），最小比值可能也是 0，导致目标值不变。一连串"不下降"迭代可能导致回到刚访问过的基——\emph{循环}。
+
+\begin{defbox}
+\textbf{Bland 规则}：进基选\emph{下标最小}的正检验数变量；离基时若平局选\emph{下标最小}的变量。
+\end{defbox}
+
+Bland 规则是理论保障——保证有限步终止。实际应用中循环极少发生。
+
+\medskip
+\refslide{5单纯形方法}{7}{5.6}
+\medskip
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item 检验数 $\sigma_j = c_B^T B^{-1} a_j - c_j$（$\min$ 问题 $\le 0$ 为最优）
+  \item 进基：最大正检验数；离基：$\min\{b_i/a_{ik} \mid a_{ik} > 0\}$
+  \item 大M法：缺基 $\to$ 人工变量 $+Mx_a$ $\to$ 单纯形 $\to$ 人工变量须为 0
+  \item 两阶段法：阶段一 $\min\sum x_a$ 找初始 BFS，阶段二求解原问题
+  \item Bland 规则：下标最小的正检验数进基，下标最小的离基
+\end{itemize}

@@ -1,0 +1,261 @@
+% ============================================================
+%  第1章：LP标准型与基本性质
+% ============================================================
+\section{第1章 \quad LP标准型与基本性质}
+
+\subsection{1.1 什么是线性规划}
+
+线性规划（Linear Programming, LP）解决的是这样一类问题：在一组\emph{线性等式/不等式}约束下，求一个\emph{线性目标函数}的最大或最小值。约束和目标函数中的变量都是\emph{连续}的（不要求整数）。
+
+\begin{defbox}
+\textbf{定义 1.1（线性规划的一般形式）}
+
+一般形式的线性规划问题写为：
+\[
+\begin{aligned}
+\min\ (\text{或}\max)\ & c_1 x_1 + c_2 x_2 + \cdots + c_n x_n \\
+\text{s.t.}\ & a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n \le b_i,\quad i\in I_1 \\
+& a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n \ge b_i,\quad i\in I_2 \\
+& a_{i1}x_1 + a_{i2}x_2 + \cdots + a_{in}x_n = b_i,\quad i\in I_3 \\
+& x_j \ge 0,\quad j\in J
+\end{aligned}
+\]
+其中 $c_j$ 称为\emph{目标函数系数}，$a_{ij}$ 称为\emph{约束系数}（或技术系数），$b_i$ 称为\emph{右端常数}，$x_j$ 称为\emph{决策变量}。
+\end{defbox}
+
+\begin{notebox}
+\textbf{为什么叫"线性"？} 目标函数和所有约束都是变量的\emph{一次}函数。没有 $x_1^2$、$x_1 x_2$、$\sin(x_1)$ 这样的项。这意味着可行域是由平面围成的\emph{凸多面体}，而最优解一定可以在某个\emph{顶点}（角点）上找到——这就是单纯形法的几何基础。
+\end{notebox}
+
+\medskip
+\refslide{4线性规划基本性质}{3}{4.1}
+\medskip
+
+\subsection{1.2 线性规划的标准型}
+
+为了用统一的算法——单纯形法——求解任意 LP，我们需要先把问题写成\emph{标准形式}。
+
+\begin{defbox}
+\textbf{定义 1.2（标准型 LP）}
+
+一个线性规划称为\emph{标准型}，当且仅当它同时满足以下四条：
+\begin{enumerate}
+  \item[(1)] 目标函数为 \textbf{极小化}（$\min$）
+  \item[(2)] 所有约束为 \textbf{等式}（$=$）
+  \item[(3)] 所有右端常数 \textbf{非负}（$b_i \ge 0$）
+  \item[(4)] 所有变量 \textbf{非负}（$x_j \ge 0$）
+\end{enumerate}
+
+写成矩阵形式（记 $x=(x_1,\dots,x_n)^T$，$c=(c_1,\dots,c_n)^T$，$b=(b_1,\dots,b_m)^T$，$A=(a_{ij})_{m\times n}$）：
+\[
+\min\ c^T x,\quad \text{s.t.}\ Ax = b,\ x \ge 0,\ b \ge 0
+\]
+\end{defbox}
+
+\medskip
+\refslide{4线性规划基本性质}{5}{4.3}
+\medskip
+
+\subsubsection{任意 LP 化为标准型}
+
+考试中第一步往往是"化标准型"，四条规则必须烂熟于心：
+
+\begin{defbox}
+\textbf{方法 1.1（化标准型四步法）}
+
+\begin{enumerate}
+  \item \textbf{$\max \to \min$}：目标乘 $-1$。即 $\max\ c^T x$ 等价于 $\min\ -c^T x$。
+  \item \textbf{$\le$ 约束}：左端加\emph{松弛变量}（slack variable）。$a^T x \le b$ $\to$ $a^T x + s = b$，其中 $s \ge 0$。
+  \item \textbf{$\ge$ 约束}：左端减\emph{剩余变量}（surplus variable）。$a^T x \ge b$ $\to$ $a^T x - s = b$，其中 $s \ge 0$。
+  \item \textbf{自由变量}：拆成两个非负变量的差。若 $x_j$ 无符号限制，令 $x_j = x_j^+ - x_j^-$ 且 $x_j^+, x_j^- \ge 0$。
+  \item \textbf{$b_i < 0$}：约束两端乘 $-1$，不等号方向反转。
+\end{enumerate}
+\end{defbox}
+
+\begin{notebox}
+\textbf{为什么要求 $b\ge 0$？} 单纯形法用单位阵做初始基，需要右端非负才能直接读出初始基本可行解。如果 $b_i<0$，乘 $-1$ 翻正后，原来的松弛/剩余变量也就不一定能组成单位基了——这就是后面的"人工变量法"要解决的问题。
+\end{notebox}
+
+\medskip
+\refslide{4线性规划基本性质}{7}{4.5}
+\medskip
+
+\subsubsection{真题示例：第一题(1)之标准型化}
+
+\begin{notebox}
+\textbf{【2025 真题·第一题】} 考虑下述线性规划：
+\[
+\begin{aligned}
+\min\ & 2x_1 - x_2 + x_3 \\
+\text{s.t.}\ & 3x_1 + x_2 + x_3 \le 6 \\
+& x_1 - x_2 + 2x_3 \ge 1 \\
+& x_1 + x_2 - x_3 \le 2 \\
+& x_1, x_2, x_3 \ge 0
+\end{aligned}
+\]
+\end{notebox}
+
+\medskip
+
+\textbf{化标准型}。原问题已经是 $\min$，不需要处理目标。
+
+\begin{itemize}
+  \item 第一个约束 $3x_1 + x_2 + x_3 \le 6$：左端\emph{加}松弛变量 $x_4 \ge 0$，化为 $3x_1 + x_2 + x_3 + x_4 = 6$。
+  \item 第二个约束 $x_1 - x_2 + 2x_3 \ge 1$：左端\emph{减}剩余变量 $x_5 \ge 0$，化为 $x_1 - x_2 + 2x_3 - x_5 = 1$。
+  \item 第三个约束 $x_1 + x_2 - x_3 \le 2$：加松弛变量 $x_6 \ge 0$，化为 $x_1 + x_2 - x_3 + x_6 = 2$。
+\end{itemize}
+
+得标准型：
+\[
+\begin{aligned}
+\min\ & 2x_1 - x_2 + x_3 \\
+\text{s.t.}\ & 3x_1 + x_2 + x_3 + x_4 = 6 \\
+& x_1 - x_2 + 2x_3 - x_5 = 1 \\
+& x_1 + x_2 - x_3 + x_6 = 2 \\
+& x_j \ge 0,\ j=1,\dots,6
+\end{aligned}
+\]
+
+注意：标准化后，$x_4$ 和 $x_6$ 的系数列分别是 $(1,0,0)^T$ 和 $(0,0,1)^T$——它们天然构成单位向量。但第二个约束缺少这样的列，需要人工变量（见第2章大M法）。
+
+\subsection{1.3 基、基本解与基本可行解}
+
+标准型 LP 的系数矩阵 $A$ 是 $m \times n$ 的（$m$ 个约束，$n$ 个变量），通常 $m < n$（变量多于方程）。让我们从矩阵的角度理解解的结构。
+
+\begin{defbox}
+\textbf{定义 1.3（基与基变量）}
+
+设 $A = (a_1, a_2, \dots, a_n)$。从中选出 $m$ 个\emph{线性无关}的列向量，组成的 $m\times m$ 方阵记为 $B = (a_{B_1}, \dots, a_{B_m})$，称为一个\emph{基}（basis）。\\
+对应的变量 $(x_{B_1},\dots,x_{B_m})$ 称为\emph{基变量}（basic variables）；\\
+其余 $n-m$ 个变量称为\emph{非基变量}（non-basic variables）。\\
+非基变量对应的列组成的 $m\times(n-m)$ 矩阵记为 $N$。
+\end{defbox}
+
+\medskip
+
+\begin{defbox}
+\textbf{定义 1.4（基本解）}
+
+给定一个基 $B$，令所有非基变量取值为 $0$，从 $B x_B = b$ 解出 $x_B = B^{-1}b$。这样得到的解 $x$ 称为对应于基 $B$ 的\emph{基本解}（basic solution）。
+
+若 $x_B \ge 0$（所有基变量非负），则称其为\emph{基本可行解}（Basic Feasible Solution, BFS）。\\
+若某个基变量恰好等于 $0$，则称其为\emph{退化的}基本可行解。
+\end{defbox}
+
+\medskip
+\refslide{4线性规划基本性质}{8}{4.6}
+\medskip
+
+\refslide{4线性规划基本性质}{9}{4.7}
+\medskip
+
+\begin{notebox}
+\textbf{直观理解}：从 $n$ 个变量中任选 $m$ 个"激活"，其余 $n-m$ 个强制为零，解出的点就是一个基本解。如果这个解碰巧所有分量都 $\ge 0$，那就是可行的——也就是可行域的一个"候选顶点"。最多有多少个基本解？$\binom{n}{m}$ 个，有限个。
+
+\textbf{注意}：同一个 BFS 可能对应多个不同的基（退化情况），但每个 BFS 至少对应一个基。
+\end{notebox}
+
+\subsection{1.4 基本可行解与极点的等价性}
+
+这是线性规划最重要的理论结论之一。
+
+\begin{defbox}
+\textbf{定理 1.1（BFS $\Leftrightarrow$ 极点）}
+
+设可行域 $S = \{x \mid Ax = b,\ x \ge 0\}$ 非空。点 $\bar{x} \in S$ 是 $S$ 的\emph{极点}（extreme point）当且仅当 $\bar{x}$ 是一个\emph{基本可行解}。
+\end{defbox}
+
+\medskip
+\refslide{4线性规划基本性质}{21}{4.16}
+\medskip
+
+\begin{notebox}
+\textbf{这意味着什么？} 可行域的"角点"恰好就是代数的"基本可行解"。我们把几何概念（极点）和代数概念（BFS）建立了严格的一一对应。这使单纯形法能够在代数层面（检验数、比值）来操作几何对象（多面体顶点）。
+\end{notebox}
+
+\subsection{1.5 最优基本可行解的存在性}
+
+单纯形法之所以有效，根植于这个定理：
+
+\begin{defbox}
+\textbf{定理 1.2（最优 BFS 的存在性）}
+
+对于标准型 LP $\min\{c^T x \mid Ax = b,\ x \ge 0\}$：
+\begin{itemize}
+  \item 若可行域非空（$S \neq \emptyset$）且目标函数在 $S$ 上有下界（最优值有限），则\emph{存在一个基本可行解是最优解}。
+  \item 换句话说：LP 的最优值一定可以在极点（BFS）上达到。
+\end{itemize}
+\end{defbox}
+
+\medskip
+\refslide{4线性规划基本性质}{22}{4.17}
+\medskip
+
+这个定理的推论极为重要：我们只需要在\emph{有限个 BFS} 中搜索最优解，而不用考虑可行域内部的无穷多个点。这就是单纯形法"在顶点间跳跃"的理论保证。
+
+\begin{notebox}
+\textbf{为什么这个定理是对的？（直觉版）} 假设 $x^*$ 是最优解但不是 BFS。那么 $x^*$ 是可行域内部（或某个面的内部）的点——它可以表示为若干个极点的凸组合。目标函数在 $x^*$ 处的值是这些极点处值的加权平均。既然是平均，那么至少有一个极点的值 $\le$ 平均值，而这个极点也是最优的。严格的证明见课件。
+\end{notebox}
+
+\subsection{1.6 真题示例：第三题（基本性质证明）}
+
+这道题直接考察最优 BFS 的存在性和极点结构。
+
+\begin{notebox}
+\textbf{【2025 真题·第三题】} 若标准型形式的线性规划有一个不是基本可行解的最优解，试证：它要么有两个或两个以上的最优基本可行解；要么它至少有一个最优基本可行解，但其一个棱可以无限延伸，即可行域内有一条以该最优基本可行解为顶点的射线。
+\end{notebox}
+
+\medskip
+
+\textbf{分析}：题目给定"存在一个非 BFS 的最优解 $x^*$"，要证明两种可能情况之一必成立。
+
+\textbf{证明}：
+
+\emph{第一步：确认至少有一个最优 BFS。}
+
+由定理 1.2，标准型 LP 有最优解（题设 $x^*$ 就是最优解，且最优值有限），则必存在最优基本可行解。记其中一个为 $y^*$。
+
+\emph{第二步：分情况讨论。}
+
+\begin{itemize}
+  \item \textbf{情况 A}：假设有两个或更多的最优 BFS。命题第一部分直接成立。
+  \item \textbf{情况 B}：假设只有一个最优 BFS（即 $y^*$ 是唯一的）。考虑从 $y^*$ 出发、方向为 $d = y^* - x^*$ 的射线：$\{y^* + \lambda d \mid \lambda \ge 0\}$。由目标函数的线性性（$c^T(y^* + \lambda d) = c^T y^* + \lambda c^T d$），且 $c^T y^* = c^T x^*$（两者都是最优），故 $c^T d = 0$，射线上所有点目标值相同，都是最优。而该射线不含其他极点（因为 $y^*$ 是唯一的），$y^*$ 本身又是可行域极点，故射线含于可行域内（否则会引出另一个极点）。命题得证。
+\end{itemize}
+
+\medskip
+\refslide{4线性规划基本性质}{28}{4.23}
+\medskip
+
+\begin{notebox}
+\textbf{这道题的考点}：一、理解 BFS=极点的等价性；二、利用目标函数的线性性（$c^Td = 0$ 推出射线上全是最优解）；三、单极点的极端情况下的几何推理。
+\end{notebox}
+
+\subsection{1.7 表示定理（选读）}
+
+\begin{defbox}
+\textbf{定理 1.3（表示定理）}
+
+标准型 LP 的可行域 $S$ 中的任意点 $x$ 都可以表示为：
+\[
+x = \sum_{i=1}^{k} \lambda_i v_i + \sum_{j=1}^{\ell} \mu_j d_j
+\]
+其中 $v_i$ 是 $S$ 的极点（BFS），$d_j$ 是 $S$ 的极方向（extreme directions），$\lambda_i \ge 0$，$\sum\lambda_i=1$，$\mu_j \ge 0$。
+\end{defbox}
+
+\medskip
+\refslide{4线性规划基本性质}{29}{4.24}
+\medskip
+
+\begin{notebox}
+\textbf{用途}：表示定理将可行域的几何结构完全刻画出来——BFS（极点）+ 极方向。当最优值无界时，目标函数沿某个极方向 $d_j$ 可以无限下降（$c^T d_j < 0$）。表示定理是单纯形法正确性的理论基石。
+\end{notebox}
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item 标准型四要素：$\min$、$=$、$b\ge 0$、$x\ge 0$
+  \item 化标准型：$\max\to\min$（乘$-1$）、$\le$（加松弛）、$\ge$（减剩余）、自由变量（$x^+-x^-$）、$b<0$（乘$-1$）
+  \item 基 $\to$ 基本解 $\to$ 基本可行解（BFS = $x_B \ge 0$）
+  \item BFS $\Leftrightarrow$ 极点（定理 1.1）
+  \item LP 有有限最优值 $\Rightarrow$ 存在最优 BFS（定理 1.2）
+\end{itemize}

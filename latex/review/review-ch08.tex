@@ -1,0 +1,205 @@
+% ============================================================
+%  第8章：无约束优化方法
+% ============================================================
+\section{第8章 \quad 无约束优化方法}
+
+\subsection{8.1 下降算法的通用框架}
+
+无约束优化 $\min f(x)$ 不能用单纯形表——我们没有约束提供的结构。但我们可以用迭代法：从某点出发，每一步选择一个\emph{下降方向}，沿该方向走\emph{合适的步长}。
+
+\begin{defbox}
+\textbf{下降算法通用格式}
+
+给定初始点 $x^{(0)}$。对 $k = 0,1,2,\dots$：
+\[
+x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}
+\]
+其中：
+\begin{itemize}
+  \item $d^{(k)}$ 是\emph{搜索方向}，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$（下降方向）
+  \item $\lambda_k > 0$ 是\emph{步长}，使得 $f(x^{(k+1)}) < f(x^{(k)})$
+\end{itemize}
+\end{defbox}
+
+\medskip
+\refslide{10使用导数的优化算法}{40}{10.1}
+\medskip
+
+不同的无约束优化方法，区别在于\emph{如何选方向}和\emph{如何定步长}。
+
+\subsection{8.2 最速下降法（梯度法）}
+
+\begin{defbox}
+\textbf{最速下降法}
+
+取 $d^{(k)} = -\nabla f(x^{(k)})$（负梯度方向）。这是局部下降最快的方向。步长通过精确线搜索确定：
+\[
+\lambda_k = \argmin_{\lambda \ge 0}\ f(x^{(k)} + \lambda d^{(k)})
+\]
+\end{defbox}
+
+最速下降法实现简单，但收敛慢（呈现锯齿形）。在 Hessian 条件数大时尤为严重。它为理解更高级方法提供了基准。
+
+\subsection{8.3 精确线搜索}
+
+在选定方向 $d^{(k)}$ 后，需要确定步长 $\lambda_k$。精确线搜索求解一元极小化问题 $\min_{\lambda \ge 0}\ \phi(\lambda) = f(x^{(k)} + \lambda d^{(k)})$。
+
+\textbf{做法}：将 $x^{(k)} + \lambda d^{(k)}$ 代入 $f$ 得 $\phi(\lambda)$，求导 $\phi'(\lambda) = 0$ 解出 $\lambda$。
+
+\medskip
+\refslide{9一维搜索}{51}{9.8}
+\medskip
+\refslide{9一维搜索}{52}{9.9}
+\medskip
+
+\subsection{8.4 共轭梯度法}
+
+最速下降法的锯齿现象源于\emph{连续两步的搜索方向是正交的}（一碰就转 90°）。共轭梯度法通过巧妙的递推\emph{构造共轭方向}，使得对正定二次函数 $f(x) = \frac{1}{2}x^T Q x + c^T x$，$n$ 步内精确收敛。
+
+\begin{defbox}
+\textbf{FR（Fletcher-Reeves）共轭梯度法}
+
+初始化：$d^{(0)} = -\nabla f(x^{(0)})$。
+
+对于 $k \ge 1$：
+\[
+\beta_k = \frac{\| \nabla f^{(k)} \|^2}{\| \nabla f^{(k-1)} \|^2}
+\]
+\[
+d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}
+\]
+方向 $d^{(k)}$ 与 $d^{(k-1)}$ 关于 Hessian $Q$ 共轭：$(d^{(k)})^T Q d^{(k-1)} = 0$。
+\end{defbox}
+
+\medskip
+\refslide{10使用导数的优化算法}{46}{10.7}
+\medskip
+
+\begin{notebox}
+\textbf{共轭梯度法为什么好？} 它不需要存储 Hessian 矩阵（存储量 $O(n)$ vs 牛顿法 $O(n^2)$），适合大规模问题；收敛速度远快于最速下降法；利用了过去方向的信息避免了锯齿。
+\end{notebox}
+
+\subsection{8.5 拟牛顿法}
+
+\subsubsection{牛顿法的瓶颈}
+
+牛顿法方向 $d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1} \nabla f(x^{(k)})$ 收敛极快（二次收敛），但需要：一、计算 Hessian 矩阵；二、求 Hessian 逆。两者计算量都很大。
+
+\subsubsection{拟牛顿法的核心思想}
+
+\textbf{不直接算 Hessian 逆，而是用迭代过程中观察到的梯度差来逐步"逼近"它}。
+
+设 $s_{k-1} = x^{(k)} - x^{(k-1)}$（位移差），$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$（梯度差）。拟牛顿条件要求近似 Hessian 逆 $H_k$ 满足：
+\[
+H_k y_{k-1} = s_{k-1}
+\]
+这有明确的几何含义：$H_k$ 沿着方向 $y_{k-1}$ 的"曲率"应该匹配实际观察到的"曲率"。
+
+\subsubsection{DFP 校正公式}
+
+\begin{defbox}
+\textbf{DFP（Davidon-Fletcher-Powell）公式}
+
+从 $H_{k-1}$ 更新到 $H_k$ 的公式为：
+\[
+H_k = H_{k-1} + \underbrace{\frac{s_{k-1} s_{k-1}^T}{s_{k-1}^T y_{k-1}}}_{\text{正定修正}}
+- \underbrace{\frac{H_{k-1} y_{k-1} y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}}_{\text{消去旧曲率信息}}
+\]
+DFP 校的是 $H$（Hessian \textbf{逆}的近似）。方向取 $d^{(k)} = -H_k \nabla f^{(k)}$。
+\end{defbox}
+
+\medskip
+\refslide{10使用导数的优化算法}{91}{10.52}
+\medskip
+\refslide{10使用导数的优化算法}{95}{10.56}
+\medskip
+
+\begin{notebox}
+\textbf{公式记忆}：两个分数项。第一项分子 $s s^T$（秩1矩阵）用位移差修正；第二项用 $Hy$ 消去旧方向上的曲率信息。两项合起来是\emph{秩2校正}。DFP 校 $H$（逆），BFGS 校 $B$（直接近似 Hessian）。
+\end{notebox}
+
+\subsubsection{BFGS 简介}
+
+BFGS 是 DFP 的"互补"方法。BFGS 公式：
+\[
+B_k = B_{k-1} + \frac{y_{k-1} y_{k-1}^T}{y_{k-1}^T s_{k-1}} - \frac{B_{k-1} s_{k-1} s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
+\]
+其中 $B_k \approx \nabla^2 f(x^{(k)})$ 是 Hessian 本身的近似。实际使用中，BFGS 往往比 DFP 更稳定（对一维搜索误差不敏感）。考试中以 DFP 为主。
+
+\subsection{8.6 真题示例：第四题——DFP 拟牛顿法完整求解}
+
+\begin{notebox}
+\textbf{【2025 真题·第四题】}
+\[
+\min\ f(X) = x_1^2 + 2x_2^2 + x_1,\quad X^{(0)} = (2,1)^T,\ H_0 = I
+\]
+用 DFP 方法求解。
+\end{notebox}
+
+\medskip
+
+\subsubsection{第 1 轮迭代}
+
+\textbf{梯度}：$\nabla f = (2x_1+1,\ 4x_2)^T$。在 $X^{(0)}$：$\nabla f^{(0)} = (5,4)^T$。
+
+\textbf{方向}：$d^{(0)} = -H_0 \nabla f^{(0)} = -(5,4)^T$（第一步同最速下降）。
+
+\textbf{一维搜索}：$X^{(0)} + \lambda d^{(0)} = (2-5\lambda,\ 1-4\lambda)^T$。
+\begin{align*}
+\phi(\lambda) &= (2-5\lambda)^2 + 2(1-4\lambda)^2 + (2-5\lambda) \\
+&= 25\lambda^2 - 20\lambda + 4 + 2(16\lambda^2 - 8\lambda + 1) + 2 - 5\lambda \\
+&= (25+32)\lambda^2 + (-20-16-5)\lambda + (4+2+2) \\
+&= 57\lambda^2 - 41\lambda + 8
+\end{align*}
+令 $\phi'(\lambda) = 114\lambda - 41 = 0$，得 $\lambda_0 = 41/114$。
+
+$X^{(1)} = X^{(0)} + \lambda_0 d^{(0)} = (2,1)^T + \frac{41}{114}(-5,-4)^T = \frac{1}{114}(23,-50)^T$。
+
+$\nabla f^{(1)} = (\frac{2\cdot 23}{114}+1,\ \frac{4\cdot(-50)}{114})^T = (\frac{160}{114},\ \frac{-200}{114})^T = \frac{1}{114}(160,-200)^T$。
+
+\medskip
+\refslide{10使用导数的优化算法}{92}{10.53}
+\medskip
+
+\subsubsection{DFP 校正}
+
+$s_0 = X^{(1)} - X^{(0)} = -\frac{41}{114}(5,4)^T$。\\
+$y_0 = \nabla f^{(1)} - \nabla f^{(0)} = \frac{1}{114}(160-570,\ -200-456)^T = \frac{1}{114}(-410,\ -656)^T = -\frac{41}{114}(10,16)^T$。
+
+计算 DFP 各项：
+\begin{align*}
+s_0^T y_0 &= \left(-\frac{41}{114}\right)^2 (5,4)\cdot(10,16) = \left(\frac{41}{114}\right)^2 \cdot 114 = \frac{41^2}{114} \\
+s_0 s_0^T &= \left(\frac{41}{114}\right)^2 \begin{pmatrix}5\\4\end{pmatrix}\begin{pmatrix}5&4\end{pmatrix} = \frac{41^2}{114^2}\begin{pmatrix}25&20\\20&16\end{pmatrix} \\
+y_0^T H_0 y_0 &= y_0^T y_0 = \left(\frac{41}{114}\right)^2 (10^2+16^2) = \frac{41^2}{114^2}\cdot 356
+\end{align*}
+
+代入 DFP 公式得 $H_1$。此处公式展开冗长，核心是：$H_1$ 不再是对角矩阵，它包含了曲率信息。完整结果见课件。
+
+\medskip
+\refslide{10使用导数的优化算法}{96}{10.57}
+\medskip
+
+\subsubsection{第 2 轮迭代}
+
+$d^{(1)} = -H_1 \nabla f^{(1)}$。一维搜索得 $\lambda_1 = 5/57$。$X^{(2)} = (-1/2,\ 0)^T$。
+
+$\nabla f(X^{(2)}) = (0,0)^T$ → 驻点。$\nabla^2 f = \begin{pmatrix}2&0\\0&4\end{pmatrix}$ 正定 → $X^{(2)}$ 是极小点。
+
+\begin{notebox}
+\textbf{DFP 的二次终止性}：对正定二次函数，DFP 法至多 $n$ 轮收敛。此题 $n=2$，恰好两轮到达精确解。这是拟牛顿法的关键理论性质。
+\end{notebox}
+
+\medskip
+\refslide{10使用导数的优化算法}{102}{10.63}
+\medskip
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item 下降算法格式：$x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$，$\nabla f^T d < 0$
+  \item 共轭梯度法（FR）：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$
+  \item 拟牛顿条件：$H_k y_{k-1} = s_{k-1}$
+  \item DFP 公式（秩2校正 $H$）：两项分数修正
+  \item BFGS 公式（秩2校正 $B$）：DFP 的互补公式
+  \item 二次终止性：对正定二次函数至多 $n$ 步收敛
+\end{itemize}

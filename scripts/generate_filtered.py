@@ -33,7 +33,7 @@ def generate():
     with open(os.path.join(SCRIPT_DIR, "notes_config.json"), "r", encoding="utf-8") as f:
         notes = json.load(f)
 
-    output_path = os.path.join(PROJECT_DIR, "latex", "chapters.tex")
+    output_path = os.path.join(PROJECT_DIR, "latex", "slides", "chapters.tex")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     total = 0

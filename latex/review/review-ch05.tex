@@ -1,0 +1,160 @@
+% ============================================================
+%  第5章：凸集与凸函数
+% ============================================================
+\section{第5章 \quad 凸集与凸函数}
+
+\subsection{5.1 为什么非线性规划需要凸性}
+
+线性规划天然是"好的"——可行域是凸多面体，局部最优就是全局最优，单纯形法能保证找到全局最优解。但到了非线性规划，目标函数可能是非凸的，可行域也可能是非凸的，局部最优不等于全局最优。\emph{凸性}（convexity）是判断"局部 $\Rightarrow$ 全局"是否成立的关键。
+
+\begin{notebox}
+\textbf{核心逻辑链}：凸集 $\to$ 凸函数 $\to$ 凸规划 $\to$ 局部极小=全局极小 $\to$ KKT 条件充要。
+\end{notebox}
+
+\subsection{5.2 凸集}
+
+\begin{defbox}
+\textbf{定义 5.1（凸集）}
+
+集合 $C \subseteq \mathbb{R}^n$ 称为\emph{凸集}，如果对任意 $x,y \in C$ 和任意 $\lambda \in [0,1]$，有：
+\[
+\lambda x + (1-\lambda) y \in C
+\]
+即：连接集合内任意两点的线段，整个都在集合内。
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{3}{3.1}
+\medskip
+\refslide{3凸分析}{4}{3.2}
+\medskip
+
+\begin{notebox}
+\textbf{直观理解}：一个集合是凸的，意味着它是"实心"的，没有凹坑或洞。圆盘是凸的，月牙形不是。$\mathbb{R}^n$ 中常见的凸集：超平面、半空间、多面体（$\{x \mid Ax \le b\}$）、球。
+\end{notebox}
+
+\begin{defbox}
+\textbf{定义 5.2（凸组合与凸包）}
+
+点 $x_1,\dots,x_k$ 的\emph{凸组合}是 $\sum_{i=1}^k \lambda_i x_i$，其中 $\lambda_i \ge 0$，$\sum \lambda_i = 1$。
+
+集合 $S$ 的\emph{凸包} $\text{conv}(S)$ 是包含 $S$ 的最小凸集，等于 $S$ 中所有点的凸组合的集合。
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{5}{3.3}
+\medskip
+
+\begin{defbox}
+\textbf{定义 5.3（极点）}
+
+凸集 $C$ 中的点 $x$ 称为\emph{极点}（extreme point），如果它不能表示为 $C$ 中其他两个不同点的严格凸组合。即：不存在 $y \neq z \in C$ 和 $\lambda \in (0,1)$ 使 $x = \lambda y + (1-\lambda)z$。
+\end{defbox}
+
+极点就是凸集的"角"。LP 的 BFS 就是可行域多面体的极点。
+
+\subsection{5.3 凸函数}
+
+\begin{defbox}
+\textbf{定义 5.4（凸函数）}
+
+函数 $f: \mathbb{R}^n \to \mathbb{R}$ 称为\emph{凸函数}，如果对任意 $x,y$ 和 $\lambda \in [0,1]$：
+\[
+f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y)
+\]
+若 $\le$ 改为 $<$（$x\neq y$，$\lambda\in(0,1)$），称为\emph{严格凸}。
+
+若 $-f$ 是凸函数，则 $f$ 为\emph{凹函数}。
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{9}{3.5}
+\medskip
+\refslide{3凸分析}{11}{3.6}
+\medskip
+
+\begin{notebox}
+\textbf{几何含义}：函数图像上任意两点的连线在函数图像\emph{上方}。即"弦在曲线上方"。
+\end{notebox}
+
+\subsection{5.4 凸函数的判别方法}
+
+考试中判断一个函数是否凸，有三层递进方法：
+
+\begin{defbox}
+\textbf{方法 5.1（凸函数三层次判别）}
+
+\textbf{层次一：定义法}。验证 $f(\lambda x+(1-\lambda)y) \le \lambda f(x)+(1-\lambda)f(y)$。仅适用于简单函数或理论证明。
+
+\textbf{层次二：一阶条件（梯度不等式）}。若 $f$ 可微，则 $f$ 凸 $\Leftrightarrow$ 对任意 $x,y$：
+\[
+f(y) \ge f(x) + \nabla f(x)^T (y-x)
+\]
+即：函数图像在任一点切线\emph{上方}。
+
+\textbf{层次三：二阶条件（Hessian 半正定）}。若 $f$ 二次可微，则 $f$ 凸 $\Leftrightarrow$ 对任意 $x$，Hessian 矩阵 $\nabla^2 f(x) \succeq 0$（半正定）。
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{14}{3.8}
+\medskip
+\refslide{3凸分析}{15}{3.9}
+\medskip
+
+\begin{notebox}
+\textbf{考试实用技巧}：判断凸函数最常用的是二阶条件——求 Hessian，检查是否半正定。对于正定二次型 $x^T Q x$，$Q \succeq 0$ 等价于 $Q$ 的所有顺序主子式 $\ge 0$。对于二次函数 $f(x) = \frac{1}{2}x^T Q x + c^T x$，$f$ 凸 $\Leftrightarrow$ $Q \succeq 0$。
+\end{notebox}
+
+\subsection{5.5 凸规划}
+
+\begin{defbox}
+\textbf{定义 5.5（凸规划）}
+
+最优化问题 $\min\{f(x) \mid x \in S\}$ 称为\emph{凸规划}，如果：
+\begin{itemize}
+  \item 可行域 $S$ 是凸集
+  \item 目标函数 $f$ 是凸函数（对 $\min$ 问题）
+\end{itemize}
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{17}{3.10}
+\medskip
+
+\begin{defbox}
+\textbf{定理 5.1（凸规划的核心性质）}
+
+对于凸规划：
+\begin{itemize}
+  \item 任意局部极小点都是全局极小点
+  \item 若 $f$ 严格凸，则全局极小点唯一
+  \item KKT 条件是全局最优性的充要条件（加上约束规格后）
+\end{itemize}
+\end{defbox}
+
+\medskip
+\refslide{3凸分析}{18}{3.11}
+\medskip
+
+\begin{notebox}
+\textbf{这为什么重要？} 第6章讲 FJ/KKT 条件时，KKT 只是一阶必要条件，要确认找到的是全局最优还需要额外条件。凸规划直接给了这个保证——只要问题是凸的，KKT 点就是全局最优。
+\end{notebox}
+
+\subsection{5.6 凸函数的保凸运算}
+
+以下运算保持凸性（考试中快速判断有用）：
+\begin{itemize}
+  \item 凸函数的非负线性组合：$f,g$ 凸，$\alpha,\beta \ge 0$，则 $\alpha f + \beta g$ 凸
+  \item 凸函数与仿射函数的复合：$f$ 凸，则 $f(Ax+b)$ 凸
+  \item 逐点最大值：$f_i$ 凸，则 $\max_i f_i(x)$ 凸
+\end{itemize}
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item 凸集：线段全在集合内。多面体、半空间、超平面都凸
+  \item 凸函数判别：定义法 $\to$ 一阶梯度不等式 $\to$ 二阶 Hessian 半正定
+  \item 凸规划：凸可行域 + 凸目标（对 $\min$） $\Rightarrow$ 局部=全局、KKT 充要
+  \item 严格凸 $\Rightarrow$ 最优解唯一
+  \item Hessian 半正定检查：所有顺序主子式 $\ge 0$
+\end{itemize}

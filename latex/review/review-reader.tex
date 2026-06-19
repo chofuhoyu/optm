@@ -1,0 +1,116 @@
+% !TeX program = xelatex
+% ============================================================
+%  最优化考试速通小册子 — BOOX Leaf5 专属
+%  按知识点编排，2025 真题作为例题嵌入
+% ============================================================
+\documentclass[14pt]{extarticle}
+\usepackage{ctex}
+
+% === 页面设置：适配 Leaf5 屏幕 ===
+\usepackage[
+  paperwidth=126.4mm,
+  paperheight=168.0mm,
+  margin=5mm
+]{geometry}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+\setlength{\fboxsep}{0pt}
+
+% === 宏包 ===
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks,bookmarks=true,bookmarksdepth=2]{hyperref}
+
+% ============================================================
+%  \refslide{文件名}{页码}{标签} — 课件引用（单线框 + 右上角标签）
+%  路径相对于 latex/review/ 需要 ../../material/
+% ============================================================
+\newlength{\refslideheadroom}
+\setlength{\refslideheadroom}{16pt}
+\newcommand{\refslide}[3]{%
+  \centerline{%
+    \fbox{%
+      \begin{tikzpicture}[baseline=(img.south)]
+        \node[inner sep=0] (img) {%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
+            {../material/#1.pdf}%
+        };
+        \node[fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
+              inner sep=1.5pt, outer sep=0pt,
+              anchor=north east] at (img.north east) {#3};
+      \end{tikzpicture}%
+    }%
+  }%
+}
+
+% ============================================================
+%  排版宏
+% ============================================================
+
+% 定义框（定理/定义/性质）
+\newtcolorbox{defbox}{
+  sharp corners,
+  colframe=black!40,
+  colback=white,
+  left=3mm,
+  right=2mm,
+  top=1.5mm,
+  bottom=1.5mm,
+  borderline west={2pt}{0pt}{black!60}
+}
+
+% 注意/提示框
+\newtcolorbox{notebox}{
+  sharp corners,
+  colframe=black!40,
+  colback=white,
+  left=3mm,
+  right=2mm,
+  top=1.5mm,
+  bottom=1.5mm,
+  borderline west={2pt}{0pt}{black!40}
+}
+
+% 考试真题区块
+\newenvironment{examquestion}[1]{%
+  \begin{notebox}
+  \textbf{【真题 #1】}\smallskip\par
+}{%
+  \end{notebox}%
+}
+
+\title{\textbf{最优化理论与算法\\[2mm]考试速通小册子}}
+\author{姚祉圻 \quad 2025018017}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setcounter{secnumdepth}{-1}
+\setcounter{tocdepth}{1}
+
+% ============================================================
+%  第一部分：线性规划
+% ============================================================
+\section{第一部分：线性规划（50分）}
+
+\input{review/review-ch01.tex}
+\input{review/review-ch02.tex}
+\input{review/review-ch03.tex}
+\input{review/review-ch04.tex}
+
+% ============================================================
+%  第二部分：非线性规划
+% ============================================================
+\section{第二部分：非线性规划（50分）}
+
+\input{review/review-ch05.tex}
+\input{review/review-ch06.tex}
+\input{review/review-ch07.tex}
+\input{review/review-ch08.tex}
+\input{review/review-ch09.tex}
+
+\end{document}
