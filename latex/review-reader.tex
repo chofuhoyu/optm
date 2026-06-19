@@ -27,22 +27,28 @@
   }%
 }
 
-% === 复习步（2张PPT）：换页 → 标题 → 文字 → PPT ===
+% === 复习步（2张PPT）：换页 → 标题 → 答案 → PPT → 解读 ===
 \newcommand{\reviewstep}[8]{%
   \clearpage
   \textbf{\Large #6}\par\medskip
+  \textbf{【真题答案】}\par\smallskip
   {#7}\par\medskip
+  \textbf{【相关课件】}\par\smallskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}\\[4pt]
     \slidetagged{#1}{#4}{#5}
   \end{center}
+  \smallskip
+  {\small 【解读】#8}
 }
 
 % === 复习步（1张PPT）===
 \newcommand{\reviewstepone}[5]{%
   \clearpage
   \textbf{\Large #4}\par\medskip
+  \textbf{【真题答案】}\par\smallskip
   {#5}\par\medskip
+  \textbf{【相关课件】}\par\smallskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}
   \end{center}
