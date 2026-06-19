@@ -39,7 +39,7 @@
           \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
             {../material/#1.pdf}%
         };
-        \node[fill=black, text=white, font=\tiny\bfseries,
+        \node[fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
               inner sep=1.5pt, outer sep=0pt,
               anchor=north east] at (img.north east) {#3};
       \end{tikzpicture}%
