@@ -26,31 +26,25 @@
   }%
 }
 
-% === 复习步（2张PPT）：上下各一张，标题在上，说明在下 ===
+% === 复习步（2张PPT）：换页 → 标题 → 文字 → PPT ===
 \newcommand{\reviewstep}[8]{%
-  % #1=ch, #2=p1, #3=lab1, #4=p2, #5=lab2, #6=步骤标题, #7=说明文字, #8=未使用
-  \medskip\hrule\medskip
-  \textbf{#6}\par\smallskip
+  \clearpage
+  \textbf{\large #6}\par\medskip
+  {\footnotesize #7}\par\medskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}\\[4pt]
     \slidetagged{#1}{#4}{#5}
   \end{center}
-  \smallskip
-  {\footnotesize #7}
-  \smallskip
 }
 
 % === 复习步（1张PPT）===
 \newcommand{\reviewstepone}[5]{%
-  % #1=ch, #2=p1, #3=lab1, #4=步骤标题, #5=说明文字
-  \medskip\hrule\medskip
-  \textbf{#4}\par\smallskip
+  \clearpage
+  \textbf{\large #4}\par\medskip
+  {\footnotesize #5}\par\medskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}
   \end{center}
-  \smallskip
-  {\footnotesize #5}
-  \smallskip
 }
 
 \title{\textbf{最优化 — 2025真题解析}}
