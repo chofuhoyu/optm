@@ -44,7 +44,7 @@
     \fbox{%
       \begin{tikzpicture}[baseline=(img.south)]
         \node[inner sep=0] (img) {%
-          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=0.20\textheight, keepaspectratio]%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
             {../material/#1.pdf}%
         };
         \node[overlay, fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
