@@ -106,7 +106,7 @@ def generate():
             slide_parts = []
             for ch, page, label in slides:
                 slide_parts.append(f"\\refslide{{{ch}}}{{{page}}}{{{label}}}")
-            slide_list = BS + BS + "[4pt]".join(slide_parts) if slide_parts else ""
+            slide_list = "\\par\\vspace{4pt}".join(slide_parts) if slide_parts else ""
             slide_count += len(slides)
 
             out_parts.append(
