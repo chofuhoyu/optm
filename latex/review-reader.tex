@@ -7,21 +7,36 @@
 ]{geometry}
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
-\usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox}
+\usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox, tikz}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
-% === 复习步（2张PPT）：上下两张幻灯片，文字在最后 ===
+% === 带角标的幻灯片框 ===
+% #1=章节文件名, #2=原始页码, #3=显示标签
+\newcommand{\slidetagged}[3]{%
+  \fbox{%
+    \begin{tikzpicture}[baseline=(img.south)]
+      \node[inner sep=0] (img) {%
+        \includegraphics[page=#2, width=0.85\textwidth, keepaspectratio]%
+          {../material/#1.pdf}%
+      };
+      \node[fill=black, text=white, font=\tiny\bfseries,
+            inner sep=1.5pt, outer sep=0pt,
+            anchor=north east] at (img.north east) {#3};
+    \end{tikzpicture}%
+  }%
+}
+
+% === 复习步（2张PPT）：上下各一张，标题在上，说明在下 ===
 \newcommand{\reviewstep}[8]{%
-  % #1=ch, #2=p1, #3=lab1, #4=p2, #5=lab2, #6=步骤标题, #7=说明文字, #8=额外备注(可选)
+  % #1=ch, #2=p1, #3=lab1, #4=p2, #5=lab2, #6=步骤标题, #7=说明文字, #8=未使用
   \medskip\hrule\medskip
+  \textbf{#6}\par\smallskip
   \begin{center}
-    \fbox{\includegraphics[page=#2, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
-    {\footnotesize #3}\\[6pt]
-    \fbox{\includegraphics[page=#4, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
-    {\footnotesize #5}\\[4pt]
-    \textbf{#6}\\[2pt]
-    \footnotesize #7
+    \slidetagged{#1}{#2}{#3}\\[4pt]
+    \slidetagged{#1}{#4}{#5}
   \end{center}
+  \smallskip
+  {\footnotesize #7}
   \smallskip
 }
 
@@ -29,12 +44,12 @@
 \newcommand{\reviewstepone}[5]{%
   % #1=ch, #2=p1, #3=lab1, #4=步骤标题, #5=说明文字
   \medskip\hrule\medskip
+  \textbf{#4}\par\smallskip
   \begin{center}
-    \fbox{\includegraphics[page=#2, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
-    {\footnotesize #3}\\[4pt]
-    \textbf{#4}\\[2pt]
-    \footnotesize #5
+    \slidetagged{#1}{#2}{#3}
   \end{center}
+  \smallskip
+  {\footnotesize #5}
   \smallskip
 }
 
