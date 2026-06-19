@@ -375,9 +375,8 @@ H_1\nabla f^{(1)}
 = \begin{pmatrix} \frac{17}{15} & -\frac{1}{15} \\[4pt]
                    -\frac{1}{15} & \frac{8}{15} \end{pmatrix}
   \begin{pmatrix} 2/3 \\[2pt] -2/3 \end{pmatrix}
-= \begin{pmatrix} \frac{34}{45}+\frac{2}{45} \\[4pt]
-                  -\frac{2}{45}-\frac{16}{45} \end{pmatrix}
-= \begin{pmatrix} 36/45 \\[4pt] -18/45 \end{pmatrix}
+= \begin{pmatrix} 34/45 + 2/45 \\ -2/45 - 16/45 \end{pmatrix}
+= \begin{pmatrix} 36/45 \\ -18/45 \end{pmatrix}
 \]
 故 $d^{(1)} = -H_1\nabla f^{(1)} = (-4/5,\; 2/5)^T$。
 
@@ -492,13 +491,15 @@ y_0^T H_0 y_0 &= \frac{41^2}{114^2}(10^2+16^2) = \frac{41^2}{114^2}\cdot 356
 DFP 两项（代入化简）：
 \begin{align*}
 \frac{s_0 s_0^T}{s_0^T y_0}
-&= \frac{\frac{41^2}{114^2}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}}{\frac{41^2}{114}}
- = \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
- \approx \begin{pmatrix} 0.219 & 0.175 \\ 0.175 & 0.140 \end{pmatrix} \\[8pt]
+&= \frac{41^2/114^2}{41^2/114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
+ = \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix} \\
+ &\approx \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
+ \quad\text{（即 }\begin{smallmatrix} 0.219 & 0.175 \\ 0.175 & 0.140 \end{smallmatrix}\text{）} \\[6pt]
 \frac{H_0 y_0 y_0^T H_0}{y_0^T H_0 y_0}
-&= \frac{\frac{41^2}{114^2}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}}{\frac{41^2}{114^2}\cdot 356}
- = \frac{1}{356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}
- \approx \begin{pmatrix} 0.281 & 0.449 \\ 0.449 & 0.719 \end{pmatrix}
+&= \frac{41^2/114^2}{41^2/114^2\cdot 356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}
+ = \frac{1}{356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix} \\
+ &\approx \frac{1}{356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}
+ \quad\text{（即 }\begin{smallmatrix} 0.281 & 0.449 \\ 0.449 & 0.719 \end{smallmatrix}\text{）}
 \end{align*}
 
 \[
