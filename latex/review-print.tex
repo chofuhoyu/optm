@@ -7,8 +7,8 @@
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
 % === 复习步：左侧嵌入PPT幻灯片，右侧文字 ===
-\newcommand{\reviewstep}[4]{%
-  % #1=章节文件名, #2=页码, #3=步骤标题, #4=说明文字
+\newcommand{\reviewstep}[5]{%
+  % #1=章节文件名, #2=原始页码, #3=显示标签, #4=步骤标题, #5=说明文字
   \medskip
   \noindent
   \begin{minipage}[t]{0.42\textwidth}
@@ -17,12 +17,12 @@
       \includegraphics[page=#2, width=0.40\textwidth, keepaspectratio]%
         {../material/#1.pdf}%
     }\\[1pt]
-    {\small Slide #2}
+    {\small #3}
   \end{minipage}%
   \hfill
   \begin{minipage}[t]{0.55\textwidth}
-    \textbf{#3}\\[2pt]
-    \small #4
+    \textbf{#4}\\[2pt]
+    \small #5
   \end{minipage}%
   \smallskip
 }
