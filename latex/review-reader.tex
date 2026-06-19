@@ -1,5 +1,5 @@
 % !TeX program = xelatex
-\documentclass[12pt]{ctexart}
+\documentclass[15pt]{ctexart}
 \usepackage[
   paperwidth=126.4mm,
   paperheight=168.0mm,
@@ -29,8 +29,8 @@
 % === 复习步（2张PPT）：换页 → 标题 → 文字 → PPT ===
 \newcommand{\reviewstep}[8]{%
   \clearpage
-  \textbf{\large #6}\par\medskip
-  {\footnotesize #7}\par\medskip
+  \textbf{\Large #6}\par\medskip
+  {#7}\par\medskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}\\[4pt]
     \slidetagged{#1}{#4}{#5}
@@ -40,8 +40,8 @@
 % === 复习步（1张PPT）===
 \newcommand{\reviewstepone}[5]{%
   \clearpage
-  \textbf{\large #4}\par\medskip
-  {\footnotesize #5}\par\medskip
+  \textbf{\Large #4}\par\medskip
+  {#5}\par\medskip
   \begin{center}
     \slidetagged{#1}{#2}{#3}
   \end{center}
