@@ -33,23 +33,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 常用命令
 
 ```bash
-# PPTX → PDF 批量转换（需要 Windows + PowerPoint）
-uv run python scripts/pptx_to_pdf.py
+# === 编译（全部使用 make） ===
+make all           # 编译全部 3 个 PDF（print + reader + review）
+make print         # 仅 A4 打印版 slides-print.pdf（8张/页）
+make reader        # 仅课件阅读器版 slides-reader.pdf（2张/页，适配 Leaf5）
+make review        # 仅复习材料 review-reader.pdf（真题答案 + 解读 + 课件）
 
-# 生成/更新 chapters.tex（根据 filter_config.json）
-uv run python scripts/generate_filtered.py
+# === 生成共享数据 ===
+make generate      # 重新生成 latex/chapters.tex（根据 filter_config.json）
 
-# 编译最终 PDF
-xelatex -interaction=nonstopmode main.tex
-xelatex -interaction=nonstopmode main.tex   # 跑两遍
+# === 推送到 BOOX 阅读器 ===
+make push          # 推送全部（课件 + 复习材料）
+make push-slides   # 仅推送课件 slides-reader.pdf
+make push-review   # 仅推送复习材料 review-reader.pdf
 
-# 全文搜索课件内容
-uv run python scripts/search_notes.py "关键词"           # 全部章节搜索
-uv run python scripts/search_notes.py "KKT" --chapter 7  # 指定章节
-uv run python scripts/search_notes.py --toc               # 章节目录
+# === 工具脚本 ===
+uv run python scripts/pptx_to_pdf.py                     # PPTX→PDF 批量转换（需 Windows + PowerPoint）
+uv run python scripts/search_notes.py "关键词"            # 全文搜索课件内容
+uv run python scripts/search_notes.py "KKT" --chapter 7   # 指定章节搜索
+uv run python scripts/search_notes.py --toc                # 章节目录
+uv run python scripts/download_pptx.py                    # Playwright 下载课件（如需要）
 
-# 用 Playwright 控制浏览器下载课件（如需要）
-uv run python scripts/download_pptx.py
+# === 其他 ===
+make clean         # 清理 latex/*.aux *.log *.out *.toc
 ```
 
 ---
@@ -71,9 +77,13 @@ material/最优化25参考答案.pdf           ← 去年真题（有答案）
 scripts/filter_config.json             ← IOE 筛选配置（JSON）
 scripts/generate_filtered.py           ← 根据配置生成 chapters.tex
 
-chapters.tex                           ← 自动生成 + 手动插笔记
-main.tex                               ← LaTeX 主模板（宏定义在此）
-main.pdf                               ← 最终打印输出
+latex/chapters.tex                     ← 自动生成 + 手动插笔记（共享数据）
+latex/slides-print.tex                 ← A4 打印版入口（8张/页）
+latex/slides-reader.tex                ← Leaf5 课件阅读器版入口（2张/页）
+latex/review-reader.tex                ← Leaf5 复习材料入口（真题 + 解读）
+latex/review-content.tex               ← 复习材料正文（手工编写）
+latex/review-source.tex                ← 复习材料数据源定义
+
 ioe.md                                 ← Include/Exclude 决策文档
 study-plan.md                          ← 两天半复习计划
 ```
@@ -93,7 +103,7 @@ study-plan.md                          ← 两天半复习计划
 - `ioe.md` — 每一章的筛选决策 + 理由，格式为 SVG 表格
 - `scripts/filter_config.json` — 机器可读的筛选配置，键=章节文件名前缀，值=保留的页码数组
 - `scripts/generate_filtered.py` — 读取 JSON 配置，生成 8 页一组编排的 `chapters.tex`
-- 修改筛选：改 `filter_config.json` → 运行 `generate_filtered.py` → 重新编译 `main.tex`
+- 修改筛选：改 `filter_config.json` → 运行 `make generate` → 重新编译（`make all` 或 `make print`）
 
 ### 抽取文件说明
 
