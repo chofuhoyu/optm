@@ -8,7 +8,7 @@
 \subsection{6.1 无约束极值条件——起点}
 
 无约束优化 $\min f(x)$ 的最优性条件是我们最熟悉的出发点。
-PPT第3页回顾了这三个经典结论，是一切有约束理论的基石。
+PPT第7.3页回顾了这三个经典结论，是一切有约束理论的基石。
 
 \medskip
 \refslide{7最优性条件}{3}{7.1}
@@ -45,6 +45,43 @@ $L(x,\mu)=f(x)+\sum_{i=1}^m \mu_i h_i(x)$。
 \end{defbox}
 
 \textbf{几何含义}：$-\nabla f(x^*)$ 落在约束法向量张成的子空间中。换句话说，目标函数梯度在约束切空间上的投影为零——沿任何可行方向移动，目标函数的一阶变化率都是零。
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.1,
+    >=stealth,
+    every node/.style={font=\footnotesize},
+]
+  % 坐标轴
+  \draw[->, thin] (-0.5,0) -- (2.0,0) node[right] {$x_1$};
+  \draw[->, thin] (0,-0.5) -- (0,2.0) node[above] {$x_2$};
+
+  % 目标函数等值线：x1²+x2² = r² 同心圆
+  \foreach \r in {0.3,0.5,0.707,0.9,1.1,1.3,1.5} {
+    \draw[dashed, thin, gray] (0,0) circle (\r);
+  }
+
+  % 约束直线 x1+x2=1（过 (1,0) 和 (0,1)）
+  \draw[thick] (-0.3,1.3) -- (1.3,-0.3);
+  \node at (1.1,0.2) {$x_1+x_2=1$};
+
+  % 虚线：原点到切点（最短距离）
+  \draw[dashed, thin, black!60] (0,0) -- (0.5,0.5);
+
+  % 切点（最优点）
+  \filldraw[black] (0.5,0.5) circle (1.5pt) node[above right=2pt] {$x^*=(\frac12,\frac12)$};
+
+  % 梯度向量：∇f=(1,1), ∇h=(1,1)，两者平行
+  \draw[->, very thick] (0.5,0.5) -- (1.15,1.15) node[right] {$\nabla f(x^*)$};
+  \draw[->, very thick] (0.5,0.5) -- (0.85,0.85) node[above left] {$\nabla h(x^*)$};
+
+  % 原点
+  \filldraw[black] (0,0) circle (1.2pt) node[below left] {$O$};
+\end{tikzpicture}
+
+\medskip
+\textbf{图 6.1：Lagrange乘子法的几何解释——在约束切线上目标函数的梯度与约束梯度平行}
+\end{center}
 
 \medskip
 
@@ -91,7 +128,7 @@ $L(x,\mu)=f(x)+\sum_{i=1}^m \mu_i h_i(x)$。
 \end{aligned}
 \]
 
-PPT第17页给出了 FJ 一阶最优性条件的形式——这是最一般、不依赖任何约束规格的必要条件。
+PPT第7.17页给出了 FJ 一阶最优性条件的形式——这是最一般、不依赖任何约束规格的必要条件。
 
 \medskip
 \refslide{7最优性条件}{17}{7.9}
@@ -130,7 +167,7 @@ FJ 条件允许 $\lambda_0 = 0$ 是它的\emph{设计缺陷}，也是它的\emph
 \end{notebox}
 
 \medskip
-PPT第26页讨论 FJ 条件中 $w_0$（$\lambda_0$）退化与约束规格的关系，是理解 CQ
+PPT第7.26页讨论 FJ 条件中 $w_0$（$\lambda_0$）退化与约束规格的关系，是理解 CQ
 动机的关键页面。
 \medskip
 \refslide{7最优性条件}{26}{7.18}
@@ -141,7 +178,7 @@ PPT第26页讨论 FJ 条件中 $w_0$（$\lambda_0$）退化与约束规格的关
 
 KKT 条件在 FJ 的基础上\textbf{加上约束规格}，强制 $\lambda_0 \neq 0$，然后归一化 $\lambda_0=1$。这样目标函数的梯度永远不会被"消掉"。
 
-PPT第19和20页给出了 KKT 条件的矩阵形式和详细表述，第27页展示了用 Lagrange 函数的紧凑写法。
+PPT第7.19和7.20页给出了 KKT 条件的矩阵形式和详细表述，第7.27页展示了用 Lagrange 函数的紧凑写法。
 
 \medskip
 \refslide{7最优性条件}{19}{7.11}
@@ -215,6 +252,47 @@ $\min\ x_1^2 + x_2^2$，s.t.\ $x_1^2 + x_2^2 \le 1$（单位圆盘内），$x_1 
 
 几何直觉：直线穿过单位圆内部。最近原点的垂足 $x_1=x_2=0.25$ 在圆内（$0.125<1$），不等式约束应不活跃。
 \end{notebox}
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.5,
+    >=stealth,
+    every node/.style={font=\footnotesize},
+]
+  % 坐标轴
+  \draw[->, thin] (-1.4,0) -- (1.4,0) node[right] {$x_1$};
+  \draw[->, thin] (0,-1.4) -- (0,1.4) node[above] {$x_2$};
+
+  % 单位圆盘（不等式约束边界）
+  \draw[thick] (0,0) circle (1);
+  \node at (0.72,0.72) {$g(x)=0$};
+
+  % 可行域标注（圆盘内部）
+  \node at (-0.5,-0.5) {可行域 $S$};
+
+  % 等式约束直线 x1+x2=0.5（过 (0.5,0) 和 (0,0.5)）
+  \draw[thick] (-0.25,0.75) -- (0.75,-0.25);
+  \node at (0.72,0.1) {$x_1\!+\!x_2\!=\!0.5$};
+
+  % 最优点（垂足，在圆盘内部）
+  \filldraw[black] (0.25,0.25) circle (1.5pt) node[below right=2pt] {$x^*\!=\!(0.25,0.25)$};
+
+  % 目标函数梯度 ∇f=(0.5,0.5)
+  \draw[->, very thick] (0.25,0.25) -- (0.65,0.65) node[right] {$\nabla f(x^*)$};
+
+  % 虚线：原点→最优点
+  \draw[dashed, thin, black!60] (0,0) -- (0.25,0.25);
+
+  % 原点
+  \filldraw[black] (0,0) circle (1.2pt) node[below left] {$O$};
+
+  % λ=0 说明
+  \node at (0.6,-1.0) {$\lambda=0$（$g(x)$不活跃）};
+\end{tikzpicture}
+
+\medskip
+\textbf{图 6.2：KKT条件示例——不等式约束非活跃}
+\end{center}
 
 \smallskip
 \textbf{第1步：写 Lagrange 函数。}
@@ -303,7 +381,7 @@ $\lambda_0=0$ 时
 \end{defbox}
 
 \medskip
-PPT第23页给出了 KKT 条件的具体算例（例7.2.1），展示验证某点是否为 KKT 点的标准过程。
+PPT第7.23页给出了 KKT 条件的具体算例（例7.2.1），展示验证某点是否为 KKT 点的标准过程。
 \medskip
 \refslide{7最优性条件}{23}{7.15}
 \medskip
