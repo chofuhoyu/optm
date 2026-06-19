@@ -1,5 +1,5 @@
 % !TeX program = xelatex
-\documentclass[15pt]{ctexart}
+\documentclass[12pt]{ctexart}
 \usepackage[
   paperwidth=126.4mm,
   paperheight=168.0mm,
@@ -9,6 +9,9 @@
 \pagestyle{empty}
 \usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox, tikz}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+% 正文14pt（LaTeX 基类只有10/11/12pt，需在文档开头手动设）
+\AtBeginDocument{\fontsize{14pt}{21pt}\selectfont}
 
 % === 带角标的幻灯片框 ===
 % #1=章节文件名, #2=原始页码, #3=显示标签
