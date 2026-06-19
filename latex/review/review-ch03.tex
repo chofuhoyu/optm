@@ -37,11 +37,11 @@
 \toprule
 \textbf{原问题（$\min$）} & \textbf{对偶问题（$\max$）} & \textbf{原因} \\
 \midrule
-约束 $i$ 是 $\le$  & 变量 $w_i \ge 0$ &
-  原 $\min$ + $\le$ 约束 $\to$ 乘子需非负惩罚方向才一致 \\
+约束 $i$ 是 $\le$  & 变量 $w_i \le 0$ &
+  原 $\min$ + $\le$ 约束 $\to$ 乘子需非正才形成下界（化为 $-\!Ax\ge -b$，令 $w=-$乘子得 $w\le 0$） \\
 
-约束 $i$ 是 $\ge$  & 变量 $w_i \le 0$ &
-  原 $\min$ + $\ge$ 约束 $\to$ 乘子需非正才形成下界 \\
+约束 $i$ 是 $\ge$  & 变量 $w_i \ge 0$ &
+  原 $\min$ + $\ge$ 约束 $\to$ 乘子自然 $\ge 0$（直接进入 Lagrange 函数） \\
 
 约束 $i$ 是 $=$   & 变量 $w_i$ 自由 &
   等式约束两边都"紧"，乘子方向不影响，故无符号限制 \\[3pt]
@@ -59,13 +59,13 @@
 \endgroup
 \end{defbox}
 
-\emph{记忆规律}：原问题 $\min$ $\to$ 对偶 $\max$。原约束的不等号方向与对偶变量的符号方向\emph{一致}（$\le \to \ge 0$，$\ge \to \le 0$）。原变量的符号与对偶约束的不等号方向\emph{相反}（$x_j\ge 0 \to$ 约束 $\le$，$x_j\le 0 \to$ 约束 $\ge$）。考试建议直接背表，不要现推。
+\emph{记忆规律}：原问题 $\min$ $\to$ 对偶 $\max$。原约束的不等号方向与对偶变量的符号方向\emph{一致}（$\le \to \le 0$，$\ge \to \ge 0$，方向真的一致）。原变量的符号与对偶约束的不等号方向\emph{相反}（$x_j\ge 0 \to$ 约束 $\le$，$x_j\le 0 \to$ 约束 $\ge$）。考试建议直接背表，不要现推。
 
 \medskip
 \textbf{例：}原问题
 $\min\ 3x_1+5x_2$，$\text{s.t.}\ 2x_1+x_2\le 10,\ x_1-3x_2\ge 4,\ x_1\ge0,x_2\le0$。\\
-查表：$\min\to\max$；约束1 $\le\to w_1\ge0$；约束2 $\ge\to w_2\le0$；$x_1\ge0\to$约束1 $\le$；$x_2\le0\to$约束2 $\ge$。得对偶：
-$\max\ 10w_1+4w_2$，$\text{s.t.}\ 2w_1+w_2\le3,\ w_1-3w_2\ge5,\ w_1\ge0,w_2\le0$。
+查表：$\min\to\max$；约束1 $\le\to w_1\le0$；约束2 $\ge\to w_2\ge0$；$x_1\ge0\to$约束1 $\le$；$x_2\le0\to$约束2 $\ge$。得对偶：
+$\max\ 10w_1+4w_2$，$\text{s.t.}\ 2w_1+w_2\le3,\ w_1-3w_2\ge5,\ w_1\le0,w_2\ge0$。
 
 \medskip
 课件6.4页展示了对称形式（$\min,\ Ax\ge b,\ x\ge 0$）和非对称形式（标准型 $\min,\ Ax=b,\ x\ge 0$）两种最常见的对偶转化。6.8页以表格形式汇总了原-对偶全部对应规则——这张表就是考试查表写对偶的标准依据。
@@ -115,7 +115,7 @@ $\max\ 10w_1+4w_2$，$\text{s.t.}\ 2w_1+w_2\le3,\ w_1-3w_2\ge5,\ w_1\ge0,w_2\le0
 \end{aligned}
 \]
 
-\textbf{构造对偶}：原问题是 $\max$，查表时先化为 $\min$ 的标准视角——或者用"$\max$ 的对应关系"：对偶是 $\min$。约束是 $\le$ 型 + $\max$ 目标 $\to$ 对偶变量 $y_1,y_2 \ge 0$（因为 $\max$ 问题 $\le$ 约束的乘子在 Lagrange 函数中带负号，转化为 $\min$ 对偶时自然 $\ge 0$）。变量 $x_1,x_2\ge 0$ $\to$ 对偶约束 $\ge$。
+约束是 $\le$ 型，原问题 $\max$、对偶 $\min$，查反向关系表得对偶变量 $y_1,y_2 \ge 0$。变量 $x_1,x_2\ge 0$（$\max\to\min$）$\to$ 对偶约束 $\ge$。
 
 \[
 \begin{aligned}
@@ -299,9 +299,9 @@ z^* = c_B^T B^{-1} b = w^{*T} b = \sum w_i^* b_i \quad\Rightarrow\quad \frac{\pa
 
 \emph{第2步：逐一查表确定对偶变量的符号。}
 \begin{itemize}
-  \item 约束1：$3x_1+x_2+x_3 \le 6$，是 $\le$ 型。原 $\min$ + 约束 $\le$ $\to$ 对偶变量 $w_1 \ge 0$（原因：$\le$ 约束的 Lagrange 乘子惩罚方向与 $\min$ 一致，乘子符号应非负）
-  \item 约束2：$x_1-x_2+2x_3 \ge 1$，是 $\ge$ 型 $\to$ $w_2 \le 0$
-  \item 约束3：$x_1+x_2-x_3 \le 2$，是 $\le$ 型 $\to$ $w_3 \ge 0$
+  \item 约束1：$3x_1+x_2+x_3 \le 6$，是 $\le$ 型。原 $\min$ + 约束 $\le$ $\to$ 对偶变量 $w_1 \le 0$（原因：$\le$ 约束化为 $-\!Ax\ge -b$ 后乘子 $\ge 0$，令 $w=-$乘子）
+  \item 约束2：$x_1-x_2+2x_3 \ge 1$，是 $\ge$ 型 $\to$ $w_2 \ge 0$
+  \item 约束3：$x_1+x_2-x_3 \le 2$，是 $\le$ 型 $\to$ $w_3 \le 0$
 \end{itemize}
 
 \emph{第3步：确定对偶约束的不等号方向。} 原变量 $x_1,x_2,x_3 \ge 0$。原 $\min$ + 原变量 $\ge 0$ $\to$ 对偶约束是 $\le$ 型（原变量符号与对偶约束不等号\emph{方向相反}）。
@@ -328,7 +328,7 @@ z^* = c_B^T B^{-1} b = w^{*T} b = \sum w_i^* b_i \quad\Rightarrow\quad \frac{\pa
 \text{s.t.}\ & 3w_1 + w_2 + w_3 \le 2 \qquad (\text{对应 } x_1)\\
 & w_1 - w_2 + w_3 \le -1 \qquad (\text{对应 } x_2)\\
 & w_1 + 2w_2 - w_3 \le 1 \qquad (\text{对应 } x_3)\\
-& w_1 \ge 0,\ w_2 \le 0,\ w_3 \ge 0
+& w_1 \le 0,\ w_2 \ge 0,\ w_3 \le 0
 \end{aligned}
 \]
 
