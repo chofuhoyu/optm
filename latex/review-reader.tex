@@ -12,7 +12,7 @@
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
 
-% === 复习步：换页 → 标题 → 答案 → PPT → 解读 ===
+% === 复习步：换页 → 文本 → PPT（每张refslide自带居中）===
 % #1=标题, #2=答案, #3=解读, #4=预构建PPT列表(\refslide链条)
 \newcommand{\reviewstep}[4]{%
   \clearpage
@@ -22,23 +22,24 @@
   \textbf{【解读】}\par\smallskip
   {\small #3}\par\medskip
   \textbf{【相关课件】}\par\smallskip
-  \begin{center}
-    #4
-  \end{center}
+  #4
 }
 
-% === 单张PPT引用：章节+页码，自动渲染带角标的幻灯片 ===
+% === 单张PPT引用：自带居中，高度 = (textheight - 两组fbox边框 - 4pt间距) / 2 ===
+% 两张上下堆叠刚好填满一页；三张时前两张占第一页，第三张自动流入第二页同位置
 \newcommand{\refslide}[3]{%
-  \fbox{%
-    \begin{tikzpicture}[baseline=(img.south)]
-      \node[inner sep=0] (img) {%
-        \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=0.40\textheight, keepaspectratio]%
-          {../material/#1.pdf}%
-      };
-      \node[fill=black, text=white, font=\tiny\bfseries,
-            inner sep=1.5pt, outer sep=0pt,
-            anchor=north east] at (img.north east) {#3};
-    \end{tikzpicture}%
+  \centerline{%
+    \fbox{%
+      \begin{tikzpicture}[baseline=(img.south)]
+        \node[inner sep=0] (img) {%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxsep-4\fboxrule-4pt)/2\relax, keepaspectratio]%
+            {../material/#1.pdf}%
+        };
+        \node[fill=black, text=white, font=\tiny\bfseries,
+              inner sep=1.5pt, outer sep=0pt,
+              anchor=north east] at (img.north east) {#3};
+      \end{tikzpicture}%
+    }%
   }%
 }
 
