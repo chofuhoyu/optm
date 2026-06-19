@@ -25,9 +25,9 @@ def generate():
         ("13罚函数法", "罚函数法"),
     ]
 
-    output_path = os.path.join(PROJECT_DIR, "chapters.tex")
+    output_path = os.path.join(PROJECT_DIR, "chapters-print.tex")
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("% 精简版 chapters.tex — 基于考试重点筛选\n")
+        f.write("% 精简版 chapters-print.tex — 基于考试重点筛选（打印版，8张/页）\n")
         f.write(f"% 生成命令: uv run python scripts/generate_filtered.py\n")
         f.write(f"% 总页数: {sum(len(config.get(ch, [])) for ch, _ in chapter_names)}\n\n")
 

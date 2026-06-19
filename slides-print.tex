@@ -1,0 +1,130 @@
+% !TeX program = xelatex
+% ============================================================
+%  最优化理论与算法 — 开卷考试参考资料
+%  排版: A4纸, 2列×4行=8张/页, 5mm页边距
+%  老师幻灯片 → 单线框 (\scell)
+%  自己笔记   → 双线框 (\ncell)
+% ============================================================
+\documentclass[12pt,a4paper]{ctexart}
+
+% === 页面设置 ===
+\usepackage[margin=5mm]{geometry}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}  % 不显示页码，节省空间
+
+% === 宏包 ===
+\usepackage{graphicx}
+\usepackage{fancybox}          % \doublebox
+\usepackage{pgffor}            % \foreach
+\usepackage{xcolor}
+\usepackage{amsmath, amssymb}
+\usepackage{tikz}
+
+% ============================================================
+%  网格尺寸
+%  A4 可用区域约 200mm × 287mm
+%  2列: 每列 ~100mm, 4行: 每行 ~71mm
+% ============================================================
+\newlength{\cellwidth}
+\newlength{\cellheight}
+\setlength{\cellwidth}{0.48\textwidth}
+\setlength{\cellheight}{0.23\textheight}
+
+% ============================================================
+%  \scell{文件名}{页码} — 老师幻灯片（单线框）
+% ============================================================
+\newcommand{\scell}[2]{%
+  \fbox{%
+    \begin{minipage}[t][\cellheight][c]{\dimexpr\cellwidth-2\fboxsep-2\fboxrule\relax}
+      \centering
+      \vspace{0pt}%
+      \includegraphics[%
+        page=#2,%
+        width=\dimexpr\cellwidth-2\fboxsep-2\fboxrule-3mm\relax,%
+        height=\dimexpr\cellheight-2\fboxsep-2\fboxrule-3mm\relax,%
+        keepaspectratio%
+      ]{material/#1.pdf}%
+    \end{minipage}%
+  }%
+}
+
+% ============================================================
+%  \emptycell — 空白单元格（用于最后一页不足8张时填充）
+% ============================================================
+\newcommand{\emptycell}{%
+  \begin{minipage}[t][\cellheight][c]{\cellwidth}
+    \centering
+  \end{minipage}%
+}
+
+% ============================================================
+%  \ncell{内容} — 自己的笔记（双线框）
+% ============================================================
+\newcommand{\ncell}[1]{%
+  \begin{minipage}[t][\cellheight][c]{\cellwidth}
+    \centering
+    \doublebox{%
+      \begin{minipage}[t][\dimexpr\cellheight-4\fboxsep-4\fboxrule-2\doublerulesep\relax][c]{%
+        \dimexpr\cellwidth-4\fboxsep-4\fboxrule-2\doublerulesep-4mm\relax%
+      }
+        \centering
+        \vspace{0pt}%
+        #1%
+      \end{minipage}%
+    }%
+  \end{minipage}%
+}
+
+% ============================================================
+%  \gridcell{文件名}{页码} — 内部用，页码=0时显示空白
+% ============================================================
+\newcommand{\gridcell}[2]{%
+  \ifnum#2=0
+    \emptycell
+  \else
+    \scell{#1}{#2}%
+  \fi
+}
+
+% ============================================================
+%  \slidegrid{文件}{p1}{p2}{...}{p8} — 一个完整的2×4网格页
+%  页码填 0 表示该格留空
+% ============================================================
+\newcommand{\slidegrid}[9]{%
+  \vspace{1mm}%
+  \noindent
+  \begin{tabular}{@{}c c@{}}
+    \gridcell{#1}{#2} & \gridcell{#1}{#3} \\
+    \gridcell{#1}{#4} & \gridcell{#1}{#5} \\
+    \gridcell{#1}{#6} & \gridcell{#1}{#7} \\
+    \gridcell{#1}{#8} & \gridcell{#1}{#9} \\
+  \end{tabular}%
+  \clearpage
+}
+
+% ============================================================
+%  \notequarterpage{内容} — 整页都是笔记（双线大框）
+%  适合章节末总结
+% ============================================================
+\newcommand{\notefullpage}[1]{%
+  \vspace{2mm}%
+  \begin{center}
+  \doublebox{%
+    \begin{minipage}[t][0.92\textheight][c]{0.92\textwidth}
+      \centering
+      #1%
+    \end{minipage}%
+  }%
+  \end{center}%
+  \clearpage
+}
+
+\begin{document}
+
+% ============================================================
+%  章节内容（由 scripts/generate_chapters.py 自动生成）
+%  你可以在各章节之间插入 \ncell{} 或 \notefullpage{}
+% ============================================================
+\input{chapters-print.tex}
+
+\end{document}
