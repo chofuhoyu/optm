@@ -227,19 +227,22 @@ PPT第7.19和7.20页给出了 KKT 条件的矩阵形式和详细表述，第7.27
 \begin{defbox}
 \textbf{常见约束规格一览}
 
-{\small
-\begin{tabular}{@{}p{14mm}@{}p{70mm}@{}}
+\medskip
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{1.5pt}
+\begin{tabular}{@{}p{15mm}@{}p{72mm}@{}}
 \toprule
 \textbf{LICQ} & 积极约束的梯度线性无关。最常用，条件最强但验证简单。\\
 \addlinespace
-\textbf{MFCQ} & 积极约束梯度正线性相关。比 LICQ 稍弱。\\
+\textbf{MFCQ} & 积极约束梯度正线性相关，比LICQ稍弱。\\
 \addlinespace
 \textbf{Slater} & 对凸问题：存在严格可行点使 $g_i(x)<0$。验证方便。\\
 \addlinespace
-\textbf{线性约束} & 若所有约束均为线性，则 CQ 自动成立，无需验证。\\
+\textbf{线性约束} & 若所有约束均为线性，则CQ自动成立，无需验证。\\
 \bottomrule
 \end{tabular}
-}
+\endgroup
 \end{defbox}
 
 % ============================================================

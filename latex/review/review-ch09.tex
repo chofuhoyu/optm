@@ -242,15 +242,21 @@ $X^{(0)} + \lambda d^{(0)} = (3+3\lambda,\ 3-3\lambda,\ 0)^T$。
 \phi(\lambda) = (3+3\lambda)^2 + 2(3-3\lambda)^2 - (3+3\lambda)(3-3\lambda) + 0 + 0
 \]
 展开：
+{\small
 \begin{align*}
 (3+3\lambda)^2 &= 9 + 18\lambda + 9\lambda^2 \\
-2(3-3\lambda)^2 &= 2(9 - 18\lambda + 9\lambda^2) = 18 - 36\lambda + 18\lambda^2 \\
+2(3-3\lambda)^2 &= 2(9 - 18\lambda + 9\lambda^2) \\
+                &= 18 - 36\lambda + 18\lambda^2 \\
 -(3+3\lambda)(3-3\lambda) &= -(9 - 9\lambda^2) = -9 + 9\lambda^2
 \end{align*}
+}
+{\small
 \begin{align*}
-\phi(\lambda) &= (9+18\lambda+9\lambda^2) + (18-36\lambda+18\lambda^2) + (-9+9\lambda^2) \\
-&= 18 - 18\lambda + 36\lambda^2
+\phi(\lambda) &= (9+18\lambda+9\lambda^2) + (18-36\lambda+18\lambda^2) \\
+              &\quad + (-9+9\lambda^2) \\
+              &= 18 - 18\lambda + 36\lambda^2
 \end{align*}
+}
 
 $\phi'(\lambda) = -18 + 72\lambda = 0 \Rightarrow \lambda_0 = 1/4 = 0.25$。
 
@@ -269,7 +275,12 @@ $d^{(1)} = -P\nabla f^{(1)} = -\begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{
 
 $d^{(1)} = 0$，说明在当前积极约束集内梯度已在法向量张成空间中。检查 KKT 乘子：
 \[
-\lambda = -(MM^T)^{-1}M\nabla f^{(1)} = -\begin{pmatrix}1/2&0\\0&1\end{pmatrix}\begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}\begin{pmatrix}5.25\\5.25\\1\end{pmatrix}
+\begin{aligned}
+\lambda &= -(MM^T)^{-1}M\nabla f^{(1)} \\
+&= -\begin{pmatrix}1/2&0\\0&1\end{pmatrix}
+   \begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}
+   \begin{pmatrix}5.25\\5.25\\1\end{pmatrix}
+\end{aligned}
 \]
 \[
 M\nabla f^{(1)} = \begin{pmatrix}10.5\\-1\end{pmatrix},\quad
@@ -312,10 +323,12 @@ PPT第13.1--13.2页给出了罚函数法的引入动机和SUMT框架，这是三
 \textbf{外点罚函数}
 
 对约束问题 $\min\{f(x) \mid g_i(x) \le 0,\ h_j(x)=0\}$，构造罚函数：
+{\small
 \[
 P(x, \sigma) = f(x) + \sigma \sum_i [\max\{0, g_i(x)\}]^2
                + \sigma \sum_j h_j(x)^2
 \]
+}
 $\sigma > 0$ 是\emph{罚因子}。当 $x$ 违反约束时，惩罚项 $>0$。$\sigma$ 逐步增大，罚款越来越重，最优解被迫回到可行域附近。
 
 序列：选 $\sigma_1 < \sigma_2 < \cdots \to \infty$，对每个 $\sigma_k$ 求解 $\min_x P(x, \sigma_k)$，得 $x^{(k)}$。$x^{(k)} \to x^*$。
@@ -498,7 +511,7 @@ PPT第13.30页展示了乘子法的收敛性质：乘子序列收敛到真实乘
 
 % === 三种罚函数法迭代路径对比 ===
 \begin{center}
-\begin{tikzpicture}[>=stealth, scale=2.5]
+\begin{tikzpicture}[>=stealth, scale=1.0]
   % ===== 外点法（左：从可行域外向可行域逼近）=====
   \begin{scope}
     % 坐标轴

@@ -17,8 +17,10 @@
 \setlength{\fboxsep}{0pt}
 
 % 容忍小幅度溢出（<12pt），给行内公式更多断行机会
-\setlength{\hfuzz}{200pt}
-\setlength{\emergencystretch}{1em}
+\setlength{\hfuzz}{2pt}
+\setlength{\emergencystretch}{3em}
+\tolerance=500
+\allowdisplaybreaks
 \raggedbottom
 
 % === 宏包 ===
@@ -27,6 +29,7 @@
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \usepackage{booktabs}
+\usepackage{ragged2e}
 \usepackage[most]{tcolorbox}
 \usepackage[hidelinks,bookmarks=true,bookmarksdepth=2]{hyperref}
 
@@ -41,10 +44,10 @@
     \fbox{%
       \begin{tikzpicture}[baseline=(img.south)]
         \node[inner sep=0] (img) {%
-          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=0.20\textheight, keepaspectratio]%
             {../material/#1.pdf}%
         };
-        \node[fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
+        \node[overlay, fill=black, text=white, font=\fontsize{12pt}{14pt}\selectfont\bfseries,
               inner sep=1.5pt, outer sep=0pt,
               anchor=north east] at (img.north east) {#3};
       \end{tikzpicture}%
@@ -93,6 +96,7 @@
 \date{}
 
 \begin{document}
+\sloppy
 \maketitle
 
 \setcounter{secnumdepth}{-1}
