@@ -14,7 +14,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 核心规则
 
 ### Git
-- **每完成一件事立即 `git add -A && git commit` + `git push`**
+- **每完成一件事立即 `git add -A && git commit`**
+- **严禁自行 `git push`，除非用户明确指示推送**
 - 不允许批量提交多个不相关的改动
 - 提交信息用中文
 
