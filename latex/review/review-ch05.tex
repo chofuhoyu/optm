@@ -5,12 +5,17 @@
 
 \subsection{5.1 为什么非线性规划需要凸性}
 
-线性规划天然是"好的"——可行域是凸多面体，局部最优就是全局最优，单纯形法能保证找到全局最优解。但到了非线性规划，目标函数可能是非凸的，可行域也可能是非凸的，局部最优不等于全局最优。\emph{凸性}（convexity）是判断"局部 $\Rightarrow$ 全局"是否成立的关键。
+线性规划天然是"好的"——可行域是凸多面体，局部最优就是全局最优，单纯形法保证找到全局最优解。但到了非线性规划，目标函数与可行域都可能非凸，局部最优不再自动等于全局最优。
+
+\emph{凸性}（convexity）是判断"局部 $\Rightarrow$ 全局"是否成立的关键条件。本章构成非线性规划的\emph{理论基础}，直接服务于第6章（凸规划下KKT条件变为充要条件）和第8章（共轭梯度法/拟牛顿法的收敛性分析依赖凸性假设）。
 
 \begin{notebox}
-\textbf{核心逻辑链}：凸集 $\to$ 凸函数 $\to$ 凸规划 $\to$ 局部极小=全局极小 $\to$ KKT 条件充要。
+\textbf{核心逻辑链}：凸集 $\to$ 凸函数 $\to$ 凸规划 $\to$ 局部极小=全局极小 $\to$ KKT条件充要。
+
+\textbf{考试定位}：25年章末未直接出大题，但凸性判别\emph{嵌入}于非线性规划的各类问题中。判定Hessian正定是第8章（Newton法/拟Newton法）的必备步骤。此外，判断一个问题是否为凸规划，直接影响KKT点是局部最优还是全局最优的结论。
 \end{notebox}
 
+% ============================================================
 \subsection{5.2 凸集}
 
 \begin{defbox}
@@ -20,81 +25,115 @@
 \[
 \lambda x + (1-\lambda) y \in C
 \]
-即：连接集合内任意两点的线段，整个都在集合内。
+几何意义：连接 $C$ 内任意两点的\emph{线段}，整个都在 $C$ 内。"实心、无洞、无凹坑"。
 \end{defbox}
 
+\medskip
+PPT第3页给出凸集的形式定义，第4页介绍仿射集（比凸集更强——要求过任意两点的\emph{整条直线}在集合内，而非仅线段）。仿射集 $\subseteq$ 凸集，线性方程组 $Ax=b$ 的解集是典型的仿射集。
 \medskip
 \refslide{3凸分析}{3}{3.1}
 \medskip
 \refslide{3凸分析}{4}{3.2}
 \medskip
 
+\textbf{例1（凸集正例，带验证）}：
+\begin{itemize}
+  \item \textbf{多面体} $C = \{x \mid Ax \le b\}$。取任意 $x,y\in C$，有 $Ax\le b$，$Ay\le b$。则
+  \[
+  A(\lambda x+(1-\lambda)y) = \lambda Ax + (1-\lambda)Ay \le \lambda b + (1-\lambda)b = b
+  \]
+  故 $\lambda x+(1-\lambda)y \in C$。$\checkmark$ 凸。LP可行域 $\{x\mid Ax=b,\ x\ge 0\}$ 是它的特例。
+
+  \item \textbf{单位圆盘} $C = \{(x_1,x_2) \mid x_1^2+x_2^2 \le 1\}$。由 $\ell_2$ 范数的三角不等式：
+  \[
+  \|\lambda x+(1-\lambda)y\|_2 \le \lambda\|x\|_2 + (1-\lambda)\|y\|_2 \le \lambda\cdot 1 + (1-\lambda)\cdot 1 = 1
+  \]
+  $\checkmark$ 凸。
+
+  \item \textbf{半空间} $C = \{x \mid a^T x \le b\}$。线性不等式定义的区域，是多面体的基本构件。$\checkmark$ 凸。
+\end{itemize}
+
+\textbf{例2（凸集反例——为什么不是凸）}：
+\begin{itemize}
+  \item \textbf{圆环} $C = \{(x_1,x_2) \mid 1 \le x_1^2+x_2^2 \le 4\}$。取 $x=(1,0)$，$y=(-1,0)$，中点 $z=(0,0)$，则 $\|z\|_2 = 0 < 1$，不在环内。非凸！原因：中间有"洞"。
+  \item \textbf{坐标轴十字} $C = \{(x_1,x_2) \mid x_1 x_2 = 0,\ x_1 \ge 0,\ x_2 \ge 0\}$。取 $(1,0)$ 和 $(0,1)$，中点 $(0.5,0.5)$ 不在坐标轴上（$0.5\cdot0.5 \neq 0$）。非凸！原因：形状不实心。
+  \item \textbf{整数点集} $C = \mathbb{Z}^n$。取 $0$ 和 $1$，中点 $0.5 \notin \mathbb{Z}$。非凸！原因：离散不连通。
+\end{itemize}
+
 \begin{notebox}
-\textbf{直观理解}：一个集合是凸的，意味着它是"实心"的，没有凹坑或洞。圆盘是凸的，月牙形不是。$\mathbb{R}^n$ 中常见的凸集：超平面、半空间、多面体（$\{x \mid Ax \le b\}$）、球。
+\textbf{直观判断法}：脑子里想象集合形状——"实心无洞无凹坑"就是凸。圆盘、多面体、半空间是凸；甜甜圈（有洞）、月牙（有凹）、离散点集（不连通）不是凸。
 \end{notebox}
 
 \begin{defbox}
 \textbf{定义 5.2（凸组合与凸包）}
 
-点 $x_1,\dots,x_k$ 的\emph{凸组合}是 $\sum_{i=1}^k \lambda_i x_i$，其中 $\lambda_i \ge 0$，$\sum \lambda_i = 1$。
+点 $x_1,\dots,x_k$ 的\emph{凸组合}：$\sum_{i=1}^k \lambda_i x_i$，其中 $\lambda_i \ge 0$，$\sum \lambda_i = 1$。
 
-集合 $S$ 的\emph{凸包} $\text{conv}(S)$ 是包含 $S$ 的最小凸集，等于 $S$ 中所有点的凸组合的集合。
+集合 $S$ 的\emph{凸包} $\text{conv}(S)$：包含 $S$ 的最小凸集，等于 $S$ 中所有点的所有凸组合的集合。
 \end{defbox}
 
+\medskip
+PPT第5页用图形展示凸包的构造过程：两点凸组合 $=$ 线段；三点凸组合 $=$ 三角形区域（含内部）。凸包就是把离散点集"填满"成包含它们的最小凸集。
 \medskip
 \refslide{3凸分析}{5}{3.3}
 \medskip
 
-\begin{defbox}
-\textbf{定义 5.3（极点）}
-
-凸集 $C$ 中的点 $x$ 称为\emph{极点}，如果它不能表示为 $C$ 中两个不同点的严格凸组合。即：不存在 $y \neq z \in C$ 和 $\lambda \in (0,1)$ 使 $x = \lambda y + (1-\lambda)z$。
-\end{defbox}
-
-极点就是凸集的"角"。LP 的 BFS 就是可行域多面体的极点。
-
-\subsection{5.3 凸函数}
+\textbf{例3}：$S = \{(0,0),(1,0),(0,1)\}$，则 $\text{conv}(S)$ 是以此三点为顶点的直角三角形（含内部），即 $\{(x_1,x_2) \mid x_1+x_2 \le 1,\ x_1 \ge 0,\ x_2 \ge 0\}$。
 
 \begin{defbox}
-\textbf{定义 5.4（凸函数）}
+\textbf{定义 5.3（多面体）}
 
-函数 $f: \mathbb{R}^n \to \mathbb{R}$ 称为\emph{凸函数}，如果对任意 $x,y$ 和 $\lambda \in [0,1]$：
-\[
-f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y)
-\]
-若 $\le$ 改为 $<$（$x\neq y$，$\lambda\in(0,1)$），称为\emph{严格凸}。
-
-若 $-f$ 是凸函数，则 $f$ 为\emph{凹函数}。
+\emph{多面体}（polyhedral set）是有限个闭半空间的交：$\{x \mid Ax \le b\}$。LP的可行域 $\{x \mid Ax = b,\ x \ge 0\}$ 也是多面体——$Ax=b$ 等价于 $Ax\le b$ 且 $-Ax\le -b$，$x\ge0$ 等价于 $-x_i\le 0$。
 \end{defbox}
 
 \medskip
+PPT第8页验证了凸集的常见例子（半空间、超平面、多面体、球等），第9页展示多面体的几何定义——有限个半空间的交集形成凸多面体。
+\medskip
+\refslide{3凸分析}{8}{3.4}
+\medskip
 \refslide{3凸分析}{9}{3.5}
+\medskip
+
+\begin{defbox}
+\textbf{定义 5.4（极点）}
+
+凸集 $C$ 中的点 $x$ 称为\emph{极点}（extreme point），如果它不能表示为 $C$ 中两个不同点的严格凸组合。即：
+\[
+x = \lambda y + (1-\lambda)z,\ \lambda\in(0,1),\ y,z\in C \;\Longrightarrow\; x=y=z
+\]
+极点是凸集的"角"——LP的基可行解（BFS）就是可行域多面体的极点。
+\end{defbox}
+
+\medskip
+PPT第11页给出极点的严格定义：$x$ 是极点当且仅当 $x=\lambda x_1+(1-\lambda)x_2$，$\lambda\in(0,1)$，$x_1,x_2\in S$ 推出 $x=x_1=x_2$。换言之，极点不能写成两个不同点的凸组合。PPT还指出：有界闭凸集中任一点都可表成极点的凸组合。
 \medskip
 \refslide{3凸分析}{11}{3.6}
 \medskip
 
+\textbf{例4（极点的几何直觉）}：
+\begin{itemize}
+  \item 三角形区域的极点 = 三个顶点
+  \item 正方形/长方体的极点 = 四个/八个顶点
+  \item 圆盘 $\{x \mid \|x\|_2 \le 1\}$ 的极点 = \emph{整个圆周}（无穷多个极点！）
+  \item LP可行域 $\{x \mid Ax=b,\ x\ge0\}$ 的极点 = 基可行解（BFS）
+\end{itemize}
+
 \begin{notebox}
-\textbf{几何含义}：函数图像上任意两点的连线在函数图像\emph{上方}。即"弦在曲线上方"。
+\textbf{极点与单纯形法的关系}：LP的最优解一定能在极点（BFS）处取得。单纯形法就是在极点之间移动，每次迭代从一个BFS跳到目标函数值更优的相邻BFS。这是第2章单纯形法的理论基础。
 \end{notebox}
 
-\subsection{5.4 凸函数的判别方法}
-
-考试中判断一个函数是否凸，有三层递进方法：
-
 \begin{defbox}
-\textbf{方法 5.1（凸函数三层次判别）}
+\textbf{定理 5.1（表示定理，选读）}
 
-\textbf{层次一：定义法}。验证 $f(\lambda x+(1-\lambda)y) \le \lambda f(x)+(1-\lambda)f(y)$。仅适用于简单函数或理论证明。
-
-\textbf{层次二：一阶条件（梯度不等式）}。若 $f$ 可微，则 $f$ 凸 $\Leftrightarrow$ 对任意 $x,y$：
+设多面体 $P=\{x \mid Ax \le b\} \neq \emptyset$ 且 $\text{rank}(A)=n$。记 $P$ 的极点集为 $\{x^k\}_{k\in K}$（非空有限），极方向集为 $\{d^j\}_{j\in J}$（$J$ 可为空）。则：
 \[
-f(y) \ge f(x) + \nabla f(x)^T (y-x)
+x \in P \;\Longleftrightarrow\; x = \sum_{k\in K}\lambda_k x^k + \sum_{j\in J}\mu_j d^j
 \]
-即：函数图像在任一点切线\emph{上方}。
-
-\textbf{层次三：二阶条件（Hessian 半正定）}。若 $f$ 二次可微，则 $f$ 凸 $\Leftrightarrow$ 对任意 $x$，Hessian 矩阵 $\nabla^2 f(x) \succeq 0$（半正定）。
+其中 $\lambda_k \ge 0,\ \sum\lambda_k = 1,\ \mu_j \ge 0$。此外，$J=\emptyset \Longleftrightarrow P$ 有界（称为多胞形）。
 \end{defbox}
 
+\medskip
+PPT第14页给出表示定理的完整陈述和公式——多面体中任意点都可以分解为极点凸组合与极方向非负组合的和。第15页给出重要\emph{推论}：标准形多面体 $\{x \mid Ax=b,\ x\ge 0\}$ 非空则必有极点。这保证了单纯形法的理论基础——只需在极点（BFS）之间迭代搜索。
 \medskip
 \refslide{3凸分析}{14}{3.8}
 \medskip
@@ -102,59 +141,347 @@ f(y) \ge f(x) + \nabla f(x)^T (y-x)
 \medskip
 
 \begin{notebox}
-\textbf{考试实用技巧}：判断凸函数最常用的是二阶条件——求 Hessian，检查是否半正定。对于正定二次型 $x^T Q x$，$Q \succeq 0$ 等价于 $Q$ 的所有顺序主子式 $\ge 0$。对于二次函数 $f(x) = \frac{1}{2}x^T Q x + c^T x$，$f$ 凸 $\Leftrightarrow$ $Q \succeq 0$。
+\textbf{考试定位}：表示定理属选读内容，25年未直接出题。核心记住\emph{推论}——标准形LP可行域非空则BFS存在，单纯形法完备。
 \end{notebox}
 
-\subsection{5.5 凸规划}
+% ============================================================
+\subsection{5.3 凸函数}
 
 \begin{defbox}
-\textbf{定义 5.5（凸规划）}
+\textbf{定义 5.5（凸函数）}
 
-最优化问题 $\min\{f(x) \mid x \in S\}$ 称为\emph{凸规划}，如果：
-\begin{itemize}
-  \item 可行域 $S$ 是凸集
-  \item 目标函数 $f$ 是凸函数（对 $\min$ 问题）
-\end{itemize}
+设 $C \subseteq \mathbb{R}^n$ 为非空凸集，$f: C \to \mathbb{R}$。$f$ 称为\emph{凸函数}，若 $\forall x,y\in C,\ \lambda\in(0,1)$：
+\[
+f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y)
+\]
+若 $x\neq y$ 时严格不等式成立，称为\emph{严格凸}。若 $-f$ 是凸函数，则 $f$ 为\emph{凹函数}；若 $-f$ 是严格凸函数，则 $f$ 为\emph{严格凹函数}。
 \end{defbox}
 
+\medskip
+PPT第17页给出凸函数的正式定义，包括严格凸、凹函数、严格凹函数的配套定义，并用图形说明"弦在曲线上方"的几何含义。
 \medskip
 \refslide{3凸分析}{17}{3.10}
 \medskip
 
-\begin{defbox}
-\textbf{定理 5.1（凸规划的核心性质）}
+\begin{notebox}
+\textbf{几何解释（弦在曲线上方）}：任取定义域内两点 $x,y$，连接 $(x,f(x))$ 与 $(y,f(y))$ 的直线段\emph{整个在函数图像上方}。凹函数则反过来——弦在图像下方。仿射函数（$a^Tx+b$）两边都等号，既凸又凹。
+\end{notebox}
 
-对于凸规划：
-\begin{itemize}
-  \item 任意局部极小点都是全局极小点
-  \item 若 $f$ 严格凸，则全局极小点唯一
-  \item KKT 条件是全局最优性的充要条件（加上约束规格后）
-\end{itemize}
+\textbf{例5（常见凸函数速查表）}：
+{\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{函数} & \textbf{定义域} & \textbf{凸性} \\
+\midrule
+$a^T x+b$（仿射） & $\mathbb{R}^n$ & 既凸又凹 \\
+$x^2$    & $\mathbb{R}$   & 严格凸 \\
+$e^{ax}$ & $\mathbb{R}$   & 凸 \\
+$|x|$    & $\mathbb{R}$   & 凸（$x=0$不可微，但仍凸！） \\
+$x\ln x$ & $(0,\infty)$   & 凸（负熵） \\
+$\|x\|$（任意范数）& $\mathbb{R}^n$ & 凸（三角不等式+齐次性）\\
+$x_1^2+x_2^2$ & $\mathbb{R}^2$ & 严格凸 \\
+$x_1^2-x_2^2$ & $\mathbb{R}^2$ & \textbf{非凸非凹}（鞍面） \\
+$x^3$    & $\mathbb{R}$   & \textbf{非凸非凹}（$x>0$凸，$x<0$凹）\\
+\bottomrule
+\end{tabular}
+}
+
+\bigskip
+
+% ============================================================
+\subsection{5.4 凸函数的判别方法}
+
+判断一个函数是否凸，有\emph{三层递进方法}。三者的\emph{因果关系}是逐步增加可微性假设，以此换取更强的计算可操作性：
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.90\textwidth}
+\small
+\textbf{方法I：定义法}（无需可微假设，适合理论证明与简单函数）\\[2pt]
+$\Big\Downarrow$ \quad 加上 $f$ 一阶可微\\[2pt]
+\textbf{方法II：一阶条件/梯度不等式}（适合理论推导，但仍需"$\forall x,y$"）\\[2pt]
+$\Big\Downarrow$ \quad 加上 $f$ 二阶可微\\[2pt]
+\textbf{方法III：二阶条件/Hessian半正定}（\textbf{最适合具体计算}——顺序主子式法系统可操作）
+\end{minipage}%
+}
+\end{center}
+
+\textbf{为什么二阶判别最实用？} 定义法须证不等式对\emph{任意两点}成立；一阶条件虽简化了形式，仍需在"所有 $x,y\in S$"上验证。二阶条件将凸性判定转化为\emph{矩阵半正定性的代数判定}——计算Hessian矩阵，检查顺序主子式。对给定的具体函数，只需微积分 $+$ 初等代数，无需处理全称量词。这是考试中最常用的判别手段。
+
+\begin{defbox}
+\textbf{方法 5.1（判别法一：定义法）}
+
+直接验证 $f(\lambda x+(1-\lambda)y) \le \lambda f(x)+(1-\lambda)f(y)$。无需可微性，仅适用于简单函数或理论证明。
+\end{defbox}
+
+\textbf{例6（定义法验证 $x^2$ 凸）}：$f(x)=x^2$。
+\begin{align*}
+f(\lambda x+(1-\lambda)y) - [\lambda f(x)+(1-\lambda)f(y)]
+&= (\lambda x+(1-\lambda)y)^2 - \lambda x^2 - (1-\lambda)y^2 \\
+&= \cancel{\lambda^2 x^2} + 2\lambda(1-\lambda)xy + \cancel{(1-\lambda)^2 y^2}
+   - \cancel{\lambda x^2} - \cancel{(1-\lambda) y^2} \\
+&= \lambda(1-\lambda)(2xy - x^2 - y^2) \\
+&= -\lambda(1-\lambda)(x-y)^2 \le 0 \quad\checkmark
+\end{align*}
+
+\textbf{例7（定义法验证范数凸）}：$f(x)=\|x\|$（不可微，只能用定义法）。
+\[
+\|\lambda x+(1-\lambda)y\| \le \|\lambda x\| + \|(1-\lambda)y\|
+= \lambda\|x\| + (1-\lambda)\|y\| \quad\checkmark
+\]
+关键是三角不等式和范数的齐次性。
+
+\begin{defbox}
+\textbf{方法 5.2（判别法二：一阶条件/梯度不等式）}
+
+设 $f$ 在开凸集 $S$ 上可微。则：
+\[
+f \text{ 凸 } \;\Longleftrightarrow\;
+f(y) \ge f(x) + \nabla f(x)^T(y-x),\quad \forall x,y\in S
+\]
+几何含义：函数图像在任意点处的切线（一阶Taylor展开）始终在函数图像\emph{下方}。
+
+（严格凸对应的不等号为严格 $>$，$\forall x\neq y$。）
 \end{defbox}
 
 \medskip
-\refslide{3凸分析}{18}{3.11}
+PPT第30页给出定理7：可微函数凸的充要条件是一阶梯度不等式对所有点成立。
+\medskip
+\refslide{3凸分析}{30}{3.12}
+\medskip
+
+\textbf{例8（一阶条件验证 $e^x$ 凸）}：$\nabla f(x)=e^x$。需证 $e^y \ge e^x + e^x(y-x)$，即 $e^{y-x} \ge 1+(y-x)$。令 $t=y-x$，需证 $e^t \ge 1+t$（$\forall t\in\mathbb{R}$）。这是指数函数的基本不等式，由 $e^t$ 的凸性可知成立。$\checkmark$
+
+\begin{defbox}
+\textbf{方法 5.3（判别法三：二阶条件/Hessian半正定）\quad $\star$ 考试最常用}
+
+设 $f$ 在开凸集 $S$ 上二次可微。则：
+\[
+f \text{ 凸 } \;\Longleftrightarrow\; \nabla^2 f(x) \succeq 0,\quad \forall x\in S
+\]
+（$\nabla^2 f(x) \succ 0$ 对所有 $x$ 成立 $\Longrightarrow$ $f$ 严格凸，但反过来不成立！）
+
+对于二次函数 $f(x)=\frac12 x^T Q x + c^T x$：$\nabla^2 f(x) \equiv Q$（常数矩阵），$f$ 凸 $\Longleftrightarrow$ $Q \succeq 0$。
+\end{defbox}
+
+\medskip
+PPT第34页给出定理9：二次可微函数凸的充要条件是Hessian矩阵处处半正定；严格凸的充分条件是Hessian处处正定。这是考试中判别凸性最常用的定理。
+\medskip
+\refslide{3凸分析}{34}{3.13}
 \medskip
 
 \begin{notebox}
-\textbf{这为什么重要？} 第6章讲 FJ/KKT 条件时，KKT 只是一阶必要条件，要确认找到的是全局最优还需要额外条件。凸规划直接给了这个保证——只要问题是凸的，KKT 点就是全局最优。
+\textbf{顺序主子式法——Hessian正/半正定的代数判据}
+
+对 $n\times n$ 实对称矩阵 $H$：（考试常见 $n=2$）
+\begin{itemize}
+  \item $H \succ 0$（正定） $\Longleftrightarrow$ 所有顺序主子式 $> 0$
+  \item $H \succeq 0$（半正定）的判断需额外小心：顺序主子式 $\ge 0$ 是必要条件但不充分。但对常见的 $2\times2$ 情形：$\Delta_1 \ge 0$，$\Delta_2 \ge 0$ 可结合矩阵结构判断。
+  \item $2\times2$ 矩阵快速判据：$H=\begin{pmatrix}a&b\\b&c\end{pmatrix}$。$H\succ0 \Longleftrightarrow a>0,\ ac-b^2>0$。$H\succeq0 \Longleftrightarrow a\ge0,\ c\ge0,\ ac-b^2\ge0$。
+\end{itemize}
 \end{notebox}
 
+\textbf{例9（Hessian法练习——四种典型情形）}：
+
+\textbf{(a) 正定（严格凸）}：$f(x_1,x_2) = 2x_1^2 + 3x_2^2$。
+\[
+\nabla f = \begin{pmatrix}4x_1 \\ 6x_2\end{pmatrix},\qquad
+\nabla^2 f = \begin{pmatrix}4 & 0 \\ 0 & 6\end{pmatrix}
+\]
+$\Delta_1 = 4 > 0$，$\Delta_2 = 24 > 0$。$\nabla^2 f \succ 0$ $\Rightarrow$ $f$ 严格凸。
+
+\textbf{(b) 正定（严格凸，带交叉项）}：$f(x_1,x_2) = x_1^2 + 2x_1x_2 + 3x_2^2$。
+\[
+\nabla^2 f = \begin{pmatrix}2 & 2 \\ 2 & 6\end{pmatrix}
+\]
+$\Delta_1 = 2 > 0$，$\Delta_2 = 2\cdot6-2\cdot2 = 8 > 0$。$\nabla^2 f \succ 0$ $\Rightarrow$ 严格凸。
+
+\textbf{(c) 半正定（凸但不严格凸）}：$f(x_1,x_2) = x_1^2 + 4x_1x_2 + 4x_2^2 = (x_1+2x_2)^2$。
+\[
+\nabla^2 f = \begin{pmatrix}2 & 4 \\ 4 & 8\end{pmatrix}
+\]
+$\Delta_1 = 2 > 0$，$\Delta_2 = 2\cdot8-4\cdot4 = 0$。$\nabla^2 f \succeq 0$ 但非正定 $\Rightarrow$ $f$ 凸但不严格凸。函数沿方向 $d=(-2,1)^T$ 恒为零——在该方向上"平坦"。
+
+\textbf{(d) 不定（非凸非凹）}：$f(x_1,x_2) = x_1^2 - 2x_1x_2 + \frac12 x_2^2$。
+\[
+\nabla^2 f = \begin{pmatrix}2 & -2 \\ -2 & 1\end{pmatrix}
+\]
+$\Delta_1 = 2 > 0$，$\Delta_2 = 2\cdot1-(-2)^2 = -2 < 0$。$\nabla^2 f$ 不定 $\Rightarrow$ $f$ 非凸非凹（鞍面）。
+
+\begin{notebox}
+\textbf{严格凸 $\neq$ Hessian处处正定（重要陷阱！）}
+
+$\nabla^2 f \succ 0$（处处正定）是严格凸的\emph{充分但不必要条件}。反例：$f(x)=x^4$（$\mathbb{R}$上），$f''(x)=12x^2 \ge 0$，$f''(0)=0$（非正定），但 $f$ 仍为严格凸函数。考试中若 Hessian 处处正定则直接下结论"严格凸"；若 Hessian 半正定但非正定，仍需结合其他方法确认是否严格凸。
+\end{notebox}
+
+% ============================================================
+\subsection{5.5 凸规划}
+
+\begin{defbox}
+\textbf{定义 5.6（凸规划）}
+
+最优化问题 $\min\{f(x) \mid x \in S\}$ 称为\emph{凸规划}，如果：
+\begin{itemize}
+  \item 可行域 $S$ 是凸集
+  \item 目标函数 $f$ 是凸函数（对 $\min$ 问题；对 $\max$ 则要求 $f$ 凹）
+\end{itemize}
+两个条件\emph{缺一不可}。
+\end{defbox}
+
+\begin{defbox}
+\textbf{定理 5.2（凸规划的核心性质）}
+
+对于凸规划 $\min\{f(x) \mid x \in S\}$：
+\begin{enumerate}
+  \item 任意\emph{局部}极小点都是\emph{全局}极小点
+  \item 若 $f$ 严格凸，则全局极小点\emph{唯一}
+  \item 上述结论\emph{不需要}任何约束规格——仅需 $f$ 凸且 $S$ 凸
+  \item 若约束规格成立，KKT条件升级为全局最优性的\emph{充要条件}
+  \item 全局极小点的集合是凸集
+\end{enumerate}
+\end{defbox}
+
+\medskip
+PPT第27页给出定理6：凸函数在凸集上的局部极小点一定是全局极小点，且极小点的集合为凸集。这是凸规划第一个核心性质的形式化陈述。
+\medskip
+\refslide{3凸分析}{27}{3.14}
+\medskip
+
+\begin{notebox}
+\textbf{这为什么重要？} 第6章的KKT条件只是\emph{一阶必要条件}——满足KKT的点不一定是全局最优。但一旦确认问题是凸规划，KKT点自动升级为全局最优解。这是连接第5章（凸性）和第6章（KKT）的关键桥梁。
+
+\textbf{判定流程}：目标函数凸？$\checkmark$ 可行域凸？$\checkmark$ $\Rightarrow$ 凸规划 $\Rightarrow$ KKT点=全局最优解。
+\end{notebox}
+
+% ============================================================
 \subsection{5.6 凸函数的保凸运算}
 
-以下运算保持凸性（考试中快速判断有用）：
-\begin{itemize}
-  \item 凸函数的非负线性组合：$f,g$ 凸，$\alpha,\beta \ge 0$，则 $\alpha f + \beta g$ 凸
-  \item 凸函数与仿射函数的复合：$f$ 凸，则 $f(Ax+b)$ 凸
-  \item 逐点最大值：$f_i$ 凸，则 $\max_i f_i(x)$ 凸
-\end{itemize}
+记住以下运算规则，可在不计算Hessian的情况下快速判断组合函数的凸性：
 
+{\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{运算} & \textbf{条件与结论} \\
+\midrule
+非负加权和  & $f,g$ 凸，$\alpha,\beta \ge 0$ $\Rightarrow$ $\alpha f+\beta g$ 凸 \\
+与仿射复合  & $f$ 凸 $\Rightarrow$ $f(Ax+b)$ 凸 \\
+逐点最大值  & $f_1,\dots,f_m$ 凸 $\Rightarrow$ $\max_i f_i(x)$ 凸 \\
+逐点上确界  & $\forall y\in A$，$f(\cdot,y)$ 凸 $\Rightarrow$ $\sup_{y\in A} f(x,y)$ 凸 \\
+标量复合(1) & $g$ 凸，$h$ 凸且单调不减 $\Rightarrow$ $h(g(x))$ 凸 \\
+标量复合(2) & $g$ 凹，$h$ 凸且单调不增 $\Rightarrow$ $h(g(x))$ 凸 \\
+\bottomrule
+\end{tabular}
+}
+
+\bigskip
+
+\begin{notebox}
+\textbf{实战技巧}：看到 $\max$ 结构立刻想到保凸运算。例如 $f(x)=\max\{x_1^2+x_2^2,\; 2x_1+3x_2\}$——$x_1^2+x_2^2$ 凸（$\nabla^2 f \succ 0$），$2x_1+3x_2$ 凸（仿射），逐点最大值保凸 $\Rightarrow$ $f$ 凸。无需算Hessian！
+\end{notebox}
+
+% ============================================================
+\subsection{5.7 自编教学例题}
+
+\subsubsection{题1：凸集判定}
+
+\textbf{判定以下集合是否为凸集，并简述理由：}
+
+(1) $S_1 = \{(x_1,x_2) \mid x_1^2 + x_2^2 \le 4,\ x_1 \ge 0\}$（右半圆盘）
+
+(2) $S_2 = \{(x_1,x_2) \mid |x_1| + |x_2| \le 1\}$（$\ell_1$ 范数球/菱形）
+
+(3) $S_3 = \{(x_1,x_2) \mid x_1^2 - x_2 \le 0\}$（抛物线 $x_2=x_1^2$ 的上方区域）
+
+\medskip
+\textbf{解：}
+
+(1) 右半圆盘 $=$ 圆盘 $\cap$ 右半平面。两个凸集的交是凸集（凸集的性质）。$\checkmark$ 凸。
+
+(2) $\ell_1$ 范数球 $=\{x \mid \|x\|_1 \le 1\}$。范数是凸函数，凸函数的下水平集是凸集。几何上是以 $(\pm1,0),(0,\pm1)$ 为顶点的菱形。$\checkmark$ 凸。
+
+(3) $S_3 = \{x \mid x_2 \ge x_1^2\}$。$g(x)=x_1^2-x_2$ 是凸函数（$\nabla^2 g=\text{diag}(2,0)\succeq0$）。凸函数的下水平集是凸集。$\checkmark$ 凸。几何上：抛物线将平面分成"内部"（凹）和"外部"（凸），$S_3$ 是外部区域。
+
+\subsubsection{题2：凸函数判定（Hessian法 + 顺序主子式）}
+
+\textbf{判定以下二元函数的凸性：}
+
+(1) $f(x_1,x_2) = 3x_1^2 + 2x_2^2 + 2x_1x_2$
+
+(2) $f(x_1,x_2) = x_1^2 + x_2^4$
+
+(3) $f(x_1,x_2) = -x_1^2 - 2x_2^2$\quad（注意负号！）
+
+\medskip
+\textbf{解：}
+
+(1) $\nabla^2 f = \begin{pmatrix}6&2\\2&4\end{pmatrix}$。$\Delta_1=6>0$，$\Delta_2=6\cdot4-2\cdot2=20>0$。$\nabla^2 f \succ 0$ $\Rightarrow$ \emph{严格凸}。
+
+(2) $\nabla^2 f = \begin{pmatrix}2&0\\0&12x_2^2\end{pmatrix}$。$\Delta_1=2>0$，$\Delta_2=24x_2^2 \ge 0$（对任意 $x$）。$\nabla^2 f \succeq 0$ 恒成立 $\Rightarrow$ $f$ 凸。注意 $x_2=0$ 处 Hessian 仅为半正定（非正定），但 $f$ 实际上仍是严格凸——这再次说明Hessian正定只是严格凸的充分条件。
+
+(3) $\nabla^2 f = \begin{pmatrix}-2&0\\0&-4\end{pmatrix}$。$\Delta_1=-2<0$，$\Delta_2=8>0$。$\nabla^2 f \prec 0$（负定）$\Rightarrow$ $-f$ 严格凸 $\Rightarrow$ $f$ \emph{严格凹}。
+
+\subsubsection{题3：凸规划实例——局部=全局的威力}
+
+\textbf{考虑问题}：
+\[
+\min\; f(x_1,x_2) = x_1^2 + x_2^2 \quad\text{s.t.}\quad
+x_1 + x_2 \ge 1,\quad x_1 \ge 0,\quad x_2 \ge 0
+\]
+
+(1) 验证这是凸规划。\quad
+(2) 求出全局最优解。
+
+\medskip
+\textbf{解：}
+
+(1) 可行域 $S = \{x \mid x_1+x_2 \ge 1,\ x_1 \ge 0,\ x_2 \ge 0\}$ 是三个半空间的交 $\Rightarrow$ 多面体，凸。目标函数 $\nabla^2 f = \begin{pmatrix}2&0\\0&2\end{pmatrix} \succ 0$ $\Rightarrow$ 严格凸。$\therefore$ 这是凸规划（且 $f$ 严格凸，解唯一）。
+
+(2) 几何解释：原点 $(0,0)$ 不可行（$0+0\ngeq1$）。全局最优解是可行域中离原点最近的点——即原点在半空间 $x_1+x_2\ge1$（正象限内）的投影。由对称性 $x_1=x_2$，结合 $x_1+x_2=1$ 得 $x_1^*=x_2^*=\frac12$。$f(x^*)=\frac12$。
+
+KKT验证（凸规划下KKT充要）：构造 Lagrange 函数 $L = x_1^2+x_2^2 + \lambda(1-x_1-x_2) - \mu_1 x_1 - \mu_2 x_2$。
+\[
+\begin{aligned}
+\frac{\partial L}{\partial x_1} &= 2x_1 - \lambda - \mu_1 = 0 \\
+\frac{\partial L}{\partial x_2} &= 2x_2 - \lambda - \mu_2 = 0
+\end{aligned}
+\]
+互补松弛：$\lambda(1-x_1-x_2)=0$，$\mu_1 x_1=0$，$\mu_2 x_2=0$。最优处 $x_1>0,x_2>0$ $\Rightarrow$ $\mu_1=\mu_2=0$。约束 $x_1+x_2\ge1$ 在最优处积极 $\Rightarrow$ $x_1+x_2=1$。代入得 $2x_1=\lambda=2x_2$ $\Rightarrow$ $x_1=x_2=\frac12$，$\lambda=1$。因为是凸规划，此KKT点即全局最优。
+
+\subsubsection{题4：从第6章真题提取凸性片段}
+
+25年真题第六题：
+\[
+\min\; x_1^2 + x_2^2,\quad \text{s.t.}\ (x_1-1)^3 - x_2^2 = 0
+\]
+
+\textbf{先看目标函数}：$f(x)=x_1^2+x_2^2$，$\nabla^2 f = \begin{pmatrix}2&0\\0&2\end{pmatrix} \succ 0$ $\Rightarrow$ $f$ 是\emph{严格凸函数}。
+
+\textbf{再看约束}：$g(x)=(x_1-1)^3-x_2^2=0$。考虑曲线上的两点：$x^A=(2,1)$（$g=1^3-1=0$）和 $x^B=(2,-1)$（$g=1^3-1=0$）。中点 $x^M=(2,0)$，$g(x^M)=1^3-0=1\neq0$，不在约束曲线上。约束集合\emph{非凸}。
+
+\textbf{结论}：目标凸 $+$ 约束非凸 $\Rightarrow$ \emph{不是凸规划}。KKT条件仅为\emph{必要条件}——这正是该题有FJ点 $(1,0)$ 但无KKT点的根本原因。凸规划判定必须两个条件同时满足，缺一不可！
+
+\begin{notebox}
+\textbf{判定凸规划的完整流程（考试操作步骤）}
+
+Step 1：检查目标函数——求Hessian、算顺序主子式，判断是否半正定/正定。\\
+Step 2：检查可行域——是否可写为 $\{x\mid g_i(x)\le0,\ h_j(x)=0\}$ 形式，每个 $g_i$ 是否凸（不等号 $\le$）、每个 $h_j$ 是否仿射（等号）。\\
+Step 3：两个条件都满足 $\Rightarrow$ 凸规划 $\Rightarrow$ 局部$=$全局，KKT充要。\\
+\hspace{1.5em}任一不满足 $\Rightarrow$ 非凸规划 $\Rightarrow$ KKT仅为必要条件。
+\end{notebox}
+
+% ============================================================
 \subsection{本章速查}
 
 \begin{itemize}
-  \item 凸集：线段全在集合内。多面体、半空间、超平面都凸
-  \item 凸函数判别：定义法 $\to$ 一阶梯度不等式 $\to$ 二阶 Hessian 半正定
-  \item 凸规划：凸可行域 + 凸目标（对 $\min$） $\Rightarrow$ 局部=全局、KKT 充要
-  \item 严格凸 $\Rightarrow$ 最优解唯一
-  \item Hessian 半正定检查：所有顺序主子式 $\ge 0$
+  \item \textbf{凸集}：线段全在集合内。多面体（$Ax\le b$）、半空间、超平面、范数球都凸
+  \item \textbf{凸集反例检验}：有洞（圆环）、有凹（月牙）、离散（$\mathbb{Z}^n$）、不连通状
+  \item \textbf{凸函数判别三层次}：定义法 $\to$ 一阶梯度不等式 $\to$ 二阶Hessian半正定
+  \item \textbf{二阶判别最实用}：算Hessian $\to$ 顺序主子式 $\to$ 正定/半正定/不定/负定
+  \item \textbf{$2\times2$ Hessian快判}：$a>0,\ ac-b^2>0$ 为正定；$ac-b^2<0$ 为不定
+  \item \textbf{凸规划}：凸可行域 $+$ 凸目标（对 $\min$）$\Rightarrow$ 局部 $=$ 全局，KKT充要
+  \item \textbf{凸规划判定}：目标凸性和可行域凸性\emph{缺一不可}，必须分别验证
+  \item \textbf{严格凸} $\Rightarrow$ 最优解唯一（但 Hessian 正定仅仅是充分条件）
+  \item \textbf{保凸运算}：非负加权和、与仿射复合、逐点最大值均保持凸性
+  \item \textbf{常见凸函数}：仿射、$x^2$、$e^x$、$|x|$、范数、$x\ln x$（负熵）
+  \item \textbf{常见非凸/非凹}：$x_1^2-x_2^2$（鞍面）、$x^3$（$\mathbb{R}$上）、$\sin x$
 \end{itemize}

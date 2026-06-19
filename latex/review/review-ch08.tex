@@ -3,12 +3,14 @@
 % ============================================================
 \section{第8章 \quad 无约束优化方法}
 
-\subsection{8.1 下降算法的通用框架}
+\subsection{8.1 问题的版图：下降算法的通用框架}
 
-无约束优化 $\min f(x)$ 不能用单纯形表——我们没有约束提供的结构。但我们可以用迭代法：从某点出发，每一步选择一个\emph{下降方向}，沿该方向走\emph{合适的步长}。
+非线性规划的求解分两大战场：\emph{无约束}问题和\emph{有约束}问题。无约束优化 $\min f(x)$ 是一切的基础——罚函数法、乘子法等约束方法的本质，就是把带约束问题转化为一系列无约束子问题。
+
+无约束优化的共同骨架是\emph{迭代下降}：从初始点出发，每步沿下降方向走一段步长，函数值严格递减，直到梯度趋于零。
 
 \begin{defbox}
-\textbf{下降算法通用格式}
+\textbf{定义 8.1（下降算法通用格式）}
 
 给定初始点 $x^{(0)}$。对 $k = 0,1,2,\dots$：
 \[
@@ -16,197 +18,522 @@ x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}
 \]
 其中：
 \begin{itemize}
-  \item $d^{(k)}$ 是\emph{搜索方向}，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$（下降方向）
-  \item $\lambda_k > 0$ 是\emph{步长}，使得 $f(x^{(k+1)}) < f(x^{(k)})$
+  \item $d^{(k)}$ 是\emph{搜索方向}，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$（与负梯度成锐角，保证局部下降）
+  \item $\lambda_k > 0$ 是\emph{步长}，使 $f(x^{(k+1)}) < f(x^{(k)})$
 \end{itemize}
+终止准则：$\|\nabla f(x^{(k)})\| \le \varepsilon$ 时停止。
 \end{defbox}
+
+\begin{notebox}
+\textbf{为什么梯度为零是停机信号？} 无约束问题的一阶必要条件就是 $\nabla f(x^*) = 0$。当我们走到梯度\"足够小\"的点，说明已经接近某个驻点。对于凸函数，这就是全局最优。
+
+\textbf{具体例子}：设 $f(x) = x_1^2 + 2x_2^2$，取 $x^{(0)} = (3, 2)^T$。$\nabla f = (2x_1,\, 4x_2)$。若选 $d^{(0)} = -\nabla f^{(0)} = (-6, -8)^T$，$\nabla f^T d = (-6)^2 + (-8)^2 = -100 < 0$（下降）。若选 $d = (1, 0)^T$，$\nabla f^T d = 6 > 0$（上升，不能用）。
+\end{notebox}
+
+PPT第10章第1页展示了下降算法的宏观流程——``指定初始点 $\to$ 确定搜索方向 $\to$ 一维搜索定步长 $\to$ 更新 $\to$ 检查终止''。本章所有方法的区别仅在于\emph{怎么选方向}和\emph{怎么定步长}。
 
 \medskip
 \refslide{10使用导数的优化算法}{40}{10.1}
 \medskip
 
-不同的无约束优化方法，区别在于\emph{如何选方向}和\emph{如何定步长}。
+\subsection{8.2 最速下降法——局部最快，全局最慢}
 
-\subsection{8.2 最速下降法（梯度法）}
+最速下降法取\emph{负梯度方向}为搜索方向。梯度指向函数增长最快的方向，其反方向就是局部下降最快的方向。
 
 \begin{defbox}
-\textbf{最速下降法}
+\textbf{定义 8.2（最速下降法 / 梯度法）}
 
-取 $d^{(k)} = -\nabla f(x^{(k)})$（负梯度方向）。这是局部下降最快的方向。步长通过精确线搜索确定：
-\[
-\lambda_k = \argmin_{\lambda \ge 0}\ f(x^{(k)} + \lambda d^{(k)})
-\]
+方向：$d^{(k)} = -\nabla f(x^{(k)})$
+
+步长：$\lambda_k = \displaystyle\operatorname*{argmin}_{\lambda \ge 0}\ f(x^{(k)} + \lambda d^{(k)})$（精确线搜索）
 \end{defbox}
 
-最速下降法实现简单，但收敛慢（呈现锯齿形）。在 Hessian 条件数大时尤为严重。它为理解更高级方法提供了基准。
+\textbf{具体例子}：$f(x_1,x_2) = x_1^2 + 9x_2^2$，$x^{(0)} = (9, 1)^T$。
+\begin{itemize}
+  \item $\nabla f = (2x_1,\, 18x_2)$，$\nabla f^{(0)} = (18,\, 18)^T$
+  \item $d^{(0)} = -(18, 18)^T = -18(1,1)^T$
+  \item 代入线搜索：$\phi(\lambda) = (9-18\lambda)^2 + 9(1-18\lambda)^2 = 90 - 648\lambda + 3240\lambda^2$
+  \item $\phi'(\lambda) = -648 + 6480\lambda = 0 \Rightarrow \lambda_0 = 0.1$
+  \item $x^{(1)} = (9-1.8,\; 1-1.8)^T = (7.2,\; -0.8)^T$
+  \item $f(x^{(1)}) = 57.6$（从 90 只降到 57.6，仅降 36\%）
+\end{itemize}
 
-\subsection{8.3 精确线搜索}
+\textbf{锯齿现象的根源}：精确线搜索下，$d^{(k)} \perp d^{(k+1)}$（连续两方向正交）。因为 $\phi'(\lambda_k) = \nabla f^{(k+1)T} d^{(k)} = 0$，即 $\nabla f^{(k+1)} \perp d^{(k)}$，而 $d^{(k+1)} = -\nabla f^{(k+1)}$，所以 $d^{(k+1)} \perp d^{(k)}$。在狭长的``山谷''地形（Hessian条件数大）中，它在山谷两侧反复横跳，而不是沿谷底前进——这就是``局部最快，全局最慢''的根源。
 
-在选定方向 $d^{(k)}$ 后，需要确定步长 $\lambda_k$。精确线搜索求解一元极小化问题 $\min_{\lambda \ge 0}\ \phi(\lambda) = f(x^{(k)} + \lambda d^{(k)})$。
+\subsection{8.3 牛顿法——一步到位的理想}
 
-\textbf{做法}：将 $x^{(k)} + \lambda d^{(k)}$ 代入 $f$ 得 $\phi(\lambda)$，求导 $\phi'(\lambda) = 0$ 解出 $\lambda$。
+牛顿法利用目标函数的二阶泰勒展开，在局部用二次函数逼近 $f$，然后直接跳到该二次逼近的极小点。
+
+\begin{defbox}
+\textbf{定义 8.3（牛顿法）}
+
+方向：$d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1}\, \nabla f(x^{(k)}$
+
+步长：$\lambda_k = 1$（纯牛顿法，不搜索）
+\end{defbox}
+
+\textbf{具体例子（接上例）}：同取 $f = x_1^2 + 9x_2^2$，$x^{(0)} = (9, 1)^T$。
+\begin{itemize}
+  \item $\nabla^2 f = \begin{pmatrix} 2 & 0 \\ 0 & 18 \end{pmatrix}$，$[\nabla^2 f]^{-1} = \begin{pmatrix} 1/2 & 0 \\ 0 & 1/18 \end{pmatrix}$
+  \item $\nabla f^{(0)} = (18, 18)^T$
+  \item $d^{(0)} = -H^{-1}\nabla f = -(9,\, 1)^T$
+  \item $x^{(1)} = (9,1) - 1\cdot(9,1) = (0,0)^T$
+  \item $\nabla f(0,0) = (0,0)^T$，\textbf{一步精确收敛！} $f(0,0) = 0$（全局最优）
+\end{itemize}
+
+牛顿法的收敛速度是\emph{二次收敛}：误差平方级递减（$\|x^{(k+1)}-x^*\| \le C\|x^{(k)}-x^*\|^2$），远快于最速下降法的线性收敛。但代价高昂——需要计算 Hessian 逆矩阵。
+
+\subsection{8.4 自编对比例题：最速下降 vs 牛顿法}
+
+下面用一个完整的对比例题，直观展示两种方法的巨大差距。
+
+\begin{notebox}
+\textbf{【自编教学例】}
+\[
+\min\ f(x_1, x_2) = x_1^2 + 9x_2^2,\qquad x^{(0)} = (9,\; 1)^T
+\]
+目标：分别用最速下降法和牛顿法各执行一轮迭代。
+\end{notebox}
+
+\medskip
+
+\subsubsection{牛顿法（第1轮）}
+
+$\nabla f = (2x_1,\, 18x_2)^T$，$\nabla^2 f = \operatorname{diag}(2, 18)$，$H^{-1} = \operatorname{diag}(\tfrac{1}{2}, \tfrac{1}{18})$。
+
+在 $x^{(0)}$ 处：$\nabla f^{(0)} = (18, 18)^T$。牛顿方向：
+\[
+d_{\text{Newton}}^{(0)} = -H^{-1}\nabla f^{(0)} = -\begin{pmatrix} 1/2 & 0 \\ 0 & 1/18 \end{pmatrix}
+\begin{pmatrix} 18 \\ 18 \end{pmatrix} = -\begin{pmatrix} 9 \\ 1 \end{pmatrix}
+\]
+$x^{(1)} = (9,1) - (9,1) = (0,0)^T$。$\nabla f(0,0) = (0,0)^T$，$f = 0$。\textbf{一步到达全局最优。}
+
+\subsubsection{最速下降法（第1轮）}
+
+方向：$d_{\text{SD}}^{(0)} = -\nabla f^{(0)} = -(18, 18)^T = -18(1,1)^T$。
+
+代入 $f$ 做线搜索：
+\[
+\phi(\lambda) = (9-18\lambda)^2 + 9(1-18\lambda)^2
+= 90 - 648\lambda + 3240\lambda^2
+\]
+$\phi'(\lambda) = -648 + 6480\lambda = 0 \Rightarrow \lambda_0 = 0.1$。
+\[
+x_{\text{SD}}^{(1)} = (9-1.8,\; 1-1.8)^T = (7.2,\; -0.8)^T
+\]
+$f(x_{\text{SD}}^{(1)}) = 7.2^2 + 9\times 0.64 = 57.6$。第二方向 $d^{(1)} = -\nabla f^{(1)} = -(14.4, -14.4)^T$，验证锯齿：$d^{(0)}\cdot d^{(1)} = (-18)(-14.4) + (-18)(14.4) = 0$（正交！）。
+
+\begin{defbox}
+\textbf{对比总结}
+\smallskip
+{\footnotesize
+\begin{tabular}{lcc}
+\toprule
+& \textbf{最速下降法} & \textbf{牛顿法} \\
+\midrule
+第1轮后 $x$      & $(7.2,\; -0.8)$         & $(0,\; 0)$ \\
+第1轮后 $f(x)$   & $57.6$                   & $0$ \\
+与最优值差距       & $57.6 > 0$                & $0$（已收敛） \\
+每步成本          & 梯度 $O(n)$               & Hessian + 求逆 $O(n^3)$ \\
+方向间关系        & 正交（锯齿）               & 直指极小点 \\
+\toprule
+\end{tabular}
+}
+\medskip
+\textbf{启示}：如果能把``牛顿的准''和``梯度的省''结合起来，该多好？这就是下一节拟牛顿法的出发点。
+\end{defbox}
+
+\subsection{8.5 线搜索——步长怎么定}
+
+无论在哪个方向下行，步长必须保证``走得足够远但不过头''。
+
+\subsubsection{精确线搜索}
+
+给定方向 $d$，求 $\min_{\lambda \ge 0}\ \phi(\lambda) = f(x + \lambda d)$。将 $x+\lambda d$ 代入 $f$ 得 $\phi(\lambda)$（一元函数），解 $\phi'(\lambda) = 0$ 即得最优步长。
+
+PPT第9章第8页对比了精确线搜索与非精确线搜索的概念。精确线搜索理论上最优，但每次要解一个一元方程——在前几步不需要这么精确。
 
 \medskip
 \refslide{9一维搜索}{51}{9.8}
 \medskip
+
+\subsubsection{Armijo 准则（非精确线搜索）}
+
+实际计算中，每次迭代精确求解 $\min_\lambda \phi(\lambda)$ 代价太高。Armijo准则用``回溯法''找一个``足够好''的步长：从 $\lambda = 1$ 开始，不断缩小 $\lambda$（乘以 $\beta \in (0,1)$，常用 $\beta = 0.5$），直到满足充分下降条件：
+\[
+f(x + \lambda d) \le f(x) + \alpha \lambda \nabla f(x)^T d
+\]
+其中 $\alpha \in (0,1)$（常用 $\alpha = 10^{-4}$）。右边是沿方向 $d$ 的线性下降预期——如果实际下降达不到这个预期，说明步长太大，需要缩步。
+
+PPT第9章第9页展示了Armijo准则的几何含义和回溯流程，这是拟牛顿法和共轭梯度法常用的步长策略。
+
+\medskip
 \refslide{9一维搜索}{52}{9.9}
 \medskip
 
-\subsection{8.4 共轭梯度法}
+\begin{notebox}
+\textbf{精确 vs 非精确线搜索的选择}：考试中手算题用\emph{精确线搜索}（因为函数简单，可手解 $\phi'(\lambda)=0$）。实际软件中Armijo准则更常见——省时，且对DFP/BFGS的收敛性理论保证已完备。
+\end{notebox}
 
-最速下降法的锯齿现象源于\emph{连续两步的搜索方向是正交的}（一碰就转 90°）。共轭梯度法通过巧妙的递推\emph{构造共轭方向}，使得对正定二次函数 $f(x) = \frac{1}{2}x^T Q x + c^T x$，$n$ 步内精确收敛。
+\subsection{8.6 共轭梯度法——不存矩阵，用巧劲}
+
+\subsubsection{核心动机}
+
+最速下降法的锯齿因连续方向正交而低效，牛顿法虽好但存 Hessian 太贵（$O(n^2)$ 存储，$O(n^3)$ 求逆）。共轭梯度法在两者之间取平衡：\emph{不存矩阵，$n$ 步收敛}——对正定二次函数，至多 $n$ 轮精确收敛到极小点。
 
 \begin{defbox}
-\textbf{FR（Fletcher-Reeves）共轭梯度法}
+\textbf{定义 8.4（FR 共轭梯度法）}
 
-初始化：$d^{(0)} = -\nabla f(x^{(0)})$。
+初始：$d^{(0)} = -\nabla f(x^{(0)})$。
 
-对于 $k \ge 1$：
+对 $k \ge 1$：
 \[
-\beta_k = \frac{\| \nabla f^{(k)} \|^2}{\| \nabla f^{(k-1)} \|^2}
-\]
-\[
+\beta_k = \frac{\|\nabla f^{(k)}\|^2}{\|\nabla f^{(k-1)}\|^2},\qquad
 d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}
 \]
-方向 $d^{(k)}$ 与 $d^{(k-1)}$ 关于 Hessian $Q$ 共轭：$(d^{(k)})^T Q d^{(k-1)} = 0$。
+
+方向 $d^{(k)}$ 与 $d^{(k-1)}$ 关于 Hessian $Q$ 共轭：$(d^{(k)})^T Q d^{(k-1)} = 0$。\emph{共轭不等于正交}——共轭考虑了目标函数的曲率（通过 $Q$ 加权），使每一步方向在 $Q$-内积意义下互不干扰。
 \end{defbox}
+
+\subsubsection{简单算例}
+
+仍用 $f(x) = \tfrac{1}{2}(x_1^2 + 2x_2^2)$，$x^{(0)} = (2, 1)^T$。$Q = \operatorname{diag}(1, 2)$。
+
+\textbf{第1步}（同最速下降）：
+$\nabla f^{(0)} = (2, 2)^T$，$d^{(0)} = -(2, 2)^T$。线搜索：$\phi(\lambda) = 3 - 4\lambda + 3\lambda^2$，$\lambda_0 = 2/3$。
+$x^{(1)} = (2/3,\; -1/3)^T$。
+
+\textbf{第2步}（共轭修正）：
+$\nabla f^{(1)} = (2/3,\; -2/3)^T$，$\beta_1 = \frac{\|(2/3,-2/3)\|^2}{\|(2,2)\|^2} = \frac{8/9}{8} = \frac{1}{9}$。
+\begin{align*}
+d^{(1)} &= -\begin{pmatrix} 2/3 \\ -2/3 \end{pmatrix}
+          + \frac{1}{9}\begin{pmatrix} -2 \\ -2 \end{pmatrix} \\
+        &= \begin{pmatrix} -2/3 - 2/9 \\ 2/3 - 2/9 \end{pmatrix}
+        = \begin{pmatrix} -8/9 \\ 4/9 \end{pmatrix}
+        = \frac{4}{9}\begin{pmatrix} -2 \\ 1 \end{pmatrix}
+\end{align*}
+线搜索沿 $d^{(1)}$ 精确到 $x^{(2)} = (0, 0)$。\textbf{两轮收敛（$n=2$）！}
+
+验证共轭性：$(d^{(1)})^T Q d^{(0)} = (-8/9, 4/9)\operatorname{diag}(1,2)(-2,-2)^T = (-8/9)(-2) + (8/9)(-2) = 0$。\checkmark
+
+\begin{notebox}
+\textbf{共轭梯度法的优势}：存储量 $O(n)$（只需存上一轮梯度），每次迭代只需算梯度（无需Hessian），对大规模问题（$n$ 成千上万）是唯一可行的选择。PPT第10章第7页给出了共轭梯度法的归纳证明框架。
+\end{notebox}
 
 \medskip
 \refslide{10使用导数的优化算法}{46}{10.7}
 \medskip
 
-\begin{notebox}
-\textbf{共轭梯度法为什么好？} 它不需要存储 Hessian 矩阵（存储量 $O(n)$ vs 牛顿法 $O(n^2)$），适合大规模问题；收敛速度远快于最速下降法；利用了过去方向的信息避免了锯齿。
-\end{notebox}
+\subsection{8.7 拟牛顿法——用梯度变化"猜"曲率}
 
-\subsection{8.5 拟牛顿法}
+\subsubsection{8.7.1 牛顿法的三大软肋}
 
-\subsubsection{牛顿法的瓶颈}
+牛顿法方向 $d = -[\nabla^2 f]^{-1}\nabla f$ 好在哪里？好在方向精确——它直接指向二次模型的极小点。但它有三个实际障碍：
+\begin{enumerate}
+  \item \textbf{Hessian 矩阵计算贵}：$\nabla^2 f$ 有 $n(n+1)/2$ 个独立二阶偏导数
+  \item \textbf{求逆更贵}：矩阵求逆是 $O(n^3)$ 量级
+  \item \textbf{不一定正定}：牛顿方向可能不是下降方向（若 Hessian 有负特征值）
+\end{enumerate}
 
-牛顿法方向 $d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1} \nabla f(x^{(k)})$ 收敛极快（二次收敛），但需要：一、计算 Hessian 矩阵；二、求 Hessian 逆。两者计算量都很大。
+\textbf{核心洞察}：我们其实不需要直接知道 Hessian 的全部信息——只需要从迭代过程中观察到的\emph{梯度变化}来\emph{推断}曲率。就像盲人用拐杖探路：每走一步感知一次坡度变化，走得多了自然摸清地形轮廓。
 
-\subsubsection{拟牛顿法的核心思想}
+\subsubsection{8.7.2 拟牛顿条件的由来}
 
-\textbf{不直接算 Hessian 逆，而是用迭代过程中观察到的梯度差来逐步"逼近"它}。
-
-设 $s_{k-1} = x^{(k)} - x^{(k-1)}$（位移差），$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$（梯度差）。拟牛顿条件要求近似 Hessian 逆 $H_k$ 满足：
+观察一个关键事实。对二次函数 $f(x) = \tfrac{1}{2}x^T Q x + c^T x$，有 $\nabla f(x) = Qx + c$。因此相邻两点 $x^{(k)}$ 与 $x^{(k-1)}$ 的梯度差满足：
 \[
-H_k y_{k-1} = s_{k-1}
+\nabla f^{(k)} - \nabla f^{(k-1)} = Q(x^{(k)} - x^{(k-1)})
 \]
-这有明确的几何含义：$H_k$ 沿着方向 $y_{k-1}$ 的"曲率"应该匹配实际观察到的"曲率"。
-
-\subsubsection{DFP 校正公式}
+记 $s_{k-1} = x^{(k)} - x^{(k-1)}$（位移差），$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$（梯度差），则：
+\[
+y_{k-1} = Q s_{k-1}\quad\Longrightarrow\quad s_{k-1} = Q^{-1} y_{k-1}
+\]
+注意：$Q^{-1}$ 就是 Hessian 的逆！对于一般的非二次函数，我们要求近似 Hessian 逆矩阵 $H_k$ 也满足同样的关系：
 
 \begin{defbox}
-\textbf{DFP（Davidon-Fletcher-Powell）公式}
+\textbf{定义 8.5（拟牛顿条件 / 割线方程）}
 
-从 $H_{k-1}$ 更新到 $H_k$ 的公式为：
 \[
-H_k = H_{k-1} + \underbrace{\frac{s_{k-1} s_{k-1}^T}{s_{k-1}^T y_{k-1}}}_{\text{正定修正}}
-- \underbrace{\frac{H_{k-1} y_{k-1} y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}}_{\text{消去旧曲率信息}}
+H_k\, y_{k-1} = s_{k-1}
 \]
-DFP 校的是 $H$（Hessian \textbf{逆}的近似）。方向取 $d^{(k)} = -H_k \nabla f^{(k)}$。
+
+解读：在方向 $y_{k-1}$ 上，$H_k$ 把``梯度变化''映射为``位移变化''——这和真正的 Hessian 逆的行为一致。$H_k$ 不能仅由此式唯一确定（$n$ 个方程 vs $n^2$ 个未知数），不同补充条件导出不同的拟牛顿公式。
 \end{defbox}
+
+\subsubsection{8.7.3 DFP 校正公式——两项的含义}
+
+DFP（Davidon-Fletcher-Powell）方法维护 $H_k \approx [\nabla^2 f]^{-1}$（Hessian \textbf{逆}的近似）。每步从 $H_{k-1}$ 出发，加上两个秩1修正：
+
+\begin{defbox}
+\textbf{定义 8.6（DFP 校正公式）}
+
+\begin{multline*}
+H_k = H_{k-1}
+      + \underbrace{\frac{s_{k-1} s_{k-1}^T}{s_{k-1}^T y_{k-1}}}_{\text{正定修正}}
+      - \underbrace{\frac{H_{k-1} y_{k-1} y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}}_{\text{擦除修正}}
+\end{multline*}
+
+\textbf{两项的因果逻辑}：
+\begin{itemize}
+  \item \textbf{第一项（正定修正）}：用位移差 $s_{k-1}$ 构造秩1矩阵。这一项保证了 $H_k y_{k-1} = s_{k-1}$ 在 $H_{k-1}=0$ 的极端情况下也成立——它``塞入''了方向 $s_{k-1}$ 上的新曲率信息。分子 $ss^T$ 是外积，分母 $s^Ty$ 做归一化。
+  \item \textbf{第二项（擦除修正）}：减去 $H_{k-1}$ 在 $y_{k-1}$ 方向上的``投影''。$H_{k-1}$ 中存储的旧曲率可能不准确——这一项把 $H_{k-1}$ 沿 $y_{k-1}$ 方向上的分量``擦掉''，给第一项新信息腾位置。代入检验可知：若无第二项，$H_k y_{k-1} \neq s_{k-1}$。
+  \item \textbf{遗传正定性}：若 $H_{k-1} \succ 0$ 且 $s_{k-1}^T y_{k-1} > 0$，则 $H_k \succ 0$ 也正定——每一步都保持 Hessian 逆近似的正定性。
+\end{itemize}
+\end{defbox}
+
+PPT第10章第52页给出了DFP算法（原称变尺度法）的整体流程，包括初始化 $H_0 = I$、确定方向 $d = -H\nabla f$、线搜索、计算 $s$ 和 $y$、DFP校正的完整循环。
 
 \medskip
 \refslide{10使用导数的优化算法}{91}{10.52}
 \medskip
-\refslide{10使用导数的优化算法}{95}{10.56}
-\medskip
-
-\begin{notebox}
-\textbf{公式记忆}：两个分数项。第一项分子 $s s^T$（秩1矩阵）用位移差修正；第二项用 $Hy$ 消去旧方向上的曲率信息。两项合起来是\emph{秩2校正}。DFP 校 $H$（逆），BFGS 校 $B$（直接近似 Hessian）。
-\end{notebox}
-
-\subsubsection{BFGS 简介}
-
-BFGS 是 DFP 的"互补"方法。BFGS 公式：
-\[
-B_k = B_{k-1} + \frac{y_{k-1} y_{k-1}^T}{y_{k-1}^T s_{k-1}} - \frac{B_{k-1} s_{k-1} s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
-\]
-其中 $B_k \approx \nabla^2 f(x^{(k)})$ 是 Hessian 本身的近似。实际使用中，BFGS 往往比 DFP 更稳定（对一维搜索误差不敏感）。考试中以 DFP 为主。
-
-\subsection{8.6 真题示例：第四题——DFP 拟牛顿法完整求解}
-
-\begin{notebox}
-\textbf{【2025 真题·第四题】}
-\[
-\min\ f(X) = x_1^2 + 2x_2^2 + x_1,\quad X^{(0)} = (2,1)^T,\ H_0 = I
-\]
-用 DFP 方法求解。
-\end{notebox}
-
-\medskip
-
-\subsubsection{第 1 轮迭代}
-
-\textbf{梯度}：$\nabla f = (2x_1+1,\ 4x_2)^T$。在 $X^{(0)}$：$\nabla f^{(0)} = (5,4)^T$。
-
-\textbf{方向}：$d^{(0)} = -H_0 \nabla f^{(0)} = -(5,4)^T$（第一步同最速下降）。
-
-\textbf{一维搜索}：$X^{(0)} + \lambda d^{(0)} = (2-5\lambda,\ 1-4\lambda)^T$。
-\begin{align*}
-\phi(\lambda) &= (2-5\lambda)^2 + 2(1-4\lambda)^2 + (2-5\lambda) \\
-&= 25\lambda^2 - 20\lambda + 4 + 2(16\lambda^2 - 8\lambda + 1) + 2 - 5\lambda \\
-&= (25+32)\lambda^2 + (-20-16-5)\lambda + (4+2+2) \\
-&= 57\lambda^2 - 41\lambda + 8
-\end{align*}
-令 $\phi'(\lambda) = 114\lambda - 41 = 0$，得 $\lambda_0 = 41/114$。
-
-\[
-X^{(1)} = X^{(0)} + \lambda_0 d^{(0)} = \frac{1}{114}(23,-50)^T
-\]
-\[
-\nabla f^{(1)} = \left(\frac{160}{114},\ \frac{-200}{114}\right)^T = \frac{1}{114}(160,-200)^T
-\]
-
-\medskip
 \refslide{10使用导数的优化算法}{92}{10.53}
 \medskip
 
-\subsubsection{DFP 校正}
+\subsubsection{8.7.4 DFP 2×2 矩阵算例——手把手演示}
 
-$s_0 = X^{(1)} - X^{(0)} = -\frac{41}{114}(5,4)^T$。\\
-$y_0 = \nabla f^{(1)} - \nabla f^{(0)} = \frac{1}{114}(160-570,\ -200-456)^T = \frac{1}{114}(-410,\ -656)^T = -\frac{41}{114}(10,16)^T$。
-
-计算 DFP 各项：
-\begin{align*}
-s_0^T y_0 &= \left(-\frac{41}{114}\right)^2 (5,4)\cdot(10,16)
-           = \frac{41^2}{114} \\[4pt]
-s_0 s_0^T &= \frac{41^2}{114^2}\begin{pmatrix}5\\4\end{pmatrix}
-            \begin{pmatrix}5&4\end{pmatrix}
-           = \frac{41^2}{114^2}\begin{pmatrix}25&20\\20&16\end{pmatrix} \\[4pt]
-y_0^T H_0 y_0 &= \left(\frac{41}{114}\right)^2 (10^2+16^2)
-               = \frac{41^2}{114^2}\cdot 356
-\end{align*}
-
-代入 DFP 公式得 $H_1$。此处公式展开冗长，核心是：$H_1$ 不再是对角矩阵，它包含了曲率信息。完整结果见课件。
-
-\medskip
-\refslide{10使用导数的优化算法}{96}{10.57}
-\medskip
-
-\subsubsection{第 2 轮迭代}
-
-$d^{(1)} = -H_1 \nabla f^{(1)}$。一维搜索得 $\lambda_1 = 5/57$。$X^{(2)} = (-1/2,\ 0)^T$。
-
-$\nabla f(X^{(2)}) = (0,0)^T$ → 驻点。$\nabla^2 f = \begin{pmatrix}2&0\\0&4\end{pmatrix}$ 正定 → $X^{(2)}$ 是极小点。
+下面用最简单的情形展示 DFP 校正公式如何把 $H_0 = I$（对角）变成包含曲率信息的 $H_1$（非对角）。
 
 \begin{notebox}
-\textbf{DFP 的二次终止性}：对正定二次函数，DFP 法至多 $n$ 轮收敛。此题 $n=2$，恰好两轮到达精确解。这是拟牛顿法的关键理论性质。
+\textbf{【2×2 DFP 演示】}
+\[
+f(x_1,x_2) = \frac{1}{2}(x_1^2 + 2x_2^2),\quad
+x^{(0)} = (2,\; 1)^T,\quad H_0 = I
+\]
+（$f$ 是正定二次函数，$Q = \operatorname{diag}(1,2)$，真逆 $Q^{-1} = \operatorname{diag}(1, 1/2)$。）
 \end{notebox}
 
+\medskip
+
+\textbf{第1步（同最速下降，$H_0=I$）}
+
+$\nabla f = (x_1,\, 2x_2)^T$，$\nabla f^{(0)} = (2, 2)^T$。$d^{(0)} = -H_0 \nabla f^{(0)} = -(2, 2)^T$。
+
+线搜索：$\phi(\lambda) = \tfrac{1}{2}[(2-2\lambda)^2 + 2(1-2\lambda)^2] = 3 - 8\lambda + 6\lambda^2$。
+$\phi'(\lambda) = -8 + 12\lambda = 0 \Rightarrow \lambda_0 = 2/3$。
+\[
+x^{(1)} = \Bigl(2-\frac{4}{3},\; 1-\frac{4}{3}\Bigr)^T
+        = \Bigl(\frac{2}{3},\; -\frac{1}{3}\Bigr)^T
+\]
+
+\textbf{计算 $s_0$ 和 $y_0$}
+
+$\nabla f^{(1)} = (2/3,\, -2/3)^T$。
+\begin{align*}
+s_0 &= x^{(1)} - x^{(0)}
+     = \Bigl(-\frac{4}{3},\; -\frac{4}{3}\Bigr)^T
+     = -\frac{4}{3}\begin{pmatrix} 1 \\ 1 \end{pmatrix} \\[4pt]
+y_0 &= \nabla f^{(1)} - \nabla f^{(0)}
+     = \Bigl(-\frac{4}{3},\; -\frac{8}{3}\Bigr)^T
+     = -\frac{4}{3}\begin{pmatrix} 1 \\ 2 \end{pmatrix}
+\end{align*}
+
+验证：$Q s_0 = \operatorname{diag}(1,2) \cdot (-\frac{4}{3})(1,1)^T = (-\frac{4}{3})(1,2)^T = y_0$。\checkmark
+
+\textbf{DFP 校正（从 $H_0=I$ 到 $H_1$）}
+
+计算三项中间量：
+\begin{align*}
+s_0^T y_0 &= \frac{16}{9}(1\cdot 1 + 1\cdot 2) = \frac{48}{9} = \frac{16}{3} \\[4pt]
+s_0 s_0^T &= \frac{16}{9}\begin{pmatrix} 1 \\ 1 \end{pmatrix}\begin{pmatrix} 1 & 1 \end{pmatrix}
+           = \frac{16}{9}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix} \\[4pt]
+y_0^T H_0 y_0 &= \frac{16}{9}(1^2 + 2^2) = \frac{80}{9} \\[4pt]
+H_0 y_0 y_0^T H_0 &= \frac{16}{9}\begin{pmatrix} 1 \\ 2 \end{pmatrix}\begin{pmatrix} 1 & 2 \end{pmatrix}
+                    = \frac{16}{9}\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}
+\end{align*}
+
+\textbf{第一项}（正定修正）：
+\[
+\frac{s_0 s_0^T}{s_0^T y_0}
+= \frac{\frac{16}{9}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}}{\frac{16}{3}}
+= \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}
+\]
+
+\textbf{第二项}（擦除修正）：
+\[
+\frac{H_0 y_0 y_0^T H_0}{y_0^T H_0 y_0}
+= \frac{\frac{16}{9}\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}}{\frac{80}{9}}
+= \frac{1}{5}\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}
+\]
+
+\textbf{合并得到 $H_1$}：
+\begin{align*}
+H_1 &= I + \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}
+            - \frac{1}{5}\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix} \\[4pt]
+    &= \begin{pmatrix} 1+\frac{1}{3}-\frac{1}{5} & \frac{1}{3}-\frac{2}{5} \\[4pt]
+                       \frac{1}{3}-\frac{2}{5} & 1+\frac{1}{3}-\frac{4}{5} \end{pmatrix} \\[4pt]
+    &= \begin{pmatrix} \frac{17}{15} & -\frac{1}{15} \\[4pt]
+                       -\frac{1}{15} & \frac{8}{15} \end{pmatrix}
+\approx \begin{pmatrix} 1.133 & -0.067 \\ -0.067 & 0.533 \end{pmatrix}
+\end{align*}
+
+\textbf{解读 $H_1$}：对比真逆 $Q^{-1} = \operatorname{diag}(1, 0.5)$，$H_1$ 的对角元已开始逼近真实值（$1.133\to 1$，$0.533\to 0.5$），且出现了非对角元（$-0.067$）——这意味着 DFP``意识到''两个坐标轴之间存在曲率耦合（尽管本题 $Q$ 实际是对角的，初始 $H_0=I$ 的不准确导致了非对角补偿）。一次校正虽未精确复原 $Q^{-1}$，但已经显著优于 $H_0 = I$。
+
+\textbf{第2步（使用 $H_1$，验证二次终止性）}
+
+$d^{(1)} = -H_1 \nabla f^{(1)}$。先算矩阵乘向量：
+\[
+H_1\nabla f^{(1)}
+= \begin{pmatrix} \frac{17}{15} & -\frac{1}{15} \\[4pt]
+                   -\frac{1}{15} & \frac{8}{15} \end{pmatrix}
+  \begin{pmatrix} 2/3 \\[2pt] -2/3 \end{pmatrix}
+= \begin{pmatrix} \frac{34}{45}+\frac{2}{45} \\[4pt]
+                  -\frac{2}{45}-\frac{16}{45} \end{pmatrix}
+= \begin{pmatrix} 36/45 \\[4pt] -18/45 \end{pmatrix}
+\]
+故 $d^{(1)} = -H_1\nabla f^{(1)} = (-4/5,\; 2/5)^T$。
+
+线搜索：$\phi(\lambda) = \tfrac{1}{2}[(\tfrac{2}{3}-\tfrac{4}{5}\lambda)^2 + 2(-\tfrac{1}{3}+\tfrac{2}{5}\lambda)^2]$
+$= \tfrac{1}{3} - \tfrac{4}{5}\lambda + \tfrac{12}{25}\lambda^2$。
+$\phi'(\lambda) = -\tfrac{4}{5} + \tfrac{24}{25}\lambda = 0 \Rightarrow \lambda_1 = \tfrac{5}{6}$。
+\[
+x^{(2)} = \Bigl(\frac{2}{3}-\frac{4}{5}\!\cdot\!\frac{5}{6},\;
+                 -\frac{1}{3}+\frac{2}{5}\!\cdot\!\frac{5}{6}\Bigr)^T
+        = \Bigl(\frac{2}{3}-\frac{2}{3},\; -\frac{1}{3}+\frac{1}{3}\Bigr)^T
+        = (0, 0)^T
+\]
+$\nabla f(0,0) = (0,0)^T$。\textbf{两轮收敛（$n=2$）！}
+
+\begin{defbox}
+\textbf{DFP 的二次终止性}：对正定二次函数，DFP法至多 $n$ 步收敛到精确极小点。且若每步精确线搜索，则产生的方向 $d^{(0)},\dots,d^{(n-1)}$ 关于 $Q$ 相互共轭。
+\end{defbox}
+
+PPT第10章第56--57页通过数值示例展示了拟牛顿法的第1次和第2次迭代全过程，第63页专门论证了DFP的二次终止性。
+
+\medskip
+\refslide{10使用导数的优化算法}{95}{10.56}
+\medskip
+\refslide{10使用导数的优化算法}{96}{10.57}
 \medskip
 \refslide{10使用导数的优化算法}{102}{10.63}
 \medskip
 
+\subsubsection{8.7.5 BFGS——DFP 的互补兄弟}
+
+BFGS不是维护 $H_k$（逆的近似），而是维护 $B_k \approx \nabla^2 f$（Hessian \textbf{本身}的近似）。将 DFP 公式中所有 $s$ 与 $y$ 互换，$H$ 换成 $B$，就得到 BFGS：
+
+\begin{defbox}
+\textbf{定义 8.7（BFGS 校正公式）}
+
+\[
+B_k = B_{k-1}
+    + \frac{y_{k-1} y_{k-1}^T}{y_{k-1}^T s_{k-1}}
+    - \frac{B_{k-1} s_{k-1} s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
+\]
+
+拟牛顿条件对应为 $B_k s_{k-1} = y_{k-1}$（$B_k$ 把位移映射为梯度变化）。
+\end{defbox}
+
+\textbf{DFP 与 BFGS 的对偶关系}：
+\begin{itemize}
+  \item DFP 校 $H$（逆）$\;\longleftrightarrow\;$ BFGS 校 $B$（Hessian本身）
+  \item DFP：$H_k y = s$ $\;\longleftrightarrow\;$ BFGS：$B_k s = y$
+  \item 记忆口诀：DFP 公式中分子是 $ss^T$ 和 $Hyy^T H$，BFGS 公式中分子是 $yy^T$ 和 $Bss^T B$
+\end{itemize}
+
+\textbf{考试以 DFP 为主}。BFGS 在实际计算中通常更鲁棒（对非精确线搜索不敏感），但公式结构完全对称，理解了一个就理解了另一个。
+
+\subsection{8.8 真题示例：第四题——DFP 拟牛顿法完整求解}
+
+\begin{notebox}
+\textbf{【2025 真题·第四题】}
+\[
+\min\ f(X) = x_1^2 + 2x_2^2 + x_1
+\]
+\[
+X^{(0)} = (2,\; 1)^T,\qquad H_0 = I
+\]
+用 DFP 方法求解（需做两轮迭代至收敛）。
+\end{notebox}
+
+\medskip
+
+\subsubsection{第1轮迭代}
+
+\textbf{梯度}：$\nabla f = (2x_1+1,\; 4x_2)^T$。在 $X^{(0)}$ 处：$\nabla f^{(0)} = (5,\; 4)^T$。
+
+\textbf{方向}：$d^{(0)} = -H_0 \nabla f^{(0)} = -(5,\; 4)^T$（第一步等价于最速下降）。
+
+\textbf{一维搜索}：$X^{(0)} + \lambda d^{(0)} = (2-5\lambda,\; 1-4\lambda)^T$。
+\begin{align*}
+\phi(\lambda) &= (2-5\lambda)^2 + 2(1-4\lambda)^2 + (2-5\lambda) \\
+  &= (4 - 20\lambda + 25\lambda^2) + 2(1 - 8\lambda + 16\lambda^2) + 2 - 5\lambda \\
+  &= (25+32)\lambda^2 + (-20-16-5)\lambda + (4+2+2) \\
+  &= 57\lambda^2 - 41\lambda + 8
+\end{align*}
+$\phi'(\lambda) = 114\lambda - 41 = 0 \Rightarrow \lambda_0 = 41/114$。
+
+\[
+X^{(1)} = \frac{1}{114}(228-205,\; 114-164)^T = \frac{1}{114}(23,\; -50)^T
+\]
+\[
+\nabla f^{(1)} = \Bigl(\frac{46}{114}+1,\; \frac{-200}{114}\Bigr)^T
+               = \frac{1}{114}(160,\; -200)^T
+\]
+
+\subsubsection{DFP 校正（$H_0 \to H_1$）}
+
+\[
+s_0 = X^{(1)} - X^{(0)}
+     = \frac{1}{114}(-205,\; -164)^T
+     = -\frac{41}{114}(5,\; 4)^T
+\]
+\[
+y_0 = \nabla f^{(1)} - \nabla f^{(0)}
+     = \frac{1}{114}(-410,\; -656)^T
+     = -\frac{41}{114}(10,\; 16)^T
+\]
+
+三个中间量（提取公共因子 $41/114$）：
+\begin{align*}
+s_0^T y_0 &= \frac{41^2}{114^2}(5\cdot 10 + 4\cdot 16) = \frac{41^2}{114} \\[4pt]
+s_0 s_0^T &= \frac{41^2}{114^2}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix} \\[4pt]
+y_0^T H_0 y_0 &= \frac{41^2}{114^2}(10^2+16^2) = \frac{41^2}{114^2}\cdot 356
+\end{align*}
+
+DFP 两项（代入化简）：
+\begin{align*}
+\frac{s_0 s_0^T}{s_0^T y_0}
+&= \frac{\frac{41^2}{114^2}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}}{\frac{41^2}{114}}
+ = \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
+ \approx \begin{pmatrix} 0.219 & 0.175 \\ 0.175 & 0.140 \end{pmatrix} \\[8pt]
+\frac{H_0 y_0 y_0^T H_0}{y_0^T H_0 y_0}
+&= \frac{\frac{41^2}{114^2}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}}{\frac{41^2}{114^2}\cdot 356}
+ = \frac{1}{356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}
+ \approx \begin{pmatrix} 0.281 & 0.449 \\ 0.449 & 0.719 \end{pmatrix}
+\end{align*}
+
+\[
+H_1 = I + \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
+          - \frac{1}{356}\begin{pmatrix} 100 & 160 \\ 160 & 256 \end{pmatrix}
+\]
+
+（完整数值结果见课件。核心：$H_1$ 从对角 $I$ 变成了非对角矩阵，包含了从 $s_0,y_0$ 中提取的曲率信息。）
+
+\subsubsection{第2轮迭代与收敛}
+
+$d^{(1)} = -H_1 \nabla f^{(1)}$。一维搜索得 $\lambda_1 = 5/57$。
+\[
+X^{(2)} = \Bigl(-\frac{1}{2},\; 0\Bigr)^T
+\]
+$\nabla f(X^{(2)}) = (0,\; 0)^T \Rightarrow$ 驻点。$\nabla^2 f = \operatorname{diag}(2, 4) \succ 0 \Rightarrow X^{(2)}$ 是全局极小点。
+\[
+f^* = f\Bigl(-\frac{1}{2},\; 0\Bigr) = \frac{1}{4} + 0 - \frac{1}{2} = -\frac{1}{4}
+\]
+
+\textbf{二次终止性验证}：$n=2$，恰好两轮收敛——DFP 的理论保证在此得到完美展示。
+
 \subsection{本章速查}
 
 \begin{itemize}
-  \item 下降算法格式：$x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$，$\nabla f^T d < 0$
-  \item 共轭梯度法（FR）：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$
-  \item 拟牛顿条件：$H_k y_{k-1} = s_{k-1}$
-  \item DFP 公式（秩2校正 $H$）：两项分数修正
-  \item BFGS 公式（秩2校正 $B$）：DFP 的互补公式
-  \item 二次终止性：对正定二次函数至多 $n$ 步收敛
+  \item \textbf{下降算法框架}：$x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$，$\nabla f^T d < 0$
+  \item \textbf{最速下降}：$d = -\nabla f$，局部最快但全局锯齿，$d^{(k)} \perp d^{(k+1)}$
+  \item \textbf{牛顿法}：$d = -[\nabla^2 f]^{-1}\nabla f$，二次收敛但 $O(n^3)$ 贵
+  \item \textbf{精确线搜索}：解 $\phi'(\lambda)=0$；\textbf{Armijo}：回溯缩步，保证充分下降
+  \item \textbf{FR共轭梯度}：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$，$O(n)$ 存储，$n$ 步收敛
+  \item \textbf{拟牛顿条件}（割线方程）：$H_k y_{k-1} = s_{k-1}$
+  \item \textbf{DFP公式}（校 $H$，逆）：两项秩1修正——正定修正$(ss^T/s^Ty)$ $+$ 擦除修正$(Hyy^TH/y^THy)$
+  \item \textbf{BFGS公式}（校 $B$，Hessian本身）：DFP的$s\leftrightarrow y$对偶，考试以DFP为主
+  \item \textbf{二次终止性}：对正定二次函数，DFP/BFGS/共轭梯度法至多 $n$ 步收敛
+  \item \textbf{遗传正定性}：在 $s^Ty > 0$ 条件下，DFP/BFGS保持近似矩阵的正定性
 \end{itemize}
+
+\endinput
