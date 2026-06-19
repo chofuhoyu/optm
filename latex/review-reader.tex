@@ -8,6 +8,7 @@
 ]{geometry}
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
+\setlength{\fboxsep}{0pt}
 \usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox, tikz}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
@@ -25,14 +26,17 @@
   #4
 }
 
-% === 单张PPT引用：自带居中，高度 = (textheight - 两组fbox边框 - 4pt间距) / 2 ===
+% === 单张PPT引用：自带居中 ===
+% 高度 = (textheight - fbox边框4×fboxrule - 4pt间距 - headroom) / 2
 % 两张上下堆叠刚好填满一页；三张时前两张占第一页，第三张自动流入第二页同位置
+\newlength{\refslideheadroom}
+\setlength{\refslideheadroom}{16pt}
 \newcommand{\refslide}[3]{%
   \centerline{%
     \fbox{%
       \begin{tikzpicture}[baseline=(img.south)]
         \node[inner sep=0] (img) {%
-          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxsep-4\fboxrule-4pt)/2\relax, keepaspectratio]%
+          \includegraphics[page=#2, width=\dimexpr\textwidth-2\fboxsep-2\fboxrule-2mm\relax, height=\dimexpr(\textheight-4\fboxrule-4pt-\refslideheadroom)/2\relax, keepaspectratio]%
             {../material/#1.pdf}%
         };
         \node[fill=black, text=white, font=\tiny\bfseries,
