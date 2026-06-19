@@ -10,18 +10,29 @@
 \usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
-% === 复习步：PPT幻灯片在上，文字在下 ===
-\newcommand{\reviewstep}[5]{%
-  % #1=章节文件名, #2=原始页码, #3=显示标签, #4=步骤标题, #5=说明文字
-  \medskip
-  \noindent
+% === 复习步（2张PPT）：上下两张幻灯片，文字在最后 ===
+\newcommand{\reviewstep}[8]{%
+  % #1=ch, #2=p1, #3=lab1, #4=p2, #5=lab2, #6=步骤标题, #7=说明文字, #8=额外备注(可选)
+  \medskip\hrule\medskip
   \begin{center}
-    \fbox{%
-      \includegraphics[page=#2, width=0.88\textwidth, keepaspectratio]%
-        {../material/#1.pdf}%
-    }\\[2pt]
-    {\footnotesize #3}\\[2pt]
-    \textbf{#4}\\[1pt]
+    \fbox{\includegraphics[page=#2, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
+    {\footnotesize #3}\\[6pt]
+    \fbox{\includegraphics[page=#4, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
+    {\footnotesize #5}\\[4pt]
+    \textbf{#6}\\[2pt]
+    \footnotesize #7
+  \end{center}
+  \smallskip
+}
+
+% === 复习步（1张PPT）===
+\newcommand{\reviewstepone}[5]{%
+  % #1=ch, #2=p1, #3=lab1, #4=步骤标题, #5=说明文字
+  \medskip\hrule\medskip
+  \begin{center}
+    \fbox{\includegraphics[page=#2, width=0.88\textwidth, keepaspectratio]{../material/#1.pdf}}\\[2pt]
+    {\footnotesize #3}\\[4pt]
+    \textbf{#4}\\[2pt]
     \footnotesize #5
   \end{center}
   \smallskip
