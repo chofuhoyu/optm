@@ -23,3 +23,6 @@ wheels/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Playwright MCP
+.playwright-mcp/
