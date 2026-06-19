@@ -27,31 +27,34 @@
   }%
 }
 
-% === 复习步（2张PPT）：换页 → 标题 → 答案 → PPT → 解读 ===
-\newcommand{\reviewstep}[8]{%
+% === 复习步：换页 → 标题 → 答案 → PPT → 解读 ===
+% #1=标题, #2=答案, #3=解读, #4=预构建PPT列表(\refslide链条)
+\newcommand{\reviewstep}[4]{%
   \clearpage
-  \textbf{\Large #6}\par\medskip
+  \textbf{\Large #1}\par\medskip
   \textbf{【真题答案】}\par\smallskip
-  {#7}\par\medskip
+  {#2}\par\medskip
   \textbf{【相关课件】}\par\smallskip
   \begin{center}
-    \slidetagged{#1}{#2}{#3}\\[4pt]
-    \slidetagged{#1}{#4}{#5}
+    #4
   \end{center}
   \smallskip
-  {\small 【解读】#8}
+  {\small 【解读】#3}
 }
 
-% === 复习步（1张PPT）===
-\newcommand{\reviewstepone}[5]{%
-  \clearpage
-  \textbf{\Large #4}\par\medskip
-  \textbf{【真题答案】}\par\smallskip
-  {#5}\par\medskip
-  \textbf{【相关课件】}\par\smallskip
-  \begin{center}
-    \slidetagged{#1}{#2}{#3}
-  \end{center}
+% === 单张PPT引用：章节+页码，自动渲染带角标的幻灯片 ===
+\newcommand{\refslide}[3]{%
+  \fbox{%
+    \begin{tikzpicture}[baseline=(img.south)]
+      \node[inner sep=0] (img) {%
+        \includegraphics[page=#2, width=0.85\textwidth, keepaspectratio]%
+          {../material/#1.pdf}%
+      };
+      \node[fill=black, text=white, font=\tiny\bfseries,
+            inner sep=1.5pt, outer sep=0pt,
+            anchor=north east] at (img.north east) {#3};
+    \end{tikzpicture}%
+  }%
 }
 
 \title{\textbf{最优化 — 2025真题解析}}
