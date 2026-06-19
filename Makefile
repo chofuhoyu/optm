@@ -4,10 +4,12 @@
 #   make print        — 仅打印版
 #   make reader       — 仅阅读器版
 #   make generate     — 重新生成 latex/chapters.tex
-#   make push-boox    — 推送阅读器版到 BOOX
+#   make push         — 推送全部到 BOOX
+#   make push-review  — 推送复习材料到 BOOX
+#   make push-slides  — 推送课件到 BOOX
 #   make clean        — 清理辅助文件
 
-.PHONY: all print reader generate push-boox clean
+.PHONY: all print reader review generate push push-review push-slides clean
 
 all: print reader review
 
@@ -37,11 +39,15 @@ generate:
 	uv run python scripts/generate_filtered.py
 
 # === 推送到 BOOX ===
-push-boox: latex/slides-reader.pdf latex/review-reader.pdf
-	curl -s -X POST "http://10.29.214.150:8085/api/storage/upload" \
-		-F "file=@latex/slides-reader.pdf"
+push: push-review push-slides
+
+push-review: latex/review-reader.pdf
 	curl -s -X POST "http://10.29.214.150:8085/api/storage/upload" \
 		-F "file=@latex/review-reader.pdf"
+
+push-slides: latex/slides-reader.pdf
+	curl -s -X POST "http://10.29.214.150:8085/api/storage/upload" \
+		-F "file=@latex/slides-reader.pdf"
 
 # === 清理 ===
 clean:
