@@ -1,17 +1,38 @@
 % !TeX program = xelatex
-\documentclass[12pt,a4paper]{ctexart}
-\usepackage[margin=12mm]{geometry}
+\documentclass[11pt,a4paper]{ctexart}
+\usepackage[margin=10mm]{geometry}
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
-\usepackage{graphicx, amsmath, amssymb, xcolor, hyperref}
+\usepackage{graphicx, amsmath, amssymb, xcolor, hyperref, fancybox}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
-\title{\textbf{最优化理论与算法 — 2025 真题逐题解析}}
+% === 复习步：左侧嵌入PPT幻灯片，右侧文字 ===
+\newcommand{\reviewstep}[4]{%
+  % #1=章节文件名, #2=页码, #3=步骤标题, #4=说明文字
+  \medskip
+  \noindent
+  \begin{minipage}[t]{0.42\textwidth}
+    \centering
+    \fbox{%
+      \includegraphics[page=#2, width=0.40\textwidth, keepaspectratio]%
+        {../material/#1.pdf}%
+    }\\[1pt]
+    {\small Slide #2}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.55\textwidth}
+    \textbf{#3}\\[2pt]
+    \small #4
+  \end{minipage}%
+  \smallskip
+}
+
+\title{\textbf{最优化理论与算法 — 2025真题逐题解析}}
 \author{姚祉圻 \quad 2025018017}
 \date{}
 
 \begin{document}
 \maketitle
-\vspace{-4mm}
+\vspace{-3mm}
 \input{review-content.tex}
 \end{document}
