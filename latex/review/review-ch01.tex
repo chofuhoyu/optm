@@ -93,28 +93,21 @@
 \end{itemize}
 
 \textbf{正例与反例对照：}
+\medskip
+\noindent
+\textbf{正例（标准型）：} $\min\ 2x_1+3x_2$，约束 $x_1+x_2=5$，$x_1,x_2\ge 0$。满足全部四条——目标 $\min$、约束 $=$、$b=5\ge 0$、变量 $\ge 0$。
 
-\begin{tabular}{@{}p{0.48\textwidth}@{\quad}p{0.48\textwidth}@{}}
-\toprule
-\multicolumn{1}{c}{\textbf{是标准型（正例）}} & \multicolumn{1}{c}{\textbf{不是标准型（反例，违反哪条）}} \\
-\midrule
-$\begin{aligned}\min\ & 2x_1+3x_2 \\ \text{s.t.}\ & x_1+x_2=5 \\ & x_1,x_2\ge 0\end{aligned}$
-&
-$\begin{aligned}\max\ & 2x_1+3x_2 \\ \text{s.t.}\ & x_1+x_2=5 \\ & x_1,x_2\ge 0\end{aligned}$ \quad 违反(1)：目标是 $\max$ \\
-\addlinespace
-$\begin{aligned}\min\ & 4x_1-x_2 \\ \text{s.t.}\ & x_1+2x_2=10 \\ & 3x_1-x_2=4 \\ & x_1,x_2\ge 0\end{aligned}$
-&
-$\begin{aligned}\min\ & 4x_1-x_2 \\ \text{s.t.}\ & x_1+2x_2\le 10 \\ & x_1,x_2\ge 0\end{aligned}$ \quad 违反(2)：约束是 $\le$ \\
-\addlinespace
-$\begin{aligned}\min\ & x_1+x_2 \\ \text{s.t.}\ & 2x_1-x_2=3 \\ & x_1,x_2\ge 0\end{aligned}$
-&
-$\begin{aligned}\min\ & x_1+x_2 \\ \text{s.t.}\ & 2x_1-x_2=-3 \\ & x_1,x_2\ge 0\end{aligned}$ \quad 违反(3)：右端 $-3<0$ \\
-\addlinespace
-$\begin{aligned}\min\ & 5x_1+2x_2 \\ \text{s.t.}\ & x_1-x_2=7 \\ & x_1,x_2\ge 0\end{aligned}$
-&
-$\begin{aligned}\min\ & 5x_1+2x_2 \\ \text{s.t.}\ & x_1-x_2=7 \\ & x_1\ge 0 \text{（$x_2$ 无限制）}\end{aligned}$ \quad 违反(4)：$x_2$ 不 $\ge 0$ \\
-\bottomrule
-\end{tabular}
+\noindent
+\textbf{反例 1（违反(1)）：} $\max\ 2x_1+3x_2$，目标是 $\max$ 而非 $\min$。改法：目标乘 $-1$ 变 $\min$。
+
+\noindent
+\textbf{反例 2（违反(2)）：} 约束是 $x_1+2x_2\le 10$，不是等式。改法：加松弛变量。
+
+\noindent
+\textbf{反例 3（违反(3)）：} 右端 $2x_1-x_2=-3$，$b_1=-3<0$。改法：乘 $-1$ 翻正。
+
+\noindent
+\textbf{反例 4（违反(4)）：} $x_2$ 无符号限制。改法：$x_2=x_2^+-x_2^-$。
 
 \subsection{1.3 化标准型：四条规则，一步一步来}
 
@@ -196,8 +189,8 @@ $\begin{aligned}\min\ & 5x_1+2x_2 \\ \text{s.t.}\ & x_1-x_2=7 \\ & x_1\ge 0 \tex
 \quad\longrightarrow\quad
 \begin{aligned}
 \min\ & 2x_1 + 3x_2 \\
-\text{s.t.}\ & x_1 + x_2 + x_3 = 20 \qquad (\text{松弛})\\
-& x_1 + 2x_2 - x_4 = 10 \qquad (\text{剩余})\\
+\text{s.t.}\ & x_1 + x_2 + x_3 = 20 \\
+& x_1 + 2x_2 - x_4 = 10 \\
 & x_1,x_2,x_3,x_4 \ge 0
 \end{aligned}
 \]
@@ -246,8 +239,9 @@ $\begin{aligned}\min\ & 5x_1+2x_2 \\ \text{s.t.}\ & x_1-x_2=7 \\ & x_1\ge 0 \tex
 \end{aligned}
 \quad\longrightarrow\quad
 \begin{aligned}
-& 3x_1 - 2x_2 \le -6 \ \xrightarrow{\times(-1)}\ -3x_1 + 2x_2 \ge 6 \quad(\text{不等号反转！}) \\
-& \xrightarrow{\text{减剩余}}\ -3x_1 + 2x_2 - x_3 = 6
+&3x_1 - 2x_2 \le -6 \\[2pt]
+&\to\ -3x_1 + 2x_2 \ge 6 \qquad \text{（乘$-1$，不等号反转）}\\[2pt]
+&\to\ -3x_1 + 2x_2 - x_3 = 6 \qquad \text{（减剩余变量）}
 \end{aligned}
 \]
 
@@ -372,11 +366,11 @@ $4>0,\;6>0$，非退化 BFS。目标值 $z = 2\cdot 0 + 1\cdot 0 + 3\cdot 4 + 1\
 \[
 \begin{cases}
 x_1 = 4 \\
-2x_1 + x_4 = 6 \Rightarrow x_4 = 6-8 = -2
+2x_1 + x_4 = 6 \;\Rightarrow\; x_4 = -2
 \end{cases}
 \quad\Longrightarrow\quad x = (4,0,0,-2)^T
 \]
-$x_4=-2<0$，这是基本解，但\emph{不是}基本可行解（违反非负条件）。
+$x_4=-2<0$，这是基本解，但\emph{不是}基本可行解。
 
 \textbf{再试一个}：取 $a_1$ 和 $a_2$，$B=\begin{pmatrix}1&2\\2&1\end{pmatrix}$，$\det B = 1-4=-3\neq 0$。令 $x_3=x_4=0$：
 \[
@@ -533,7 +527,7 @@ c^T(y^* + \lambda d) = c^T y^* + \lambda\cdot c^T d
 \]
 计算 $c^T d$：
 \[
-c^T d = c^T(x^* - y^*) = c^T x^* - c^T y^* = z^* - z^* = 0 \quad(\text{两者目标值都是最优值 }z^*)
+c^T d = c^T(x^* - y^*) = c^T x^* - c^T y^* = z^* - z^* = 0
 \]
 所以射线上\emph{所有点}的目标值都是 $z^*$——整条射线都是最优的！
 

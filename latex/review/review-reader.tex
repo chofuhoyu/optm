@@ -19,6 +19,7 @@
 % 容忍小幅度溢出（<12pt），给行内公式更多断行机会
 \setlength{\hfuzz}{30pt}
 \setlength{\emergencystretch}{1em}
+\raggedbottom
 
 % === 宏包 ===
 \usepackage{graphicx}
@@ -33,7 +34,7 @@
 %  路径相对于 latex/review/ 需要 ../../material/
 % ============================================================
 \newlength{\refslideheadroom}
-\setlength{\refslideheadroom}{16pt}
+\setlength{\refslideheadroom}{20pt}
 \newcommand{\refslide}[3]{%
   \centerline{%
     \fbox{%
