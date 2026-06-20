@@ -222,9 +222,11 @@ MM^T = \begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix}\begin{pmatrix}1&0\\1&-1\\1&0\en
 
 \begin{align*}
 M^T(MM^T)^{-1}M
-&= \frac{1}{2}\begin{pmatrix}1&0\\1&-1\\1&0\end{pmatrix}\begin{pmatrix}1&1\\1&3\end{pmatrix}\begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix} \\[2pt]
-&= \frac{1}{2}\begin{pmatrix}1&1\\0&-2\\1&1\end{pmatrix}\begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix}
- = \begin{pmatrix} 1/2 & 0 & 1/2 \\ 0 & 1 & 0 \\ 1/2 & 0 & 1/2 \end{pmatrix}
+&= \frac{1}{2}\begin{pmatrix}1&0\\1&-1\\1&0\end{pmatrix}\begin{pmatrix}1&1\\1&3\end{pmatrix}
+   \begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix} \\
+&= \frac{1}{2}\begin{pmatrix}1&1\\0&-2\\1&1\end{pmatrix}
+   \begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix} \\
+&= \begin{pmatrix} 1/2 & 0 & 1/2 \\ 0 & 1 & 0 \\ 1/2 & 0 & 1/2 \end{pmatrix}
 \end{align*}
 
 \[
@@ -233,7 +235,11 @@ P = I - M^T(MM^T)^{-1}M = \begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 
 
 \textbf{搜索方向：}
 \[
-d^{(0)} = -P\,\nabla f^{(0)} = -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}2\\6\\5\end{pmatrix} = \begin{pmatrix} 1.5 \\ 0 \\ -1.5 \end{pmatrix}
+\begin{aligned}
+d^{(0)} = -P\,\nabla f^{(0)}
+&= -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}2\\6\\5\end{pmatrix} \\
+&= \begin{pmatrix} 1.5 \\ 0 \\ -1.5 \end{pmatrix}
+\end{aligned}
 \]
 
 验证可行性：$\nabla h^T d^{(0)} = 1.5+0-1.5 = 0$（切于等式约束），$\nabla(2-x_2)^T d^{(0)} = 0$（切于积极不等式）。沿 $d^{(0)}$，$x_2$ 不变，$x_1$ 增 $x_3$ 减——保持在 $x_1+x_2+x_3=6$ 上。
@@ -245,13 +251,13 @@ $X^{(0)} + \lambda d^{(0)} = (2+1.5\lambda,\; 2,\; 2-1.5\lambda)^T$。
 步长上界（不违反非负约束）：$2-1.5\lambda \ge 0 \Rightarrow \lambda \le 4/3$。
 
 代入 $f$（$x_2=2$ 固定）：
-{\small
 \begin{align*}
-\phi(\lambda) &= (2+1.5\lambda)^2 + 2\cdot 2^2 + (2-1.5\lambda)^2 - 2(2+1.5\lambda) + (2-1.5\lambda) \\
-&= (4+6\lambda+2.25\lambda^2) + 8 + (4-6\lambda+2.25\lambda^2) - (4+3\lambda) + (2-1.5\lambda) \\
+\phi(\lambda) &= (2+1.5\lambda)^2 + 2\cdot 2^2 + (2-1.5\lambda)^2 \\
+&\quad - 2(2+1.5\lambda) + (2-1.5\lambda) \\
+&= (4+6\lambda+2.25\lambda^2) + 8 + (4-6\lambda+2.25\lambda^2) \\
+&\quad - (4+3\lambda) + (2-1.5\lambda) \\
 &= 14 - 4.5\lambda + 4.5\lambda^2
 \end{align*}
-}
 
 $\phi'(\lambda) = 9\lambda - 4.5 = 0 \;\Rightarrow\; \lambda_0 = 0.5$（在允许范围内）。
 
@@ -269,12 +275,20 @@ X^{(1)} = (2+0.75,\; 2,\; 2-0.75)^T = (2.75,\; 2,\; 1.25)^T
 
 积极约束不变（$x_2=2$ 仍积极），$M$ 和 $P$ 不变。
 \[
-d^{(1)} = -P\,\nabla f^{(1)} = -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} = \begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
+\begin{aligned}
+d^{(1)} = -P\,\nabla f^{(1)}
+&= -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} \\
+&= \begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
+\end{aligned}
 \]
 
 $d^{(1)} = 0$——梯度已在法向量张成空间中。计算 Lagrange 乘子：
 \[
-\lambda = (MM^T)^{-1} M \nabla f^{(1)} = \frac{1}{2}\begin{pmatrix}1&1\\1&3\end{pmatrix}\begin{pmatrix}12.25\\-5.25\end{pmatrix} = \begin{pmatrix} 3.5 \\ -1.75 \end{pmatrix}
+\begin{aligned}
+\lambda = (MM^T)^{-1} M \nabla f^{(1)}
+&= \frac{1}{2}\begin{pmatrix}1&1\\1&3\end{pmatrix}\begin{pmatrix}12.25\\-5.25\end{pmatrix} \\
+&= \begin{pmatrix} 3.5 \\ -1.75 \end{pmatrix}
+\end{aligned}
 \]
 
 \textbf{检查不等式乘子符号：} 对于不等式 $2-x_2 \ge 0$，乘子 $\lambda_2 = -1.75 < 0$（应为非负）。这意味着从当前积极集中去掉该约束可使目标进一步下降。\textbf{从 $M$ 中去掉不等式约束对应的行}，仅保留等式约束。
@@ -282,11 +296,19 @@ $d^{(1)} = 0$——梯度已在法向量张成空间中。计算 Lagrange 乘子
 \medskip
 重新计算（$M = (1,\,1,\,1)$，仅等式约束）：
 \[
-P = I - M^T(MM^T)^{-1}M = I - \frac{1}{3}\begin{pmatrix}1\\1\\1\end{pmatrix}(1,1,1) = \frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}
+\begin{aligned}
+P &= I - M^T(MM^T)^{-1}M
+   = I - \frac{1}{3}\begin{pmatrix}1\\1\\1\end{pmatrix}(1,1,1) \\
+  &= \frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}
+\end{aligned}
 \]
 
 \[
-d^{(1)} = -P\,\nabla f^{(1)} = -\frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} = \frac{1}{3}\begin{pmatrix} 7/4 \\ -7/2 \\ 7/4 \end{pmatrix}
+\begin{aligned}
+d^{(1)} = -P\,\nabla f^{(1)}
+&= -\frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} \\
+&= \frac{1}{3}\begin{pmatrix} 7/4 \\ -7/2 \\ 7/4 \end{pmatrix}
+\end{aligned}
 \]
 
 简化（方向乘以正因子 12/7 不影响搜索方向，线搜索会自动补偿）：
@@ -307,7 +329,10 @@ X^{(1)} + \lambda d^{(1)} = \Bigl(\frac{11}{4}+\frac{7}{12}\lambda,\; 2-\frac{7}
 代入 $f$ 并求导得 $\phi'(\lambda)=0 \Rightarrow \lambda_1 = 1/4$。
 
 \[
-X^{(2)} = \Bigl(\frac{11}{4}+\frac{7}{48},\; 2-\frac{7}{24},\; \frac{5}{4}+\frac{7}{48}\Bigr)^T \approx (2.896,\; 1.708,\; 1.396)^T
+\begin{aligned}
+X^{(2)} &= \Bigl(\frac{11}{4}+\frac{7}{48},\; 2-\frac{7}{24},\; \frac{5}{4}+\frac{7}{48}\Bigr)^T \\
+&\approx (2.896,\; 1.708,\; 1.396)^T
+\end{aligned}
 \]
 
 在 $X^{(2)}$ 处检验 KKT 条件：梯度可被积极约束（此时 $x_2 = 41/24 \approx 1.708 < 2$，不等式不再积极，仅等式 $x_1+x_2+x_3=6$ 积极）的梯度所表示，且乘子符号满足要求。$X^{(2)}$ 为 KKT 点。

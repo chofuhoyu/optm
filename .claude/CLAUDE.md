@@ -26,6 +26,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `.pptx` 和 `.pdf` 都纳入 git 追踪
 - `.gitignore` 排除：`.venv/`、`__pycache__/`、`*.aux`、`*.log`、`*.out`、`latex/*.pdf`、`material/*_p2t_output/`
 
+### 编译
+- **`make` 命令严禁后接任何管道**（`|`、`2>&1`、`>/dev/null` 等），必须直接运行并阅读完整输出
+- 编译后必须检查 `latex/review-reader.log`（或对应 `.log`）中的 Overfull/Underfull 警告
+- 发现 Overfull 必须修复。**严禁用 `\small`/`\footnotesize`/`\scriptsize` 缩小字号来消除溢出**——正确做法是换行（`\\`、`aligned`、`align*`、`multline` 等）或拆分长公式
+
 ### 工作语言
 - 所有解释、注释用中文
 - git 提交信息用中文
