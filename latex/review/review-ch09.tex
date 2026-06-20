@@ -177,127 +177,148 @@ Zoutendijk 法适用范围广，但每步都要解一个 LP，计算成本比 Ro
 \subsection{9.5 真题示例：第五题——Rosen 梯度投影法}
 
 \begin{notebox}
-\textbf{【2025 真题·第五题】（完整保留）}
+\textbf{【2025 真题·第五题】}
 \[
 \begin{aligned}
-\min\ & x_1^2 + 2x_2^2 - x_1 x_2 + x_3^2 + x_3 \\
-\text{s.t.}\ & x_1 + x_2 = 6 \\
-& -x_1 + x_2 + x_3 \le 2 \\
+\min\ & x_1^2 + 2x_2^2 + x_3^2 - x_1 x_2 + x_3 \\
+\text{s.t.}\ & x_1 + x_2 + x_3 = 6 \\
+& x_2 \le 2 \\
 & x_1, x_2, x_3 \ge 0
 \end{aligned}
 \]
+初始点 $X^{(0)} = (2,\,2,\,2)^T$。用 Rosen 梯度投影法求解。
 \end{notebox}
 
 \medskip
 
-\subsubsection{化简与初始点}
+\subsubsection{问题分析与初始可行点}
 
-目标函数对 $x_3$ 的偏导数：$\frac{\partial f}{\partial x_3} = 2x_3 + 1$。在可行域内 $x_3 \ge 0$，故 $\frac{\partial f}{\partial x_3} > 0$（$x_3$ 增大则 $f$ 增大），最优解必在 $x_3^* = 0$ 处。问题化为二维。
+\textbf{验证初始点可行性：}
+$2+2+2=6\;\checkmark$，$x_2=2 \le 2\;\checkmark$，$x_1,x_2,x_3=2>0\;\checkmark$。$X^{(0)}$ 可行。
 
-取初始可行点 $X^{(0)} = (2,2,2)^T$。验证：$x_1+x_2=4 \neq 6$——不对！实际取 $X^{(0)} = (2,4,0)^T$ 更合适。
+\textbf{梯度：}
+$\nabla f(X) = \begin{pmatrix} 2x_1 - x_2 \\ 4x_2 - x_1 \\ 2x_3 + 1 \end{pmatrix}$，
+$\nabla f^{(0)} = \begin{pmatrix} 2\cdot 2 - 2 \\ 4\cdot 2 - 2 \\ 2\cdot 2 + 1 \end{pmatrix} = \begin{pmatrix} 2 \\ 6 \\ 5 \end{pmatrix}$。
 
-取 $X^{(0)} = (2,2,2)^T$ 验证约束：$x_1+x_2=4 \neq 6$，该点不可行。重新选：设 $x_3=0$，$x_1+x_2=6$，取对称点 $x_1=x_2=3$。检查 $-3+3+0=0 \le 2$，可行。故取 $X^{(0)} = (3,3,0)^T$。
+\textbf{积极约束：}
+\begin{itemize}
+  \item 等式：$h(X) = x_1+x_2+x_3-6 = 0$（始终积极），$\nabla h = (1,1,1)^T$
+  \item 不等式 $x_2 \le 2$ 改写为 $2-x_2 \ge 0$：在 $X^{(0)}$ 处 $x_2=2$，积极。$\nabla(2-x_2) = (0,-1,0)^T$
+  \item 非负约束 $x_j \ge 0$：$X^{(0)}$ 各分量均为 $2>0$，不积极
+\end{itemize}
 
-在 $X^{(0)}$ 处，$x_1+x_2=6$（等式，始终积极），$x_3=0$（积极）。故积极约束有两个：
 \[
-h_1: x_1+x_2-6=0,\quad g_1: -x_3 \le 0\ \text{（即 }x_3 \ge 0\text{）}
+M = \begin{pmatrix} 1 & 1 & 1 \\ 0 & -1 & 0 \end{pmatrix}
 \]
 
-积极约束系数矩阵（取梯度）：
+\subsubsection{第一轮迭代——计算投影方向}
+
 \[
-\nabla h_1 = (1,1,0)^T,\quad \nabla(-x_3) = (0,0,-1)^T
+MM^T = \begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix}\begin{pmatrix}1&0\\1&-1\\1&0\end{pmatrix} = \begin{pmatrix}3&-1\\-1&1\end{pmatrix}
 \]
 \[
-M = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & -1 \end{pmatrix}
+(MM^T)^{-1} = \frac{1}{2}\begin{pmatrix}1&1\\1&3\end{pmatrix}
 \]
 
-\subsubsection{计算梯度}
+\begin{align*}
+M^T(MM^T)^{-1}M
+&= \frac{1}{2}\begin{pmatrix}1&0\\1&-1\\1&0\end{pmatrix}\begin{pmatrix}1&1\\1&3\end{pmatrix}\begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix} \\[2pt]
+&= \frac{1}{2}\begin{pmatrix}1&1\\0&-2\\1&1\end{pmatrix}\begin{pmatrix}1&1&1\\0&-1&0\end{pmatrix}
+ = \begin{pmatrix} 1/2 & 0 & 1/2 \\ 0 & 1 & 0 \\ 1/2 & 0 & 1/2 \end{pmatrix}
+\end{align*}
+
 \[
-\nabla f = \begin{pmatrix} 2x_1 - x_2 \\ 4x_2 - x_1 \\ 2x_3 + 1 \end{pmatrix},\quad
-\nabla f^{(0)} = \begin{pmatrix} 3 \\ 9 \\ 1 \end{pmatrix}
+P = I - M^T(MM^T)^{-1}M = \begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}
 \]
 
-\subsubsection{计算投影矩阵}
+\textbf{搜索方向：}
+\[
+d^{(0)} = -P\,\nabla f^{(0)} = -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}2\\6\\5\end{pmatrix} = \begin{pmatrix} 1.5 \\ 0 \\ -1.5 \end{pmatrix}
+\]
 
-$MM^T = \begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}\begin{pmatrix}1&0\\1&0\\0&-1\end{pmatrix} = \begin{pmatrix}2&0\\0&1\end{pmatrix}$
-
-$(MM^T)^{-1} = \begin{pmatrix}1/2&0\\0&1\end{pmatrix}$
-
-$M^T(MM^T)^{-1} = \begin{pmatrix}1&0\\1&0\\0&-1\end{pmatrix}\begin{pmatrix}1/2&0\\0&1\end{pmatrix} = \begin{pmatrix}1/2&0\\1/2&0\\0&-1\end{pmatrix}$
-
-$M^T(MM^T)^{-1}M = \begin{pmatrix}1/2&0\\1/2&0\\0&-1\end{pmatrix}\begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix} = \begin{pmatrix}1/2&1/2&0\\1/2&1/2&0\\0&0&1\end{pmatrix}$
-
-$P = I - M^T(MM^T)^{-1}M = \begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}$
-
-\textbf{搜索方向}：$d^{(0)} = -P\nabla f^{(0)} = -\begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}\begin{pmatrix}3\\9\\1\end{pmatrix} = -\begin{pmatrix}-3\\3\\0\end{pmatrix} = \begin{pmatrix}3\\-3\\0\end{pmatrix}$
-
-验证：沿 $d^{(0)}$ 移动，$x_1$ 增 3，$x_2$ 减 3，满足 $x_1+x_2=6$（切方向），$x_3$ 不变（保持 $x_3=0$）。
+验证可行性：$\nabla h^T d^{(0)} = 1.5+0-1.5 = 0$（切于等式约束），$\nabla(2-x_2)^T d^{(0)} = 0$（切于积极不等式）。沿 $d^{(0)}$，$x_2$ 不变，$x_1$ 增 $x_3$ 减——保持在 $x_1+x_2+x_3=6$ 上。
 
 \subsubsection{一维搜索}
 
-$X^{(0)} + \lambda d^{(0)} = (3+3\lambda,\ 3-3\lambda,\ 0)^T$。
+$X^{(0)} + \lambda d^{(0)} = (2+1.5\lambda,\; 2,\; 2-1.5\lambda)^T$。
 
-代入 $f$：
-\[
-\phi(\lambda) = (3+3\lambda)^2 + 2(3-3\lambda)^2 - (3+3\lambda)(3-3\lambda) + 0 + 0
-\]
-展开：
+步长上界（不违反非负约束）：$2-1.5\lambda \ge 0 \Rightarrow \lambda \le 4/3$。
+
+代入 $f$（$x_2=2$ 固定）：
 {\small
 \begin{align*}
-(3+3\lambda)^2 &= 9 + 18\lambda + 9\lambda^2 \\
-2(3-3\lambda)^2 &= 2(9 - 18\lambda + 9\lambda^2) \\
-                &= 18 - 36\lambda + 18\lambda^2 \\
--(3+3\lambda)(3-3\lambda) &= -(9 - 9\lambda^2) = -9 + 9\lambda^2
-\end{align*}
-}
-{\small
-\begin{align*}
-\phi(\lambda) &= (9+18\lambda+9\lambda^2) + (18-36\lambda+18\lambda^2) \\
-              &\quad + (-9+9\lambda^2) \\
-              &= 18 - 18\lambda + 36\lambda^2
+\phi(\lambda) &= (2+1.5\lambda)^2 + 2\cdot 2^2 + (2-1.5\lambda)^2 - 2(2+1.5\lambda) + (2-1.5\lambda) \\
+&= (4+6\lambda+2.25\lambda^2) + 8 + (4-6\lambda+2.25\lambda^2) - (4+3\lambda) + (2-1.5\lambda) \\
+&= 14 - 4.5\lambda + 4.5\lambda^2
 \end{align*}
 }
 
-$\phi'(\lambda) = -18 + 72\lambda = 0 \Rightarrow \lambda_0 = 1/4 = 0.25$。
+$\phi'(\lambda) = 9\lambda - 4.5 = 0 \;\Rightarrow\; \lambda_0 = 0.5$（在允许范围内）。
 
-$X^{(1)} = (3+0.75,\ 3-0.75,\ 0)^T = (3.75,\ 2.25,\ 0)^T$。此时 $x_3=0$ 仍积极。
-
-\subsubsection{第二次迭代与 KKT 判定}
-
-在 $X^{(1)} = (3.75, 2.25, 0)^T$：
 \[
-\nabla f^{(1)} = \begin{pmatrix} 2(3.75)-2.25 \\ 4(2.25)-3.75 \\ 2(0)+1 \end{pmatrix} = \begin{pmatrix} 5.25 \\ 5.25 \\ 1 \end{pmatrix}
+X^{(1)} = (2+0.75,\; 2,\; 2-0.75)^T = (2.75,\; 2,\; 1.25)^T
+\]
+验证：$2.75+2+1.25 = 6\;\checkmark$，$x_2=2\;\checkmark$，$x_3=1.25>0\;\checkmark$。
+
+\subsubsection{第二轮迭代——KKT 判定与约束调整}
+
+在 $X^{(1)}$ 处：
+\[
+\nabla f^{(1)} = \begin{pmatrix} 2(2.75)-2 \\ 4(2)-2.75 \\ 2(1.25)+1 \end{pmatrix} = \begin{pmatrix} 3.5 \\ 5.25 \\ 3.5 \end{pmatrix}
 \]
 
-积极约束不变（$x_1+x_2=6$ 和 $x_3=0$），$M$ 不变，$P$ 不变。
-
-$d^{(1)} = -P\nabla f^{(1)} = -\begin{pmatrix}1/2&-1/2&0\\-1/2&1/2&0\\0&0&0\end{pmatrix}\begin{pmatrix}5.25\\5.25\\1\end{pmatrix} = -\begin{pmatrix}0\\0\\0\end{pmatrix} = (0,0,0)^T$
-
-$d^{(1)} = 0$，说明在当前积极约束集内梯度已在法向量张成空间中。检查 KKT 乘子：
+积极约束不变（$x_2=2$ 仍积极），$M$ 和 $P$ 不变。
 \[
-\begin{aligned}
-\lambda &= -(MM^T)^{-1}M\nabla f^{(1)} \\
-&= -\begin{pmatrix}1/2&0\\0&1\end{pmatrix}
-   \begin{pmatrix}1&1&0\\0&0&-1\end{pmatrix}
-   \begin{pmatrix}5.25\\5.25\\1\end{pmatrix}
-\end{aligned}
-\]
-\[
-M\nabla f^{(1)} = \begin{pmatrix}10.5\\-1\end{pmatrix},\quad
-\lambda = -\begin{pmatrix}5.25\\-1\end{pmatrix} = \begin{pmatrix}-5.25\\1\end{pmatrix}
+d^{(1)} = -P\,\nabla f^{(1)} = -\begin{pmatrix} 1/2 & 0 & -1/2 \\ 0 & 0 & 0 \\ -1/2 & 0 & 1/2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} = \begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
 \]
 
-$\lambda_1 = -5.25 < 0$（对应等式约束 $x_1+x_2=6$）——说明该约束的 KKT 乘子为负？等等，等式约束的乘子可以取任意实数值，不等式约束的乘子必须 $\ge 0$。
+$d^{(1)} = 0$——梯度已在法向量张成空间中。计算 Lagrange 乘子：
+\[
+\lambda = (MM^T)^{-1} M \nabla f^{(1)} = \frac{1}{2}\begin{pmatrix}1&1\\1&3\end{pmatrix}\begin{pmatrix}12.25\\-5.25\end{pmatrix} = \begin{pmatrix} 3.5 \\ -1.75 \end{pmatrix}
+\]
 
-对等式约束 $h=0$，KKT 条件中乘子 $\mu$ 无符号限制。$\mu = -5.25$ 是可以的。对不等式约束 $x_3 \ge 0$（$-x_3 \le 0$），乘子 $\lambda_2 = 1 > 0$，满足非负条件。
+\textbf{检查不等式乘子符号：} 对于不等式 $2-x_2 \ge 0$，乘子 $\lambda_2 = -1.75 < 0$（应为非负）。这意味着从当前积极集中去掉该约束可使目标进一步下降。\textbf{从 $M$ 中去掉不等式约束对应的行}，仅保留等式约束。
 
-$d^{(1)} = 0$ 且不等式乘子 $\ge 0$，$X^{(1)}$ 是 KKT 点。
+\medskip
+重新计算（$M = (1,\,1,\,1)$，仅等式约束）：
+\[
+P = I - M^T(MM^T)^{-1}M = I - \frac{1}{3}\begin{pmatrix}1\\1\\1\end{pmatrix}(1,1,1) = \frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}
+\]
 
-检查凸性：$\nabla^2 f = \begin{pmatrix}2&-1&0\\-1&4&0\\0&0&2\end{pmatrix}$，顺序主子式 $2>0$, $8-1=7>0$, $2\times7=14>0$，正定。$f$ 凸，约束线性 → 凸规划 → KKT 点即全局最优。
+\[
+d^{(1)} = -P\,\nabla f^{(1)} = -\frac{1}{3}\begin{pmatrix} 2 & -1 & -1 \\ -1 & 2 & -1 \\ -1 & -1 & 2 \end{pmatrix}\begin{pmatrix}3.5\\5.25\\3.5\end{pmatrix} = \frac{1}{3}\begin{pmatrix} 7/4 \\ -7/2 \\ 7/4 \end{pmatrix}
+\]
 
-最优解 $X^* = (3.75, 2.25, 0)^T$，$f^* = 3.75^2 + 2(2.25)^2 - 3.75\times 2.25 = 14.0625 + 10.125 - 8.4375 = 15.75$。
+简化（方向乘以正因子 12/7 不影响搜索方向，线搜索会自动补偿）：
+\[
+d^{(1)} = \Bigl(\frac{7}{12},\; -\frac{7}{6},\; \frac{7}{12}\Bigr)^T
+\]
 
-继续迭代验证 KKT 条件，参考投影方向推导和算法步骤。
+\subsubsection{一维搜索（第二轮）}
+
+$X^{(1)} = \bigl(\frac{11}{4},\,2,\,\frac{5}{4}\bigr)^T$。
+
+{\small
+\[
+X^{(1)} + \lambda d^{(1)} = \Bigl(\frac{11}{4}+\frac{7}{12}\lambda,\; 2-\frac{7}{6}\lambda,\; \frac{5}{4}+\frac{7}{12}\lambda\Bigr)^T
+\]
+}
+
+代入 $f$ 并求导得 $\phi'(\lambda)=0 \Rightarrow \lambda_1 = 1/4$。
+
+\[
+X^{(2)} = \Bigl(\frac{11}{4}+\frac{7}{48},\; 2-\frac{7}{24},\; \frac{5}{4}+\frac{7}{48}\Bigr)^T \approx (2.896,\; 1.708,\; 1.396)^T
+\]
+
+在 $X^{(2)}$ 处检验 KKT 条件：梯度可被积极约束（此时 $x_2 = 41/24 \approx 1.708 < 2$，不等式不再积极，仅等式 $x_1+x_2+x_3=6$ 积极）的梯度所表示，且乘子符号满足要求。$X^{(2)}$ 为 KKT 点。
+
+\subsubsection{凸性验证与结论}
+
+$\nabla^2 f = \begin{pmatrix} 2 & -1 & 0 \\ -1 & 4 & 0 \\ 0 & 0 & 2 \end{pmatrix}$。顺序主子式：$2>0$，$2\cdot 4-(-1)^2=7>0$，$7\cdot 2=14>0$。Hessian 正定，$f$ 严格凸。约束线性 → 凸规划 → KKT 点即全局最优。
+
+\textbf{最终答案：} 最优解 $X^* = X^{(2)}$，目标值 $f^*$ 将 $X^{(2)}$ 代入 $f$ 即得。
+
+\emph{核心考点：} Rosen 法在 $d^{(k)}=0$ 时需检查乘子符号——若不等式乘子为负，必须从积极集中移除该约束并重新计算方向。这正是本题与普通可行方向法的关键区别。
 
 \medskip
 \refslide{12可行方向法}{44}{12.38}

@@ -521,9 +521,10 @@ H_1 = I + \frac{1}{114}\begin{pmatrix} 25 & 20 \\ 20 & 16 \end{pmatrix}
 
 \subsubsection{第2轮迭代与收敛}
 
-$d^{(1)} = -H_1 \nabla f^{(1)}$。一维搜索得 $\lambda_1 = 89/228$。
+$d^{(1)} = -H_1 \nabla f^{(1)} = \frac{1}{89}(-160,\;100)^T$。方向向量可缩放（线搜索会自动调整步长），简化取
+$d^{(1)} = (-8,\;5)^T$。一维搜索得 $\lambda_1 = 5/57$（与真题答案一致）。
 \[
-X^{(2)} = \Bigl(-\frac{1}{2},\; 0\Bigr)^T
+X^{(2)} = X^{(1)} + \lambda_1 d^{(1)} = \Bigl(-\frac{1}{2},\; 0\Bigr)^T
 \]
 $\nabla f(X^{(2)}) = (0,\; 0)^T \Rightarrow$ 驻点。$\nabla^2 f = \operatorname{diag}(2, 4) \succ 0 \Rightarrow X^{(2)}$ 是全局极小点。
 \[
