@@ -29,3 +29,6 @@ Thumbs.db
 
 # Compiled PDFs
 latex/*.pdf
+
+# Pix2Text intermediate output
+material/*_p2t_output/

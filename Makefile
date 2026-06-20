@@ -5,12 +5,13 @@
 #   make reader       — 仅阅读器版
 #   make review       — 仅复习材料
 #   make generate     — 重新生成 latex/slides/chapters.tex
+#   make extract-exam — 用 Pix2Text 提取真题 PDF → exam_2025.md
 #   make push         — 推送全部到 BOOX
 #   make push-review  — 推送复习材料到 BOOX
 #   make push-slides  — 推送课件到 BOOX
 #   make clean        — 清理辅助文件
 
-.PHONY: all print reader review generate push push-review push-slides clean
+.PHONY: all print reader review generate extract-exam push push-review push-slides clean
 
 all: print reader review
 
@@ -39,6 +40,10 @@ latex/review-reader.pdf: latex/review/review-reader.tex $(REVIEW_SRCS)
 # === 生成共享章节数据 ===
 generate:
 	uv run python scripts/generate_filtered.py
+
+# === 提取真题 PDF（Pix2Text） ===
+extract-exam:
+	uv run python scripts/extract_pdf.py "material/最优化25参考答案.pdf" -o exam_2025.md
 
 # === 推送到 BOOX ===
 push: push-review push-slides
