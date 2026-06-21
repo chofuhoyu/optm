@@ -1,0 +1,91 @@
+% ============================================================
+%  第8章：无约束优化方法
+% ============================================================
+\section{第8章 \quad 无约束优化方法}
+
+\subsection{下降算法通用框架}
+
+\textbf{迭代格式：} $x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$
+\begin{itemize}
+  \item $d^{(k)}$：搜索方向，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$
+  \item $\lambda_k > 0$：步长，使 $f(x^{(k+1)}) < f(x^{(k)})$
+  \item 终止：$\|\nabla f(x^{(k)})\| \le \varepsilon$
+\end{itemize}
+（课件 p10.1）
+
+\subsection{最速下降法}
+
+\textbf{方向：} $d^{(k)} = -\nabla f(x^{(k)})$（负梯度，局部下降最快）。
+
+\textbf{锯齿现象：} 精确线搜索下 $d^{(k)} \perp d^{(k+1)}$。Hessian条件数大时严重，收敛慢。
+
+\subsection{牛顿法}
+
+\textbf{方向：} $d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1} \nabla f(x^{(k)})$，步长 $\lambda_k = 1$。
+
+\textbf{二次收敛：} $\|x^{(k+1)}-x^*\| \le C\|x^{(k)}-x^*\|^2$。对正定二次函数一步收敛。
+代价：需算 Hessian 逆 $O(n^3)$。
+
+\subsection{线搜索（步长确定）}
+
+\textbf{精确线搜索：} 解 $\phi'(\lambda)=0$ 得 $\lambda_k = \operatorname{argmin}_{\lambda\ge 0} f(x+\lambda d)$。
+
+\textbf{Armijo准则（非精确）：}
+从 $\lambda=1$ 开始回溯（缩半 $\beta\in(0,1)$），直至：
+$f(x+\lambda d) \le f(x) + \alpha\lambda \nabla f(x)^T d$，
+其中 $\alpha\in(0,1)$（常取 $10^{-4}$），$\beta$ 常取 $0.5$。
+
+（课件 p9.8, p9.9）
+
+\subsection{FR共轭梯度法}
+
+\textbf{方向：}
+$\beta_k = \frac{\|\nabla f^{(k)}\|^2}{\|\nabla f^{(k-1)}\|^2}$，
+$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$
+（初始 $d^{(0)} = -\nabla f^{(0)}$）。
+
+\textbf{性质：} $O(n)$ 存储，对正定二次函数至多 $n$ 步收敛。方向满足 $(d^{(i)})^T Q d^{(j)} = 0$（$Q$-共轭）。
+
+（课件 p10.7）
+
+\subsection{拟牛顿法}
+
+\textbf{拟牛顿条件（割线方程）：}
+$s_{k-1} = x^{(k)} - x^{(k-1)}$，$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$。
+$H_k y_{k-1} = s_{k-1}$（$H_k \approx [\nabla^2 f]^{-1}$）。
+
+\textbf{DFP公式（校 $H$ = Hessian逆近似）：}
+\[
+H_k = H_{k-1}
+    + \frac{s_{k-1}s_{k-1}^T}{s_{k-1}^T y_{k-1}}
+    - \frac{H_{k-1}y_{k-1}y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}
+\]
+搜索方向：$d^{(k)} = -H_k \nabla f^{(k)}$。初始化 $H_0 = I$。
+
+\textbf{BFGS公式（校 $B$ = Hessian近似）：}
+\[
+B_k = B_{k-1}
+    + \frac{y_{k-1}y_{k-1}^T}{y_{k-1}^T s_{k-1}}
+    - \frac{B_{k-1}s_{k-1}s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
+\]
+拟牛顿条件：$B_k s_{k-1} = y_{k-1}$。搜索方向：解 $B_k d^{(k)} = -\nabla f^{(k)}$。
+
+\textbf{DFP vs BFGS：} DFP校 $H$（逆），BFGS校 $B$（Hessian本身）。公式对称（$s \leftrightarrow y$互换）。考试以DFP为主。
+
+\textbf{二次终止性：} DFP/BFGS/共轭梯度对正定二次函数至多 $n$ 步收敛，产生的方向关于 $Q$ 共轭。
+
+（课件 p10.52--p10.63）
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{最速下降}：$d = -\nabla f$，锯齿正交，收敛慢
+  \item \textbf{牛顿法}：$d = -H^{-1}\nabla f$，二次收敛，$O(n^3)$贵
+  \item \textbf{精确线搜索}：解 $\phi'(\lambda)=0$；\textbf{Armijo}：回溯缩步
+  \item \textbf{FR共轭梯度}：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$O(n)$存储，$n$步收敛
+  \item \textbf{DFP}：$H_k = H_{k-1} + \frac{ss^T}{s^Ty} - \frac{Hyy^TH}{y^THy}$（校Hessian逆）
+  \item \textbf{BFGS}：$B_k = B_{k-1} + \frac{yy^T}{y^Ts} - \frac{Bss^TB}{s^TBs}$（校Hessian本身）
+  \item \textbf{拟牛顿条件}：$H_k y_{k-1} = s_{k-1}$（DFP）/ $B_k s_{k-1} = y_{k-1}$（BFGS）
+  \item \textbf{二次终止性}：对正定二次函数至多$n$步收敛
+  \item \textbf{遗传正定性}：$s^Ty > 0$时DFP/BFGS保持矩阵正定性
+\end{itemize}
