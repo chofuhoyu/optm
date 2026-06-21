@@ -14,6 +14,29 @@
 
 （课件 p3.1, p3.2）
 
+\subsection{多元微积分基础}
+
+\textbf{梯度：} $\nabla f(x) = \bigl(\frac{\partial f}{\partial x_1}, \dots, \frac{\partial f}{\partial x_n}\bigr)^T$。对 $f(x)=\frac12 x^TQx+c^Tx$：$\nabla f(x)=Qx+c$。
+
+\textbf{Hessian矩阵：} $[\nabla^2 f(x)]_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$。对二次函数：$\nabla^2 f(x)=Q$。
+
+\textbf{一阶Taylor展开：} $f(y) \approx f(x) + \nabla f(x)^T(y-x)$。
+
+\textbf{二阶Taylor展开：} $f(x+d) \approx f(x) + \nabla f(x)^T d + \frac12 d^T \nabla^2 f(x) d$（牛顿法基础）。
+
+\textbf{方向导数：} $D_d f(x) = \nabla f(x)^T d$。$\nabla f^T d < 0 \Longleftrightarrow$ 沿 $d$ 方向 $f$ 下降；$>0$ 则上升。
+
+\textbf{正定性（形式定义）：} $A$ 为 $n\times n$ 实对称矩阵。
+\begin{itemize}
+  \item $A \succ 0$（正定）：$\forall x\neq 0$，$x^T A x > 0$。
+  \item $A \succeq 0$（半正定）：$\forall x$，$x^T A x \ge 0$。
+  \item $A \prec 0$（负定）：$\forall x\neq 0$，$x^T A x < 0$（等价 $-A \succ 0$）。
+\end{itemize}
+
+\textbf{顺序主子式（Sylvester判别法）：}
+第 $k$ 阶顺序主子式 $\Delta_k$ 是 $H$ 左上角 $k\times k$ 子矩阵的行列式。$H\succ 0 \Longleftrightarrow$ 所有 $\Delta_k > 0$（充要）。
+\textbf{陷阱：} $H \succeq 0$ 时 $\Delta_k \ge 0$ 仅为必要条件——反例 $\begin{pmatrix}0&0\\0&-1\end{pmatrix}$：$\Delta_1=0\ge0$，$\Delta_2=0\ge0$，但非半正定。
+
 \subsection{凸函数}
 
 \textbf{定义 5.2（凸函数）}

@@ -11,6 +11,26 @@
 
 \textbf{二阶充分条件：} 若 $\nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)$ 正定，则 $x^*$ 严格局部极小。
 
+\subsection{基本概念}
+
+\textbf{可行方向：} 设 $x^*\in\Omega$。向量 $d$ 是 $x^*$ 处的可行方向，若 $\exists\bar{t}>0$ 使 $\forall t\in[0,\bar{t}]$，$x^*+td\in\Omega$。
+
+\textbf{下降条件：} $D_d f(x^*)=\nabla f(x^*)^T d < 0 \Longleftrightarrow$ 沿 $d$ 走一小步 $f$ 下降。
+局部极小点处：对\emph{所有}可行方向 $d$，$\nabla f(x^*)^T d \ge 0$（无法可行下降）。
+
+\textbf{积极约束：} 在 $x^*$ 处取等号的不等式约束（$g_i(x^*)=0$）。$g_i(x^*)<0$ 为非积极约束，局部可忽略。
+
+\textbf{锥：} 集合 $K$ 是锥，若 $d\in K \Rightarrow \alpha d\in K$（$\forall\alpha\ge0$）。向量组生成的凸锥 $=\{\sum\alpha_i v_i \mid \alpha_i\ge 0\}$。
+
+\textbf{切空间（等式约束）：} 所有满足 $\nabla h_j(x^*)^T d = 0$ 的方向 $d$ 的集合。沿切向移动不违反约束（一阶意义上）。
+
+\textbf{Farkas引理（择一定理）：}
+对矩阵 $A$ 和向量 $b$，以下两系统恰有一个有解：
+(I) $Ax=b,\ x\ge 0$；\quad (II) $A^T y \ge 0,\ b^T y < 0$。
+该引理是「不存在可行下降方向 $\Rightarrow$ 梯度在约束梯度锥中」的代数依据，是 FJ/KKT 条件的理论基础。
+
+\textbf{乘子 $\mu_j$ 的经济含义：} $\frac{\partial f^*}{\partial b_j} = -\mu_j^*$（约束右端项的影子价格）。
+
 \subsection{Lagrange乘子法（仅等式约束）}
 
 考虑 $\min f(x)$ s.t. $h_i(x)=0$。Lagrange函数 $L(x,\mu)=f(x)+\sum\mu_i h_i(x)$。
