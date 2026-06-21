@@ -53,7 +53,7 @@ PPT第12.1--12.2页给出了可行方向法的引入动机和基本框架。
 
 Rosen 法的核心思想：将\emph{负梯度方向投影到约束的切空间上}，得到既下降又（局部）可行的方向。
 
-\textbf{为什么要投影？} 负梯度 $-\nabla f$ 是下降最快的方向（详见第8章最速下降法），但它可能指向可行域外部——直接沿负梯度走会违反约束。我们把 $-\nabla f$ 投影到约束的切空间（所有可行方向所在的空间），得到的投影方向既保留了下降性，又保证了局部可行性。
+\reviewonly{\textbf{为什么要投影？} 负梯度 $-\nabla f$ 是下降最快的方向（详见第8章最速下降法），但它可能指向可行域外部——直接沿负梯度走会违反约束。我们把 $-\nabla f$ 投影到约束的切空间（所有可行方向所在的空间），得到的投影方向既保留了下降性，又保证了局部可行性。}
 
 \begin{defbox}
 \textbf{投影矩阵的推导}
@@ -87,7 +87,7 @@ Pv &= v - M^T(MM^T)^{-1} Mv \\
 搜索方向：$d = -P \nabla f$（负梯度在切线空间上的正交投影）。
 \end{defbox}
 
-\subsubsection{投影矩阵的具体算例}
+\reviewonly{\subsubsection{投影矩阵的具体算例}
 
 \textbf{问题}：设有一条约束 $x_1 + x_2 = 0$（一维直线），求投影矩阵，并验证投影效果。
 
@@ -105,7 +105,7 @@ Pv &= v - M^T(MM^T)^{-1} Mv \\
   \item $P \begin{bmatrix}1\\-1\end{bmatrix} = \begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}\begin{bmatrix}1\\-1\end{bmatrix} = \begin{bmatrix}1\\-1\end{bmatrix}$ ——切向量保持不变
   \item $P \begin{bmatrix}1\\1\end{bmatrix} = \begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}\begin{bmatrix}1\\1\end{bmatrix} = \begin{bmatrix}0\\0\end{bmatrix}$ ——法向量被消灭
 \end{itemize}
-这正是投影算子的性质：切空间内的向量原样保留，法向量（梯度方向）被归零。
+这正是投影算子的性质：切空间内的向量原样保留，法向量（梯度方向）被归零。}
 
 \begin{notebox}
 \textbf{投影矩阵的几何直觉}：$P \nabla f = 0$ 意味着梯度完全落在约束法向量的张成空间中——此时 $-\nabla f$ 没有“切向分量”可走，说明当前点已是（局部）约束最优，这就是 KKT 条件的几何解释。$P \nabla f \neq 0$ 意味着梯度在切方向上有分量，沿 $-P\nabla f$ 移动可以下降且不立即违反约束。
@@ -400,10 +400,10 @@ $\sigma > 0$ 是\emph{罚因子}。当 $x$ 违反约束时，惩罚项 $>0$。$\
 序列：选 $\sigma_1 < \sigma_2 < \cdots \to \infty$，对每个 $\sigma_k$ 求解 $\min_x P(x, \sigma_k)$，得 $x^{(k)}$。$x^{(k)} \to x^*$。
 \end{defbox}
 
-\textbf{为什么叫“外点法”、为什么允许不可行中间点？}
-外点法对违反约束的惩罚是“从零开始逐渐加码”的。中间迭代点往往不在可行域内（在“外部”），因为罚因子不够大时，惩罚项的威慑力不足以把解完全拉进可行域。\emph{这种“先不管约束、逐步逼近”的策略是外点法的核心特征}——它从可行域外向可行域收敛。优点是初始点不需要可行；缺点是中间结果不可用（不可行），且 $\sigma \to \infty$ 时 Hessian 条件数爆炸。
+\reviewonly{\textbf{为什么叫”外点法”、为什么允许不可行中间点？}
+外点法对违反约束的惩罚是”从零开始逐渐加码”的。中间迭代点往往不在可行域内（在”外部”），因为罚因子不够大时，惩罚项的威慑力不足以把解完全拉进可行域。\emph{这种”先不管约束、逐步逼近”的策略是外点法的核心特征}——它从可行域外向可行域收敛。优点是初始点不需要可行；缺点是中间结果不可用（不可行），且 $\sigma \to \infty$ 时 Hessian 条件数爆炸。}
 
-\subsubsection{外点法教学算例}
+\reviewonly{\subsubsection{外点法教学算例}
 
 \textbf{自编例题}：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ x_1 + x_2 = 1$。（精确解：$x_1^* = x_2^* = 0.5$, $f^* = 0.5$, $\lambda^* = -1$）
 
@@ -427,7 +427,7 @@ x_1 + \sigma(2x_1 - 1) = 0 \;\Rightarrow\; x_1(1+2\sigma) = \sigma \;\Rightarrow
   \item $\sigma_2 = 10$：$x^{(2)} = (\frac{10}{21}, \frac{10}{21})^T \approx (0.476, 0.476)^T$，$x_1+x_2 \approx 0.952$（更接近可行），$f \approx 0.454$
   \item 极限 $\sigma \to \infty$：$x \to (0.5, 0.5)^T$，回到可行域，$f^* = 0.5$
 \end{itemize}
-可见外点法从“外部”（$x_1+x_2 < 1$）逐步逼近约束，每步的点都不完全可行。
+可见外点法从”外部”（$x_1+x_2 < 1$）逐步逼近约束，每步的点都不完全可行。}
 
 \subsubsection{9.6.2 内点法（障碍法）}
 
@@ -449,8 +449,8 @@ $r > 0$ 是障碍因子。$r \to 0^+$ 时障碍项的影响逐渐消失。
 \textbf{严格可行初始点}：$x$ 必须满足 $g_i(x) < 0$（严格内部），否则 $\frac{-1}{g_i(x)}$ 或 $\ln(-g_i(x))$ 无定义。
 \end{defbox}
 
-\textbf{为什么内点法要求严格可行内部点？}
-障碍项在 $g_i(x) \to 0^-$（逼近边界）时 $\to +\infty$，形成一堵“无形的墙”，阻止迭代点越界。如果从可行域外部出发，障碍项符号反转（变成“吸引力”而非“排斥力”），完全失去障碍作用。因此内点法\emph{必须从严格可行内部点出发}，且一维搜索必须限制步长保证不越界。
+\reviewonly{\textbf{为什么内点法要求严格可行内部点？}
+障碍项在 $g_i(x) \to 0^-$（逼近边界）时 $\to +\infty$，形成一堵”无形的墙”，阻止迭代点越界。如果从可行域外部出发，障碍项符号反转（变成”吸引力”而非”排斥力”），完全失去障碍作用。因此内点法\emph{必须从严格可行内部点出发}，且一维搜索必须限制步长保证不越界。}
 
 PPT第13.14页展示了内点法的障碍函数构造和几何示意图。
 
@@ -458,7 +458,7 @@ PPT第13.14页展示了内点法的障碍函数构造和几何示意图。
 \refslide{13罚函数法}{15}{13.14}
 \medskip
 
-\subsubsection{内点法教学算例}
+\reviewonly{\subsubsection{内点法教学算例}
 
 同一问题改写为不等式形式：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ 1 - x_1 - x_2 \le 0$（即 $x_1 + x_2 \ge 1$）。
 
@@ -482,7 +482,7 @@ x_1 = \frac{2 + \sqrt{4 + 16r}}{8} = \frac{1 + \sqrt{1 + 4r}}{4}
   \item $r_2 = 0.1$：$x^{(2)} = (\frac{1+\sqrt{1.4}}{4}, \frac{1+\sqrt{1.4}}{4})^T \approx (0.546, 0.546)^T$，$x_1+x_2 \approx 1.092$（逼近边界），$f \approx 0.596$
   \item 极限 $r \to 0^+$：$x \to (0.5, 0.5)^T$，$f^* = 0.5$
 \end{itemize}
-内点法始终从“内部”（$x_1+x_2 > 1$）逼近边界，与外点法方向相反。
+内点法始终从”内部”（$x_1+x_2 > 1$）逼近边界，与外点法方向相反。}
 
 \subsubsection{9.6.3 乘子法（增广 Lagrange 法）}
 
@@ -504,8 +504,8 @@ L_A(x, \lambda, \sigma) = f(x) + \sum_j \lambda_j h_j(x) + \frac{\sigma}{2}\sum_
 \end{enumerate}
 \end{defbox}
 
-\textbf{为什么 $\sigma$ 不需要趋于无穷？}
-关键在于乘子更新公式 $\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。当 $x^{(k)}$ 不满足约束时，$h(x^{(k)}) \neq 0$，乘子被修正以“补偿”违反量。随着 $\lambda^{(k)}$ 逼近真实乘子 $\lambda^*$，原问题的 KKT 条件被逐步满足，不需要靠 $\sigma \to \infty$ 来强力施压。增广项 $\frac{\sigma}{2}h^2$ 的作用是“拉弯”Hessian 使 $L_A$ 在 $x^*$ 附近凸且良态，但收敛主要靠乘子迭代驱动。
+\reviewonly{\textbf{为什么 $\sigma$ 不需要趋于无穷？}
+关键在于乘子更新公式 $\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。当 $x^{(k)}$ 不满足约束时，$h(x^{(k)}) \neq 0$，乘子被修正以”补偿”违反量。随着 $\lambda^{(k)}$ 逼近真实乘子 $\lambda^*$，原问题的 KKT 条件被逐步满足，不需要靠 $\sigma \to \infty$ 来强力施压。增广项 $\frac{\sigma}{2}h^2$ 的作用是”拉弯”Hessian 使 $L_A$ 在 $x^*$ 附近凸且良态，但收敛主要靠乘子迭代驱动。}
 
 PPT第13.24--13.25页展示了乘子法的基本思想和增广Lagrange函数的构造。
 
@@ -515,7 +515,7 @@ PPT第13.24--13.25页展示了乘子法的基本思想和增广Lagrange函数的
 \refslide{13罚函数法}{26}{13.25}
 \medskip
 
-\subsubsection{乘子法教学算例}
+\reviewonly{\subsubsection{乘子法教学算例}
 
 同一问题：$\min\ f(x) = x_1^2 + x_2^2,\ \text{s.t.}\ x_1 + x_2 = 1$。取 $\sigma = 1$（固定），$\lambda^{(0)} = 0$。
 
@@ -542,7 +542,7 @@ L_A(x, \lambda, \sigma) = x_1^2 + x_2^2 + \lambda(x_1+x_2-1) + \frac{1}{2}(x_1+x
   \item $k=3$：$x^{(3)} = (\frac{1.875}{4}, \frac{1.875}{4})^T = (0.46875, 0.46875)^T$
 \end{itemize}
 
-序列 $x^{(k)} \to (0.5, 0.5)^T$，$\lambda^{(k)} \to -1$（真实乘子），而 $\sigma = 1$ 从未改变。对比外点法：外点法需要 $\sigma \to \infty$ 才能逼近精确解，乘子法用固定 $\sigma$ 配合乘子更新即可。
+序列 $x^{(k)} \to (0.5, 0.5)^T$，$\lambda^{(k)} \to -1$（真实乘子），而 $\sigma = 1$ 从未改变。对比外点法：外点法需要 $\sigma \to \infty$ 才能逼近精确解，乘子法用固定 $\sigma$ 配合乘子更新即可。}
 
 \reviewonly{\begin{notebox}
 \textbf{乘子更新公式的直觉}：$\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。如果 $h > 0$（$x$ 超出约束），加大 $\lambda$ 使下一轮增广 Lagrange 函数更”惩罚”正的 $h$，把 $x$ 拉回来。如果 $h < 0$，减小 $\lambda$ 把 $x$ 推回去。这就是”乘子自适应调整”的因果机制。
