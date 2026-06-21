@@ -107,9 +107,9 @@ Pv &= v - M^T(MM^T)^{-1} Mv \\
 \end{itemize}
 这正是投影算子的性质：切空间内的向量原样保留，法向量（梯度方向）被归零。}
 
-\begin{notebox}
-\textbf{投影矩阵的几何直觉}：$P \nabla f = 0$ 意味着梯度完全落在约束法向量的张成空间中——此时 $-\nabla f$ 没有“切向分量”可走，说明当前点已是（局部）约束最优，这就是 KKT 条件的几何解释。$P \nabla f \neq 0$ 意味着梯度在切方向上有分量，沿 $-P\nabla f$ 移动可以下降且不立即违反约束。
-\end{notebox}
+\reviewonly{\begin{notebox}
+\textbf{投影矩阵的几何直觉}：$P \nabla f = 0$ 意味着梯度完全落在约束法向量的张成空间中——此时 $-\nabla f$ 没有”切向分量”可走，说明当前点已是（局部）约束最优，这就是 KKT 条件的几何解释。$P \nabla f \neq 0$ 意味着梯度在切方向上有分量，沿 $-P\nabla f$ 移动可以下降且不立即违反约束。
+\end{notebox}}
 
 % === Rosen梯度投影法几何解释 ===
 \begin{center}
