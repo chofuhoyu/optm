@@ -18,7 +18,16 @@
 
 \textbf{梯度：} $\nabla f(x) = \bigl(\frac{\partial f}{\partial x_1}, \dots, \frac{\partial f}{\partial x_n}\bigr)^T$。对 $f(x)=\frac12 x^TQx+c^Tx$：$\nabla f(x)=Qx+c$。
 
-\textbf{Hessian矩阵：} $[\nabla^2 f(x)]_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$。对二次函数：$\nabla^2 f(x)=Q$。
+\textbf{Hessian矩阵：} $f$ 的所有二阶偏导数排成的 $n\times n$ 对称矩阵：
+\[
+\nabla^2 f(x) = \begin{pmatrix}
+\frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1\partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_1\partial x_n} \\[3pt]
+\frac{\partial^2 f}{\partial x_2\partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \cdots & \frac{\partial^2 f}{\partial x_2\partial x_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{\partial^2 f}{\partial x_n\partial x_1} & \frac{\partial^2 f}{\partial x_n\partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_n^2}
+\end{pmatrix}
+\]
+即 $[\nabla^2 f(x)]_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$。对二次函数 $f(x)=\frac12 x^T Q x + c^T x$：$\nabla^2 f(x)=Q$（常数矩阵）。
 
 \textbf{一阶Taylor展开：} $f(y) \approx f(x) + \nabla f(x)^T(y-x)$。
 
