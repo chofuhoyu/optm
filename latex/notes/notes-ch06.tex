@@ -1,0 +1,89 @@
+% ============================================================
+%  第6章：最优性条件（FJ与KKT）
+% ============================================================
+\section{第6章 \quad 最优性条件（FJ与KKT）}
+
+\subsection{无约束极值条件}
+
+\textbf{一阶必要条件：} 若 $x^*$ 局部极小且 $f$ 可微，则 $\nabla f(x^*) = 0$。
+
+\textbf{二阶必要条件：} 若 $f$ 二次可微，则 $\nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)$ 半正定。
+
+\textbf{二阶充分条件：} 若 $\nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)$ 正定，则 $x^*$ 严格局部极小。
+
+\subsection{Lagrange乘子法（仅等式约束）}
+
+考虑 $\min f(x)$ s.t. $h_i(x)=0$。Lagrange函数 $L(x,\mu)=f(x)+\sum\mu_i h_i(x)$。
+若 $x^*$ 局部极小且 $\nabla h_i(x^*)$ 线性无关，则存在乘子使 $\nabla_x L(x^*,\mu^*)=0$。
+几何：$-\nabla f(x^*)$ 落在约束法向量张成的子空间中。
+
+\subsection{FJ条件（Fritz John, 1948）}
+
+\textbf{定理 6.2（FJ条件）}
+对一般约束问题 $\min f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。若 $x^*$ 局部极小且函数连续可微，则存在{\color{red}不全为零}的乘子 $\lambda_0,\lambda_1,\dots,\lambda_m,\mu_1,\dots,\mu_p$：
+\[
+\boxed{\lambda_0 \nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0}
+\]
+\[
+\lambda_i \ge 0\ (i=0,1,\dots,m),\qquad \lambda_i g_i(x^*) = 0\ (i=1,\dots,m)
+\]
+$\mu_j$ 无符号约束。
+
+\textbf{注意 $\lambda_0$ 的特殊性：} $\lambda_0$ 可为 $0$——此时目标梯度完全消失，FJ退化为仅约束梯度的线性相关。这是FJ条件的"软肋"，也是引入约束规格的动机。
+
+（课件 p7.17, p7.26）
+
+\subsection{KKT条件}
+
+\textbf{定理 6.3（KKT条件）}
+在FJ基础上{\color{red}加上约束规格}，强制 $\lambda_0 \neq 0$，归一化 $\lambda_0=1$：
+\[
+\nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0
+\]
+加上：$g_i(x^*)\le 0$，$h_j(x^*)=0$，$\lambda_i\ge 0$，$\lambda_i g_i(x^*)=0$。
+
+Lagrange函数 $L(x,\lambda,\mu)=f(x)+\sum\lambda_i g_i(x)+\sum\mu_j h_j(x)$。
+则条件等价于 $\nabla_x L=0$ + $\lambda_i g_i=0$。
+
+（课件 p7.19, p7.20, p7.27）
+
+\subsection{约束规格（CQ）}
+
+\textbf{作用：} 保证约束梯度的线性化与真实可行域局部几何一致，使KKT必要条件成立。
+
+\textbf{常用约束规格：}
+\begin{itemize}
+  \item \textbf{LICQ}：积极约束梯度线性无关（最强，验证简单）
+  \item \textbf{MFCQ}：积极约束梯度正线性相关（较LICQ稍弱）
+  \item \textbf{Slater}：凸问题中存在严格可行点 $g_i(x)<0$
+  \item \textbf{线性约束}：CQ自动成立，无需验证
+\end{itemize}
+
+\subsection{FJ vs KKT 对比}
+
+\begin{tabular}{@{}p{18mm}@{}p{35mm}@{}p{35mm}@{}}
+\toprule
+& \textbf{FJ} & \textbf{KKT} \\
+\midrule
+$\lambda_0$ & $\ge0$，可为0 & 归一化 $=1$ \\
+\midrule
+是否需要CQ & 不需要 & 必须 \\
+\midrule
+适用范围 & 所有局部极小点 & 仅满足CQ的局部极小点 \\
+\midrule
+$\lambda_0=0$时 & 目标梯度消失 & 不存在此退化 \\
+\midrule
+解题方法 & 分$\lambda_0=0$和$\lambda_0\neq0$讨论 & 分互补松弛情形讨论 \\
+\bottomrule
+\end{tabular}
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{FJ}：$\lambda_0\nabla f + \sum\lambda_i\nabla g_i + \sum\mu_j\nabla h_j = 0$，$\lambda_0,\lambda_i\ge0$，$\lambda_i g_i=0$，乘子不全为零
+  \item \textbf{KKT}：同上但 $\lambda_0=1$，需要CQ
+  \item \textbf{核心区别}：FJ允许$\lambda_0=0$，KKT不允许
+  \item \textbf{LICQ}：积极约束梯度线性无关——最常用
+  \item \textbf{FJ解题}：分$\lambda_0=0$和$\lambda_0\neq0$；\textbf{KKT解题}：分互补松弛情形
+  \item \textbf{退化判断}：检查积极约束梯度是否为零向量
+\end{itemize}
