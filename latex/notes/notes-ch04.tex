@@ -77,19 +77,17 @@
 
 \textbf{灵敏度分析总决策表}：
 \medskip
-{\small
-\setlength{\tabcolsep}{1pt}
-\begin{tabular}{@{}p{36mm}p{20mm}p{42mm}@{}}
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lll@{}}
 \toprule
-原问题状态 & 对偶问题状态 & 应对措施 \\
+原问题状态 & 对偶问题 & 措施 \\
 \midrule
-可行 + 对偶可行 & 对偶可行 & 最优解/最优基不变 \\
+可行 + 对偶可行 & 对偶可行 & 最优基不变 \\
 可行 + 对偶不可行 & 对偶不可行 & 原始单纯形继续迭代 \\
 不可行 + 对偶可行 & 对偶可行 & 对偶单纯形继续迭代 \\
-不可行 + 对偶不可行 & 对偶不可行 & 加人工变量从头求解 \\
+不可行 + 对偶不可行 & 对偶不可行 & 加人工变量重头求解 \\
 \bottomrule
 \end{tabular}
-}
 
 \subsection{4.5 目标系数 $c$ 的变化}
 

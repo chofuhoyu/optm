@@ -3,53 +3,170 @@
 % ============================================================
 \section{第7章 \quad 非线性对偶}
 
-\subsection{Lagrange对偶}
+\subsection{7.1 从线性对偶到非线性对偶}
 
-\textbf{原问题 (P)：}
-$\min\ f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。
+第3章讲线性规划对偶，结论非常漂亮：强对偶定理成立，对偶间隙为零。到了非线性规划，事情变得复杂——强对偶不总是成立，对偶间隙可能大于零。
 
-\textbf{Lagrange函数：}
-$L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p \mu_j h_j(x)$，$\lambda_i \ge 0$。
+线性规划对偶实际上就是 Lagrange 对偶的特例——当 $f$、$g_i$、$h_j$ 全部是线性（仿射）函数时，Lagrange 对偶退化为我们熟悉的 LP 对偶。具体验证：
 
-\textbf{对偶函数：}
-$\theta(\lambda,\mu) = \inf_{x}\ L(x,\lambda,\mu)$。对偶函数对任意 $\lambda\ge 0$ 给出原问题最优值的下界。
+标准形 LP $\min c^T x$ s.t.\ $Ax=b,\ x\ge0$。将 $x\ge0$ 改写为 $-x\le0$，引入乘子 $y$（对 $Ax=b$，无限制）和 $\mu\ge0$（对 $-x\le0$）：
+\begin{align*}
+L(x,y,\mu) &= c^T x + y^T(b-Ax) + \mu^T(-x) \\
+           &= b^T y + (c - A^T y - \mu)^T x
+\end{align*}
+取 $\inf_x L$：若 $c-A^T y-\mu\neq0$，线性项可拉向 $-\infty$；仅当 $c-A^T y-\mu=0$ 即 $\mu=c-A^T y\ge0$（即 $A^T y\le c$）时，$\theta(y,\mu)=b^T y$。此时对偶问题 $\max b^T y$ s.t.\ $A^T y\le c$——正是 LP 对偶。
 
-\textbf{注：} LP对偶是Lagrange对偶的特例——当 $f,g_i,h_j$ 均为仿射时，$\theta(\lambda,\mu)$ 退化为 LP 对偶问题。
+非线性对偶的核心工具是 Lagrange 对偶函数。思路：把约束"价格化"（引入乘子），问在乘子固定的情况下，无约束问题的最坏（最小）情况是什么。这个下确界给出了原问题最优值的一个下界。
 
-\textbf{对偶问题 (D)：}
-$\max\ \theta(\lambda,\mu)$ s.t. $\lambda \ge 0$。
+\subsection{7.2 Lagrange对偶函数}
 
-\subsection{对偶定理}
+考虑一般非线性规划（原问题）：
+\[
+\begin{aligned}
+\min\ & f(x) \\
+\text{s.t.}\ & g_i(x) \le 0 \quad (i=1,\dots,m) \\
+& h_j(x) = 0 \quad (j=1,\dots,p) \\
+& x \in X
+\end{aligned}
+\]
 
-\textbf{定理 7.1（弱对偶）}
-对任意原可行解 $x$ 和 $\lambda\ge 0$：$\theta(\lambda,\mu) \le f(x)$。即对偶最优值 $\le$ 原最优值。
+\textbf{定义 7.1（Lagrange对偶函数）}
 
-\textbf{定理 7.2（强对偶）}
-若 (P) 为凸规划且 Slater 条件成立，则 $\theta^* = f^*$，且对偶最优解可达。
+对不等式约束引入乘子 $\lambda_i \ge 0$，对等式约束引入乘子 $\mu_j$（无符号限制），定义 Lagrange 函数：
+\[
+L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p \mu_j h_j(x)
+\]
+则 Lagrange 对偶函数为：
+\[
+\theta(\lambda,\mu) = \inf_{x \in X} L(x,\lambda,\mu)
+\]
+即在乘子固定的条件下，对 $x$ 取下确界。
 
-\textbf{对偶间隙：} $f^* - \theta^* \ge 0$。非凸问题中可能 $>0$。
+\textbf{对偶问题：} $\displaystyle\max_{\lambda \ge 0,\,\mu}\ \theta(\lambda,\mu)$，即寻找给出最大下界的乘子。
 
-\subsection{鞍点与KKT}
+\textbf{为什么取 inf？} 原问题是"在约束条件下最小化 $f(x)$"。引入乘子后，我们解除了约束，但用乘子施加惩罚：$g_i(x) \le 0$ 若被违反（$g_i > 0$），则 $\lambda_i g_i$ 为正惩罚项；若满足（$g_i \le 0$），则 $\lambda_i g_i \le 0$ 反而是奖励。取 $\inf_x$ 意味着：在乘子固定时，寻找使"目标 + 惩罚"最小的 $x$。这本质上是把原问题"放松"为一个无约束问题——由于去掉约束后容许的 $x$ 更多，最小值只可能更小（或相等），从而提供了原最优值的下界。乘子不同，下界也不同；最优的下界就是对偶问题要寻找的。
 
-\textbf{定义（鞍点）}
-$(\bar{x},\bar{\lambda},\bar{\mu})$（$\bar{\lambda}\ge 0$）称为 $L$ 的鞍点，若
-$L(\bar{x},\lambda,\mu) \le L(\bar{x},\bar{\lambda},\bar{\mu}) \le L(x,\bar{\lambda},\bar{\mu})$，$\forall x,\lambda\ge 0,\mu$。
-即 $\bar{x}$ 极小化 $L(\cdot,\bar{\lambda},\bar{\mu})$，$(\bar{\lambda},\bar{\mu})$ 极大化 $L(\bar{x},\cdot,\cdot)$。
+（课件 p7.32，p7.35）
 
-\textbf{定理：} 鞍点存在 $\Longleftrightarrow$ 强对偶成立且原/对偶最优解可达。
+\subsection{7.3 弱对偶定理（永恒成立）}
 
-\subsection{Wolfe对偶（二次规划）}
+\textbf{定理 7.1（弱对偶定理）}
 
-对二次规划 $\min\ \frac{1}{2}x^TQx + c^Tx$ s.t. $Ax\le b$（$Q\succ 0$）：
-Wolfe对偶为 $\max\ -\frac{1}{2}y^TQy + b^T\lambda$ s.t. $Qy + c + A^T\lambda = 0$，$\lambda\ge 0$。
-最优解满足 $x^* = y^*$。
+设 $x$ 是原问题的任意可行解，$(\lambda,\mu)$ 是任意对偶乘子（$\lambda \ge 0$）。则恒有：
+\[
+f(x) \ge \theta(\lambda,\mu)
+\]
+因此：
+\[
+\inf\{\,f(x) \mid \text{可行}\,\} \;\ge\; \sup_{\lambda \ge 0,\,\mu}\ \theta(\lambda,\mu)
+\]
+即：原最优值 $\ge$ 对偶最优值。差值称为对偶间隙。
+
+弱对偶不需要任何条件——不需要凸性，不需要约束规格，对任意 $f,g_i,h_j$ 都成立。核心原因仅在于 $\lambda_i \ge 0$ 且 $g_i(x) \le 0$ 这两个不等式方向一致：对可行 $x$，有 $\lambda_i g_i(x) \le 0$，$h_j(x)=0$ 故 $\mu_j h_j(x)=0$，因此 $L(x,\lambda,\mu) \le f(x)$。取下确界后不等式方向保持，得 $\theta(\lambda,\mu) \le f(x)$。
+
+（课件 p7.24，p7.36）
+
+\subsection{7.4 强对偶定理（需要条件）}
+
+\textbf{定理 7.2（强对偶定理）}
+
+若原问题为凸规划（$f$ 凸，每个 $g_i$ 凸，每个 $h_j$ 仿射）且 Slater 条件成立（存在严格可行点使所有 $g_i(x)<0$），则：
+\[
+\min\ f(x) \;=\; \max_{\lambda \ge 0,\,\mu}\ \theta(\lambda,\mu)
+\]
+且对偶问题的最优乘子就是原问题 KKT 条件中的乘子。
+
+\textbf{为什么强对偶需要条件？} 弱对偶的证明只用了"$\lambda_i g_i \le 0$"这个不等式，它对任意函数都成立。但要让等号成立，需要原问题和对偶问题之间没有"间隙"——这本质上是一个分离超平面的存在性问题。
+
+Hahn-Banach 定理（凸分析中）的推论：两个不相交的凸集可以被超平面分离。取"原问题最优值以下"的凸集和对偶问题的上镜集，强对偶等价于两者恰好在同一点被分离。凸性保证了分离超平面的存在，Slater 条件保证了分离是严格的（避免退化情形）。
+
+\textbf{约束规格的角色：} Slater 条件排除了退化情形。例如 $\min x$ s.t.\ $x^2\le 0$（仅有 $x=0$ 可行）——虽然凸但无严格内点，强对偶可能失败。
+
+（课件 p7.39，p7.55）
+
+\subsection{7.5 鞍点——对偶理论的几何核心}
+
+Lagrange 对偶的完整图景中，鞍点（saddle point）是连接原问题和对偶问题的核心概念。
+
+\textbf{定义 7.3（Lagrange函数的鞍点）}
+
+点 $(\bar{x}, \bar{\lambda}, \bar{\mu})$（$\bar{\lambda}\ge0$）称为 Lagrange 函数 $L(x,\lambda,\mu)$ 的鞍点，如果：
+\begin{align*}
+L(\bar{x},\lambda,\mu) \;\le\; L(\bar{x},\bar{\lambda},\bar{\mu})
+\;\le\; L(x,\bar{\lambda},\bar{\mu}) \\[-2pt]
+\forall\ x\in X,\ \lambda\ge0,\ \mu
+\end{align*}
+即：固定 $\bar{\lambda},\bar{\mu}$，$\bar{x}$ 使 $L$ 最小（对 $x$）；固定 $\bar{x}$，$(\bar{\lambda},\bar{\mu})$ 使 $L$ 最大（对 $\lambda\ge0,\mu$）。
+
+\textbf{直观理解——马鞍的形状：} 想象骑在马鞍上——沿马身方向（$x$ 方向），你在最低点（最小化）；沿马腹方向（$\lambda$ 方向），你在最高点（最大化）。
+
+\textbf{鞍点的核心定理：}
+\[
+(\bar{x},\bar{\lambda},\bar{\mu}) \text{ 是鞍点}
+\;\Longleftrightarrow\;
+\begin{aligned}
+&\bar{x} \text{ 是原问题最优解} \\
+&\quad (\bar{\lambda},\bar{\mu}) \text{ 是对偶问题最优解} \\
+&\quad \text{强对偶成立}
+\end{aligned}
+\]
+鞍点定理将三个独立的结论统一为一个条件。若问题非凸导致对偶间隙 $>0$，则鞍点不存在。
+
+\subsection{7.6 对偶间隙}
+
+对偶间隙定义为 $f^* - \theta^* \ge 0$（由弱对偶定理保证非负）。三种情形：
+
+\begin{itemize}
+  \item \textbf{凸规划 + Slater 条件：} 对偶间隙 $=0$，强对偶成立。
+  \item \textbf{非凸问题：} 对偶间隙可能 $>0$。根本机制：非凸约束使得 Lagrange 放松后的下确界比原问题的最优值"低太多"——当 Lagrange 函数中存在高阶非线性项（如三次项），取 $\inf_x$ 时这些项可能主导并拉向 $-\infty$，使得对偶函数在几乎所有乘子值处退化（仅个别乘子值处有限）。
+  \item \textbf{退化凸规划：} 即使凸但不满足约束规格，对偶间隙也可能 $>0$。例如 $\min x$ s.t.\ $x^2\le0$，可行域仅 $\{0\}$ 无严格内点。
+\end{itemize}
+
+\subsection{7.7 变量消元法的陷阱}
+
+在处理等式约束时，有时会想：直接从约束解出一个变量代入目标函数，不就变成无约束问题了吗？
+
+\textbf{这是最常见的一种错误。} 原因：等式约束可能隐含不等式限制。
+
+典型例子——考虑形如 $x_2^2 = p(x_1)$ 的约束（左边非负）。如果"解出" $x_2^2$ 代入目标函数，表面上消除了 $x_2$，但实际上丢失了关键信息：
+\[
+x_2^2 = p(x_1) \quad\Rightarrow\quad p(x_1) \ge 0
+\]
+因为左边 $x_2^2$ 是非负的，右边也必须是。这个不等式是隐含约束——若不写出来，一元化后的目标可能在不可行点取得更小的值，导致错误的最优解。
+
+更一般地，任何形如 $A(x) = B(x)$ 的等式约束，若 $A(x)$ 或 $B(x)$ 有值域限制（如非负性、有界性），消元后必须显式写出这些隐含条件。
+
+\textbf{正确做法：} 变量消元后，必须显式加上所有隐含的不等式条件，将问题转化为正确的约束优化问题再求解。
+
+\subsection{7.8 Wolfe对偶（二次规划）}
+
+对二次规划（QP）问题，Wolfe 对偶提供了结构化的对偶形式。考虑凸二次规划：
+\[
+\min\ \frac{1}{2}x^T Q x + c^T x \quad \text{s.t.}\ A x \le b
+\]
+其中 $Q \succ 0$（正定，保证强凸）。Wolfe 对偶为：
+\[
+\max\ -\frac{1}{2}y^T Q y + b^T \lambda
+\quad \text{s.t.}\ Q y + c + A^T \lambda = 0,\ \lambda \ge 0
+\]
+最优解满足 $x^* = y^*$（原变量与对偶变量一致）。
+
+Wolfe 对偶的关键特征：
+\begin{itemize}
+  \item 对偶目标中二次项系数变为负号（$-\frac{1}{2}y^T Q y$），因为 $Q \succ 0$ 保证了对偶目标仍是凹函数（最大化凹函数 = 凸规划）
+  \item 约束为线性等式 $Q y + c + A^T \lambda = 0$（来自 $\nabla_x L = 0$ 的最优性条件）加非负约束 $\lambda \ge 0$
+  \item 强对偶自动成立（凸 QP 满足 Slater 条件时），且 $x^* = y^*$
+\end{itemize}
 
 \subsection{本章速查}
 
 \begin{itemize}
-  \item \textbf{对偶函数}：$\theta(\lambda,\mu) = \inf_x L(x,\lambda,\mu)$
-  \item \textbf{弱对偶}：$\theta^* \le f^*$；\textbf{强对偶}：凸+Slater $\Rightarrow \theta^* = f^*$
-  \item \textbf{对偶间隙}：$f^* - \theta^*$，非凸时可 $>0$
-  \item \textbf{鞍点}：$\Longleftrightarrow$ 强对偶成立且解可达
-  \item \textbf{Wolfe对偶}：二次规划的特化对偶形式
+  \item Lagrange对偶函数：$\theta(\lambda,\mu) = \inf_{x\in X} \{\,f(x) + \sum\lambda_i g_i(x) + \sum\mu_j h_j(x)\,\}$
+  \item 弱对偶定理：$f(x) \ge \theta(\lambda,\mu)$ 恒成立（无须任何条件），核心是 $\lambda_i g_i(x) \le 0$
+  \item 强对偶定理：需要凸规划（$f$ 凸，$g_i$ 凸，$h_j$ 仿射）+ 约束规格（如 Slater），保证 $f^* = \theta^*$
+  \item 对偶间隙：$f^* - \theta^* \ge 0$，非凸问题可能 $>0$；根本原因是非线性项在取 inf 时拉向 $-\infty$
+  \item 鞍点存在 $\Longleftrightarrow$ 强对偶成立且原/对偶最优解可达
+  \item 变量消元陷阱：必须保留隐含不等式约束（如 $x^2 \ge 0$ 等非负条件自动传递）
+  \item Wolfe对偶：凸二次规划的特化对偶形式，$x^* = y^*$，强对偶自动成立
+  \item LP对偶是Lagrange对偶在仿射函数下的特例：令 $f,g_i,h_j$ 均为仿射即退化
 \end{itemize}
