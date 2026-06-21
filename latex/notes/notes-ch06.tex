@@ -40,7 +40,7 @@
 \subsection{FJ条件（Fritz John, 1948）}
 
 \textbf{定理 6.2（FJ条件）}
-对一般约束问题 $\min f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。若 $x^*$ 局部极小且函数连续可微，则存在{\color{red}不全为零}的乘子 $\lambda_0,\lambda_1,\dots,\lambda_m,\mu_1,\dots,\mu_p$：
+对一般约束问题 $\min f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。若 $x^*$ 局部极小且函数连续可微，则存在\textbf{不全为零}的乘子 $\lambda_0,\lambda_1,\dots,\lambda_m,\mu_1,\dots,\mu_p$：
 \[
 \boxed{\lambda_0 \nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0}
 \]
@@ -56,7 +56,7 @@ $\mu_j$ 无符号约束。
 \subsection{KKT条件}
 
 \textbf{定理 6.3（KKT条件）}
-在FJ基础上{\color{red}加上约束规格}，强制 $\lambda_0 \neq 0$，归一化 $\lambda_0=1$：
+在FJ基础上\textbf{加上约束规格}，强制 $\lambda_0 \neq 0$，归一化 $\lambda_0=1$：
 \[
 \nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0
 \]
