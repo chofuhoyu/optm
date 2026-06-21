@@ -3,75 +3,337 @@
 % ============================================================
 \section{第3章 \quad 对偶理论}
 
-\subsection{对偶问题的构造}
+\subsection{3.1 什么是对偶}
 
-\textbf{对称形式（$\min$ 原问题，$\le$ 约束）：}
-\begin{center}
-\begin{tabular}{c|c}
-\textbf{原问题 (P)} & \textbf{对偶问题 (D)} \\
-\hline
-$\min\ c^T x$ & $\max\ b^T y$ \\
-$\text{s.t.}\ Ax \ge b$ & $\text{s.t.}\ A^T y \le c$ \\
-$x \ge 0$ & $y \ge 0$ \\
-\end{tabular}
-\end{center}
+每一个线性规划问题（称为\emph{原问题}，Primal）天然对应着另一个线性规划问题（称为\emph{对偶问题}，Dual）。对偶的产生有一个直观的经济背景——食谱问题：
 
-\textbf{一般构造规则：}
+一个家庭想用最少的钱购买食品（奶和蛋）来满足每日营养需求，这是原问题（$\min$ 成本）。一家制药商想给维生素定价卖给家庭，价格不能超过食品的市场价（否则顾客不如直接买食品），又要使收入最大——这是对偶问题（$\max$ 收入）。两个问题共享同一组数据（营养含量表），只是"角色互换"。（课件 p6.1）
+
+对偶的用途极广：
 \begin{itemize}
-  \item 原问题 $\min$ $\to$ 对偶问题 $\max$
-  \item 原问题第 $i$ 约束的右端 $b_i$ $\to$ 对偶变量 $y_i$
-  \item 原问题第 $j$ 变量的系数 $c_j$ $\to$ 对偶约束的右端
-  \item 等式约束 $\to$ 对偶变量无符号限制
-  \item $\ge$ 约束（对 $\min$ 问题）$\to$ 对偶变量 $\le 0$
-  \item 自由变量 $\to$ 对偶等式约束
+  \item 一个问题的对偶有时比原问题更容易求解（约束少、变量少的方向）
+  \item 弱/强对偶定理为最优性提供验证工具——对偶目标值给出原问题最优值的界
+  \item 互补松弛条件可以从一侧最优解反推另一侧最优解，省去重算
+  \item 对偶变量就是资源的\emph{影子价格}，灵敏度分析直接使用
 \end{itemize}
 
-\subsection{对偶定理}
+\subsection{3.2 如何构造对偶：$w$ 从哪来，常数怎么搬家}
 
-\textbf{定理 3.1（弱对偶定理）}
-设 $x$ 和 $y$ 分别是 (P) 和 (D) 的可行解，则 $c^T x \ge b^T y$。
-推论：若 $c^T x = b^T y$，则 $x$ 和 $y$ 分别是各自问题的最优解。
+\subsubsection{第零步：$w$ 究竟是怎么冒出来的？——Lagrange 乘子}
 
-\textbf{定理 3.2（强对偶定理）}
-若 (P) 有有限最优解 $x^*$，则 (D) 也有最优解 $y^*$，且 $c^T x^* = b^T y^*$。
-
-\subsection{互补松弛条件}
-
-\textbf{定理 3.3（互补松弛）}
-设 $x^*$ 和 $y^*$ 分别是 (P) 和 (D) 的可行解。它们同时为最优的充要条件是：
+对偶变量不是凭空定义的。以标准对称形式为例：原问题 $\min\; c^T x$，$\text{s.t.}\; Ax \ge b,\; x \ge 0$。对每个约束 $a_i^T x \ge b_i$ 引入一个\emph{Lagrange 乘子} $w_i \ge 0$（不等式乘子需非负以形成下界），构造 Lagrange 函数：
 \[
-(y^*)^T(Ax^* - b) = 0,\qquad (c - A^T y^*)^T x^* = 0
+L(x, w) = c^T x + \sum_{i=1}^{m} w_i\,(b_i - a_i^T x)
 \]
-即：
-\begin{itemize}
-  \item 若 $x_j^* > 0$，则对应对偶约束取等号
-  \item 若对偶约束严格不取等，则 $x_j^* = 0$
-  \item 若 $y_i^* > 0$，则对应原约束取等号
-  \item 若原约束严格不取等，则 $y_i^* = 0$
-\end{itemize}
+定义\emph{对偶函数} $\theta(w) = \inf_{x \ge 0} L(x, w)$。整理：
+\[
+\theta(w) = \inf_{x \ge 0} \bigl\{ w^T b + (c^T - w^T A)x \bigr\}
+\]
+要使 $\theta(w) > -\infty$（否则对偶函数无意义），必须有 $c^T - w^T A \ge 0$，即 $A^T w \le c$。于是对偶问题最大化 $\theta(w) = b^T w$：
+\[
+\max\; b^T w,\quad \text{s.t.}\; A^T w \le c,\; w \ge 0
+\]
+\textbf{这就是对偶问题的来源——它不是"凑"出来的，而是 Lagrange 对偶的必然结果。} $w_i$ 就是第 $i$ 个约束的 Lagrange 乘子，在经济上解释为资源的影子价格。
 
-\subsection{对偶单纯形法}
+如果原约束是 $\le$ 型（$a_i^T x \le b_i \iff -a_i^T x \ge -b_i$），乘子符号会反过来（$w_i \le 0$）；如果是等式约束，乘子无符号限制。下面的表把这些符号规则全部覆盖。
 
-\textbf{适用场景：} 原始不可行但对偶可行（检验数全 $\ge 0$ 但 $B^{-1}b$ 有负分量）。
+\subsubsection{第一步：$w$ 是什么？——每个约束配一个对偶变量}
 
-\textbf{算法步骤：}
+从上述推导可以看出：原问题的每个约束都对应一个 Lagrange 乘子 $w_i$，这个 $w_i$ 就是\emph{对偶变量}。
+
+原问题有 $m$ 个约束 $\;\Rightarrow\;$ 对偶问题有 $m$ 个变量 $w_1,w_2,\dots,w_m$。\\
+原问题有 $n$ 个变量 $\;\Rightarrow\;$ 对偶问题有 $n$ 个约束（每个原变量对应一个对偶约束）。
+
+\textbf{把 $w$ 想象成"每单位约束资源的价格"：} 对偶的目标是用这些价格给资源定价，使得总价值最大（或最小）。
+
+\subsubsection{第二步：数据怎么"搬家"？——三个机械操作}
+
+对偶问题的\emph{所有数据}都来自原问题，只是位置和方向变了。不管符号规则，先记住三个"搬家"动作：
+
+\textbf{对偶的数据来源（与符号无关，纯结构）}
+
 \begin{enumerate}
-  \item 确定出基变量：选 $B^{-1}b$ 中最负的分量对应行
-  \item 确定进基变量：在该行负系数列中，取 $\displaystyle \min\left\{\frac{\sigma_j}{|a_{rj}|} \;\middle|\; a_{rj} < 0\right\}$
-  \item 转轴运算（同单纯形法）
-  \item 重复直至 $B^{-1}b \ge 0$（原始可行）
+  \item \textbf{对偶目标系数} = 原问题的\emph{右端常数} $b = (b_1,\dots,b_m)^T$
+
+  原问题的 $b$ 完全搬到对偶的目标函数里。对偶目标形如 $\max\; b_1 w_1 + b_2 w_2 + \cdots + b_m w_m$（或 $\min$，取决于原方向）。
+
+  \item \textbf{对偶约束右端} = 原问题的\emph{目标系数} $c = (c_1,\dots,c_n)^T$
+
+  原问题的 $c_j$（$x_j$ 在目标中的系数）搬到对偶的第 $j$ 个约束的右端。
+
+  \item \textbf{对偶约束矩阵} = 原问题约束矩阵的\emph{转置} $A^T$
+
+  原问题中 $x_j$ 在各约束中的系数列 $(a_{1j},a_{2j},\dots,a_{mj})^T$，转置后成为对偶第 $j$ 个约束的系数行 $(a_{1j},a_{2j},\dots,a_{mj})$。
 \end{enumerate}
 
-\subsection{影子价格}
+\textbf{一句话总结搬家的方向：}
+\[
+\begin{array}{c|c}
+\text{原问题（$\min$）} & \text{对偶问题（$\max$）} \\
+\hline
+\text{右端 } b & \longrightarrow \text{ 目标系数} \\
+\text{目标系数 } c & \longrightarrow \text{ 约束右端} \\
+\text{矩阵 } A & \longrightarrow \text{ 转置 } A^T \\
+m \text{ 个约束} & \longrightarrow m \text{ 个变量 } w_1,\dots,w_m \\
+n \text{ 个变量} & \longrightarrow n \text{ 个约束}
+\end{array}
+\]
 
-\textbf{定义：} 对偶变量 $y_i^*$ 的经济含义——第 $i$ 种资源增加 1 单位时，最优目标值的边际变化量。$y_i^* = \frac{\partial z^*}{\partial b_i}$。
+\subsubsection{第三步：符号和不等号怎么定？——查表}
+
+搬家的\emph{数值}是确定的，但变量的符号（$w_i \ge 0$？$\le 0$？自由？）和约束的不等号（$\le$？$\ge$？$=$？）需要根据原问题的形式来定。
+
+\textbf{表 3.1：原-对偶对应关系（原问题 $\min$ $\to$ 对偶 $\max$）}
+
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{原问题（$\min$）} & \textbf{对偶问题（$\max$）} \\
+\midrule
+约束 $i$：$a_i^T x \le b_i$ & 变量 $w_i \le 0$ \\
+约束 $i$：$a_i^T x \ge b_i$ & 变量 $w_i \ge 0$ \\
+约束 $i$：$a_i^T x = b_i$  & 变量 $w_i$ 自由 \\[3pt]
+变量 $x_j \ge 0$  & 约束 $j$：$w^T A_j \le c_j$ \\
+变量 $x_j \le 0$  & 约束 $j$：$w^T A_j \ge c_j$ \\
+变量 $x_j$ 自由   & 约束 $j$：$w^T A_j = c_j$ \\
+\bottomrule
+\end{tabular}
+
+\textbf{为什么是这样的对应？} 回顾 Lagrange 乘子推导：$\le$ 约束化 $-a_i^T x \ge -b_i$ 后乘子 $\ge 0$，令 $w_i = -$乘子，故 $w_i \le 0$；$\ge$ 约束的乘子自然 $\ge 0$（形成下界）；等式无松紧方向，乘子可正可负。变量侧：$x_j \ge 0$ 要求对偶约束取 $\le$（不等号与变量符号\emph{相反}）；$x_j \le 0$ 取 $\ge$；自由变量取等式。
+
+\medskip
+\emph{记忆规律（考试直接用）：}
+\begin{itemize}
+  \item \textbf{目标方向翻转}：原 $\min$ $\to$ 对偶 $\max$（反之亦然）
+  \item \textbf{约束 $\to$ 变量符号（方向一致）}：原 $\le$ $\to$ $w\le0$，原 $\ge$ $\to$ $w\ge0$，原 $=$ $\to$ $w$ 自由
+  \item \textbf{变量符号 $\to$ 约束不等号（方向相反）}：$x\ge0$ $\to$ 约束 $\le$，$x\le0$ $\to$ 约束 $\ge$，$x$ 自由 $\to$ 约束 $=$
+\end{itemize}
+
+\medskip
+\emph{如果原问题是 $\max$？}
+
+原 $\min \to$ 对偶 $\max$ 的表中有两条对应关系：
+\begin{enumerate}
+  \item \textbf{原约束不等号 $\to$ 对偶变量符号}：原 $\le \to w\le0$，原 $\ge \to w\ge0$（\emph{同向}）
+  \item \textbf{原变量符号 $\to$ 对偶约束不等号}：$x\ge0 \to$ 约束 $\le$，$x\le0 \to$ 约束 $\ge$（\emph{反向}）
+\end{enumerate}
+
+当原问题从 $\min$ 变成 $\max$ 时，\textbf{这两条关系恰好都反过来}：
+
+\textbf{原问题 $\max$ $\to$ 对偶 $\min$ 的对应规则：}
+\begin{itemize}
+  \item 原约束 $\le$ $\to$ $w\ge0$，原约束 $\ge$ $\to$ $w\le0$\quad（关系一：\emph{反向}）
+  \item $x\ge0$ $\to$ 约束 $\ge$，$x\le0$ $\to$ 约束 $\le$\quad（关系二：\emph{同向}）
+\end{itemize}
+
+\textit{怎么记？} 背住 $\min\to\max$ 那张表就够了。遇到 $\max$ 时，有两种等价做法：做法一——两条关系都反过来。做法二（考试推荐）——原 $\max\ c^T x \iff \min\ -c^T x$，用 $\min$ 表写出对偶后，把对偶目标方向翻转回来。不会出错。
+
+\medskip
+\subsubsection{完整示例：逐步构造}
+
+原问题：
+\[
+\begin{aligned}
+\min\ & 3x_1 + 5x_2 \\
+\text{s.t.}\ & 2x_1 + x_2 \le 10,\quad x_1 - 3x_2 \ge 4 \\
+& x_1 \ge 0,\ x_2 \le 0
+\end{aligned}
+\]
+
+\textbf{第1步：结构搬家（不管符号）。} 原问题有 2 个约束 $\to$ 对偶有 2 个变量 $w_1,w_2$。原问题 $\min$ $\to$ 对偶 $\max$。对偶目标系数取原右端 $b=(10,4)^T$：$\max\; 10w_1 + 4w_2$。对偶约束右端取原目标系数 $c=(3,5)^T$。矩阵 $A=\begin{pmatrix}2&1\\1&-3\end{pmatrix}$ 转置。
+
+\textbf{第2步：查表定符号和不等号。}
+\begin{itemize}
+  \item 约束1 $2x_1+x_2\le10$（$\le$） $\to$ $w_1 \le 0$
+  \item 约束2 $x_1-3x_2\ge4$（$\ge$） $\to$ $w_2 \ge 0$
+  \item $x_1\ge0$ $\to$ 对偶约束1 取 $\le$：$2w_1 + w_2 \le 3$
+  \item $x_2\le0$ $\to$ 对偶约束2 取 $\ge$：$w_1 - 3w_2 \ge 5$
+\end{itemize}
+
+\textbf{第3步：汇总。}
+\[
+\begin{aligned}
+\max\ & 10w_1 + 4w_2 \\
+\text{s.t.}\ & 2w_1 + w_2 \le 3 \qquad (\text{来自 }x_1)\\
+& w_1 - 3w_2 \ge 5 \qquad (\text{来自 }x_2)\\
+& w_1 \le 0,\ w_2 \ge 0
+\end{aligned}
+\]
+
+\emph{验算：} 对偶的目标函数用了原右端 $(10,4)$ $\checkmark$；对偶约束右端用了原目标系数 $(3,5)$ $\checkmark$；矩阵是 $A^T$ $\checkmark$；符号和不等号按表逐条对照 $\checkmark$。
+
+\medskip
+（课件 p6.4 展示了对称和非对称形式的标准写法，p6.8 的对偶关系表是考试构造对偶的核心工具。）
+
+\textbf{对偶的对偶是原问题}：将已写出的对偶问题再套一次对偶关系表（注意此时原问题是 $\max$，行对应关系要反过去），会回到最初的原问题。考试中若怀疑写错了对偶，可以用这个性质自检。（课件 p6.9）
+
+\textbf{查表的常见陷阱：}
+\begin{itemize}
+  \item 原问题是 $\max$ 时两条对应关系\emph{都反过来}：原约束 $\le$ $\to$ $w\ge0$（不再 $\le0$）；$x\ge0$ $\to$ 约束 $\ge$（不再 $\le$）
+  \item 自由变量的对偶约束是等式——很多人写成不等式
+  \item 约束带等号（$=$）时，对应的对偶变量无符号限制——不要漏写"自由"
+  \item 三个符号方向检查：原目标方向 $\to$ 对偶目标方向 / 原约束 $\to$ 对偶变量符号 / 原变量符号 $\to$ 对偶约束不等号
+\end{itemize}
+
+\subsection{3.4 弱对偶定理}
+
+\textbf{定理 3.1（弱对偶定理）}
+
+设 $x$ 是原问题（$\min\ c^T x$，约束 $Ax\ge b,\ x\ge 0$）的任意可行解，$w$ 是对偶问题（$\max\ b^T w$，约束 $A^T w\le c,\ w\ge 0$）的任意可行解。则恒有：
+\[
+c^T x \ge b^T w
+\]
+即：原问题的目标值永远不小于对偶的目标值——对偶的目标值给出原问题最优值的\emph{下界}。
+
+\medskip
+\textbf{为什么恒成立？} 利用原可行性和对偶可行性的不等式链：
+\[
+c^T x \ge (A^T w)^T x = w^T A x \ge w^T b = b^T w
+\]
+第一步用对偶约束 $A^T w \le c$ 且 $x\ge 0$；第二步用原约束 $Ax \ge b$ 且 $w\ge 0$。这说明弱对偶不需要任何额外条件——只要各自可行就成立。
+
+\medskip
+\textbf{例（弱对偶验证）：}\\
+原问题：$\min\ x_1+x_2$，$\text{s.t.}\ x_1+2x_2\ge4,\ 2x_1+x_2\ge4,\ x_1,x_2\ge0$。\\
+对偶问题：$\max\ 4w_1+4w_2$，$\text{s.t.}\ w_1+2w_2\le1,\ 2w_1+w_2\le1,\ w_1,w_2\ge0$。\\
+取原可行解 $x=(4,0)$，目标值 $=4$；取对偶可行解 $w=(0.2,0.2)$，目标值 $=1.6$。弱对偶成立：$4 \ge 1.6$。
+
+\medskip
+\textbf{推论}：
+\begin{itemize}
+  \item 若原问题无下界（$\min \to -\infty$），则对偶必无可行解
+  \item 若对偶无上界（$\max \to +\infty$），则原问题必无可行解
+  \item 若找到 $c^T x^* = b^T w^*$，则 $x^*$ 和 $w^*$ 分别是原问题和对偶的最优解（最优性的\emph{充分条件}，无需检验 KKT）
+\end{itemize}
+
+\textbf{弱对偶的几何直觉}：对偶问题的最优值是从"下方"逼近原问题最优值的。原最优值 $\ge$ 对偶最优值，这个差值称为\emph{对偶间隙}。对于线性规划，强对偶定理告诉我们间隙总是零——这是 LP 的独特性质。对于非线性规划，间隙可能为正，需要凸性 + 约束规格才能消除。
+
+（课件 p6.10 陈述了对偶定理体系及其推论。）
+
+\subsection{3.5 强对偶定理}
+
+\textbf{定理 3.2（强对偶定理）}
+
+设原问题和对偶问题均可行。则两者都存在最优解，且最优目标值相等：
+\[
+\min\ c^T x = \max\ b^T w
+\]
+
+\medskip
+\textbf{为什么重要？} 强对偶定理是线性规划的核心定理。它意味着：
+\begin{itemize}
+  \item 求解原问题等同于求解对偶——选哪个更容易就解哪个
+  \item 单纯形法的最优表同时给出原最优解和对偶最优解：检验数行 $c_B^T B^{-1}$ 就是对偶最优解
+  \item 互补松弛条件作为最优性的\emph{充要条件}，正是建立在强对偶之上
+\end{itemize}
+
+\subsection{3.6 互补松弛条件}
+
+\textbf{定理 3.3（互补松弛条件）}
+
+设 $x^*$ 和 $w^*$ 分别是原问题（$\min\ c^T x,\ Ax\ge b,\ x\ge0$）和对偶问题（$\max\ b^T w,\ A^T w\le c,\ w\ge0$）的可行解。它们是各自最优解的\emph{充要条件}是：
+\[
+\begin{aligned}
+&\text{(1)}\quad w_i^* \cdot (a_i^T x^* - b_i) = 0 \quad \forall i \\
+&\qquad\text{（对偶变量 $\times$ 原约束松弛量 $=0$）}\\[4pt]
+&\text{(2)}\quad x_j^* \cdot (c_j - w^{*T} a_j) = 0 \quad \forall j \\
+&\qquad\text{（原变量 $\times$ 对偶约束松弛量 $=0$）}
+\end{aligned}
+\]
+
+\medskip
+\textbf{互补松弛的直观含义}：
+\begin{itemize}
+  \item \textbf{(1) 约束侧}：若 $w_i^* > 0$（该资源有正影子价格），则原约束必须是紧的（$a_i^T x^* = b_i$，资源恰好用完）。若原约束是松的（$a_i^T x^* > b_i$，资源有剩余），则 $w_i^* = 0$（多余的资源边际价值为零）。
+  \item \textbf{(2) 变量侧}：若 $x_j^* > 0$（该产品被生产），则对偶约束必须是紧的（$w^{*T} a_j = c_j$，边际收益恰好等于成本）。若对偶约束是松的（$w^{*T} a_j < c_j$，边际成本低于收益），则 $x_j^* = 0$（不生产该产品——因为"不值得"）。
+  \item 这就是"互补"的含义——乘积中一个为正，另一个必须为零。
+\end{itemize}
+
+\medskip
+\textbf{考试怎么用？} 已知原（或对偶）最优解，用互补松弛条件反推另一侧的最优解。步骤：
+\begin{enumerate}
+  \item 看每个对偶变量 $w_i^*$ 是否 $>0$——若是，对应的原约束取等号
+  \item 看每个原约束是否松——若是，对应的对偶变量必为 $0$
+  \item 看每个原变量 $x_j^*$ 是否 $>0$——若是，对应的对偶约束取等号
+  \item 看每个对偶约束是否松——若是，对应的原变量必为 $0$
+  \item 联立所有等式，解出未知量
+\end{enumerate}
+不需要跑单纯形法。
+
+（课件 p6.10 讨论了对偶定理体系：弱对偶 $\to$ 强对偶 $\to$ 互补松弛；p6.15 给出了互补松弛性质的正式表述与例题。）
+
+\subsection{3.7 对偶的经济解释：影子价格}
+
+对偶变量 $w_i$ 的绝对值有明确的经济含义——它是第 $i$ 种资源的\emph{影子价格}。在最优基不变的前提下（即灵敏度分析的有效范围内）：
+\[
+w_i = \frac{\partial z^*}{\partial b_i}
+\]
+即：增加一单位资源 $b_i$，最优目标值恰好改变 $w_i$。这从强对偶定理可直接推出：
+\[
+z^* = c_B^T B^{-1} b = w^{*T} b = \sum w_i^* b_i \quad\Rightarrow\quad \frac{\partial z^*}{\partial b_i} = w_i^*
+\]
+
+影子价格的用途：
+\begin{itemize}
+  \item 判断哪种资源是瓶颈（$w_i$ 大 $\to$ 稀缺）——应优先增加
+  \item 判断购入额外资源是否划算（市价 $<$ 影子价格 $\to$ 买入有利）
+  \item 灵敏度分析中，$b$ 在小范围内变化时，最优基不变，影子价格不变，可直接计算新最优值
+\end{itemize}
+
+\subsection{3.8 对偶单纯形法}
+
+\textbf{核心思想：} 对偶单纯形法不是"对偶问题的单纯形法"，而是在\emph{原问题的单纯形表}上操作，始终保持\emph{对偶可行性}（检验数条件满足），逐步消除\emph{原始不可行性}（$B^{-1}b$ 的负分量）。
+
+\textbf{适用场景：} 原始不可行但对偶可行。具体来说，检验数全部满足最优性条件（对 $\min$ 问题 $\sigma_j \le 0$），但基本解有负分量（$B^{-1}b \not\ge 0$）。常见于：
+\begin{itemize}
+  \item 灵敏度分析中 $b$ 改变后原最优基不再可行
+  \item 添加新约束后原最优解违反新约束
+  \item 某些问题天然更容易写出对偶可行的初始表
+\end{itemize}
+
+\textbf{与原始单纯形法的对比：}
+
+\begin{tabular}{@{}p{1.8cm}p{2.6cm}p{2.6cm}@{}}
+\toprule
+& \textbf{原始单纯形法} & \textbf{对偶单纯形法} \\
+\midrule
+维持可行 & 原始可行（$b\ge0$） & 对偶可行（$\sigma_j\le0$） \\
+消除目标 & 对偶不可行性 & 原始不可行性 \\
+离基规则 & 最小比值（正系数列） & 选最负的 $b_i$ \\
+进基规则 & 最大正检验数 & 最小比值（负系数列） \\
+初始要求 & 需初始BFS & 需对偶可行基 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\textbf{算法步骤：}
+\begin{enumerate}
+  \item \textbf{初始检查}：确认当前单纯形表满足对偶可行性——所有检验数 $\le 0$（对 $\min$ 问题）。若不满足，先通过行变换或大M法使检验数满足条件。
+  \item \textbf{最优判断}：检查 $b$ 列（$B^{-1}b$）。若所有分量 $\ge 0$，则当前解原始可行且对偶可行，得最优解，停止。
+  \item \textbf{确定离基变量}：选 $b$ 列中\emph{最负}的分量对应的行 $r$（$b_r < 0$ 且最小）。对应的基变量 $x_{B_r}$ 离基。
+  \item \textbf{判断无可行解}：检查第 $r$ 行所有非基列系数。若所有 $\bar{a}_{rj} \ge 0$（全为非负），则原问题无可行解，停止。原因：$x_{B_r} = b_r - \sum\bar{a}_{rj}x_j$，$b_r<0$ 且所有 $\bar{a}_{rj}\ge0$，无论非基变量取何值，$x_{B_r} < 0$ 恒成立，无法满足非负约束。
+  \item \textbf{确定进基变量}：对第 $r$ 行中所有 $\bar{a}_{rj} < 0$ 的列 $j$，计算比值：
+  \[
+  \theta_j = \frac{|\sigma_j|}{|\bar{a}_{rj}|} = \frac{-\sigma_j}{-\bar{a}_{rj}},\quad \text{只对 } \bar{a}_{rj} < 0 \text{ 的列}
+  \]
+  取 $\theta_j$\emph{最小}的列 $k$，$x_k$ 进基。主元为 $\bar{a}_{rk}$。
+
+  \textbf{为什么取最小？} 对偶单纯形法的转轴必须保证新表的检验数仍 $\le 0$（维持对偶可行性）。可以证明，选 $\min\{\sigma_j/\bar{a}_{rj} \mid \bar{a}_{rj}<0\}$ 能保持这一性质。
+  \item \textbf{转轴运算}：以 $\bar{a}_{rk}$ 为主元，执行 Gauss 行变换——主元行除以 $\bar{a}_{rk}$ 使主元变为 $1$，然后用此行消去其他所有行（包括检验数行）的第 $k$ 列。
+  \item \textbf{返回步骤 2}：重复直至 $b \ge 0$ 或判定无可行解。
+\end{enumerate}
+
+\medskip
+\textbf{对偶单纯形法的优势：} 灵敏度分析中，原最优基因 $b$ 改变而不可行时，只需从原最优表出发执行对偶单纯形法，通常几次迭代即可恢复最优——比重头求解快得多。
 
 \subsection{本章速查}
 
 \begin{itemize}
-  \item \textbf{对称对偶}：$\min\ c^Tx,\ Ax\ge b,\ x\ge0 \;\longleftrightarrow\; \max\ b^Ty,\ A^Ty\le c,\ y\ge0$
-  \item \textbf{弱对偶}：$c^Tx \ge b^Ty$；\textbf{强对偶}：最优值相等
-  \item \textbf{互补松弛}：$(y^*)^T(Ax^*-b)=0$，$(c-A^Ty^*)^T x^*=0$
-  \item \textbf{对偶单纯形法}：原始不可行但对偶可行时使用
-  \item \textbf{影子价格}：$y_i^* = \partial z^* / \partial b_i$
+  \item \textbf{对称对偶}：$\min\ c^T x,\ Ax\ge b,\ x\ge0 \;\longleftrightarrow\; \max\ b^T w,\ A^T w\le c,\ w\ge0$
+  \item \textbf{构造对偶三步}：判原方向 $\to$ 定对偶方向 $\to$ 逐约束查对偶变量符号（同向）$\to$ 逐变量查对偶约束方向（反向）$\to$ 转置矩阵写系数 $\to$ 汇总。若原问题 $\max$，两条关系都反过来
+  \item \textbf{对偶关系表（$\min\to\max$）}：原 $\le \to w\le0$，原 $\ge \to w\ge0$，原 $= \to w$ 自由；$x\ge0 \to$ 约束 $\le$，$x\le0 \to$ 约束 $\ge$，$x$ 自由 $\to$ 约束 $=$
+  \item \textbf{弱对偶}：$c^T x \ge b^T w$（对任意可行解恒成立，不需任何条件）。推论：$c^T x^* = b^T w^*$ 则均为最优解
+  \item \textbf{强对偶}：原和对偶均可行 $\to$ 最优值相等 $c^T x^* = b^T w^*$（LP 特有，是互补松弛的基础）
+  \item \textbf{互补松弛}：$w_i^*(a_i^Tx^*-b_i)=0$ 且 $x_j^*(c_j-w^{*T}a_j)=0$——最优性的\emph{充要条件}。用法：已知一侧最优解，用互补松弛联立等式反推另一侧
+  \item \textbf{影子价格}：$w_i = \partial z^*/\partial b_i$——资源的边际价值，用于灵敏度分析和资源配置决策
+  \item \textbf{对偶单纯形法}：保持对偶可行（检验数条件），消除原始不可行（$b$ 的负分量）。离基选最负 $b_i$，进基选 $\min\{\sigma_j/|\bar{a}_{rj}| \mid \bar{a}_{rj}<0\}$。适用于灵敏度分析和天然对偶可行的场景
 \end{itemize}
