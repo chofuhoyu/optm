@@ -29,6 +29,14 @@
 \]
 即 $[\nabla^2 f(x)]_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$。对二次函数 $f(x)=\frac12 x^T Q x + c^T x$：$\nabla^2 f(x)=Q$（常数矩阵）。
 
+\textbf{常用导数/梯度公式：}
+\begin{itemize}
+  \item $\nabla(b^T x) = b$（$b$ 为常向量）
+  \item $\nabla(x^T A x) = 2Ax$（$A$ 对称）；若 $A$ 不对称则为 $(A+A^T)x$
+  \item $\nabla(\frac12 x^T Q x + c^T x) = Qx + c$（$Q$ 对称）
+  \item $\nabla\|x\|_2^2 = \nabla(x^T x) = 2x$
+\end{itemize}
+
 \textbf{一阶Taylor展开：} $f(y) \approx f(x) + \nabla f(x)^T(y-x)$。
 
 \textbf{二阶Taylor展开：} $f(x+d) \approx f(x) + \nabla f(x)^T d + \frac12 d^T \nabla^2 f(x) d$（牛顿法基础）。
