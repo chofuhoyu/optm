@@ -11,7 +11,7 @@
 #   make push-slides  — 推送课件到 BOOX
 #   make clean        — 清理辅助文件
 
-.PHONY: all print reader review generate extract-exam push push-review push-slides clean
+.PHONY: all print reader review generate extract-exam push push-review push-slides notes clean
 
 all: print reader review
 
@@ -36,6 +36,14 @@ REVIEW_SRCS := $(wildcard latex/review/review-ch*.tex)
 latex/review-reader.pdf: latex/review/review-reader.tex $(REVIEW_SRCS)
 	cd latex && xelatex -interaction=nonstopmode review/review-reader.tex
 	cd latex && xelatex -interaction=nonstopmode review/review-reader.tex
+
+# === 考场课堂笔记（A4 打印版）===
+notes: latex/notes-print.pdf
+
+NOTES_SRCS := $(wildcard latex/notes/notes-ch*.tex)
+latex/notes-print.pdf: latex/notes/notes-print.tex $(NOTES_SRCS)
+	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
+	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
 
 # === 生成共享章节数据 ===
 generate:
@@ -62,3 +70,4 @@ clean:
 	rm -f latex/slides/*.aux latex/slides/*.log latex/slides/*.out latex/slides/*.toc
 	rm -f latex/review/*.aux latex/review/*.log latex/review/*.out latex/review/*.toc
 	rm -f latex/review-old/*.aux latex/review-old/*.log latex/review-old/*.out latex/review-old/*.toc
+	rm -f latex/notes/*.aux latex/notes/*.log latex/notes/*.out latex/notes/*.toc
