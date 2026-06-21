@@ -39,6 +39,28 @@ L(x, w) = c^T x + \sum_{i=1}^{m} w_i\,(b_i - a_i^T x)
 
 如果原约束是 $\le$ 型（$a_i^T x \le b_i \iff -a_i^T x \ge -b_i$），乘子符号会反过来（$w_i \le 0$）；如果是等式约束，乘子无符号限制。下面的表把这些符号规则全部覆盖。
 
+\medskip
+\textbf{对称对偶标准形式（对称形式）：}
+
+\[
+\begin{aligned}
+(P)\quad &\min\; c^T x &\quad& \text{s.t.}\; Ax \ge b,\; x \ge 0 \\[4pt]
+(D)\quad &\max\; b^T w &\quad& \text{s.t.}\; A^T w \le c,\; w \ge 0
+\end{aligned}
+\]
+
+其中 $A \in \mathbb{R}^{m \times n}$，$x, c \in \mathbb{R}^n$，$w, b \in \mathbb{R}^m$。称 $(P)$ 和 $(D)$ 为一对\emph{对称对偶}——所有约束均为不等式，所有变量均有符号限制。（课件 p6.4）
+
+\medskip
+\textbf{一般形式（非对称形式）的构造：} 实际问题中的原问题往往不是对称形式——约束可能混合 $\le$、$\ge$、$=$，变量可能 $\ge 0$、$\le 0$ 或自由。构造对偶时，不需要先将原问题化为对称形式再套公式，而是直接逐条对照原-对偶关系表（见第三步的表 3.1 和表 3.2）写出对偶。关键原则：
+
+\begin{itemize}
+  \item \textbf{每个原约束} $\to$ 一个对偶变量：根据原约束的不等号方向（$\le$/$\ge$/$=$）决定该对偶变量的符号（$\le 0$/$\ge 0$/自由）
+  \item \textbf{每个原变量} $\to$ 一个对偶约束：根据原变量的符号（$\ge 0$/$\le 0$/自由）决定该对偶约束的不等号方向（$\le$/$\ge$/$=$）
+  \item \textbf{数据搬家}：$b \to$ 对偶目标系数，$c \to$ 对偶约束右端，$A \to A^T$
+  \item \textbf{目标方向翻转}：原 $\min$ $\to$ 对偶 $\max$，原 $\max$ $\to$ 对偶 $\min$
+\end{itemize}
+
 \subsubsection{第一步：$w$ 是什么？——每个约束配一个对偶变量}
 
 从上述推导可以看出：原问题的每个约束都对应一个 Lagrange 乘子 $w_i$，这个 $w_i$ 就是\emph{对偶变量}。
@@ -83,7 +105,7 @@ n \text{ 个变量} & \longrightarrow n \text{ 个约束}
 
 \subsubsection{第三步：符号和不等号怎么定？——查表}
 
-搬家的\emph{数值}是确定的，但变量的符号（$w_i \ge 0$？$\le 0$？自由？）和约束的不等号（$\le$？$\ge$？$=$？）需要根据原问题的形式来定。下面这张表覆盖所有情况。
+搬家的\emph{数值}是确定的，但变量的符号（$w_i \ge 0$？$\le 0$？自由？）和约束的不等号（$\le$？$\ge$？$=$？）需要根据原问题的形式来定。下面两张表覆盖所有情况。
 
 \textbf{表 3.1：原-对偶对应关系（原问题 $\min$ $\to$ 对偶 $\max$）}
 
@@ -102,7 +124,7 @@ n \text{ 个变量} & \longrightarrow n \text{ 个约束}
 \end{tabular}
 
 \medskip
-\textbf{为什么是这样的对应？} 回顾 Lagrange 乘子推导：$\le$ 约束化 $-a_i^T x \ge -b_i$ 后乘子 $\ge 0$，令 $w_i = -$乘子，故 $w_i \le 0$；$\ge$ 约束的乘子自然 $\ge 0$（形成下界）；等式无松紧方向，乘子可正可负。变量侧：$x_j \ge 0$ 要求对偶约束取 $\le$（不等号与变量符号\emph{相反}）；$x_j \le 0$ 取 $\ge$；自由变量取等式。
+\textbf{为什么是这样的对应？} 回顾 Lagrange 乘子推导：$\le$ 约束化为 $-a_i^T x \ge -b_i$ 后乘子 $\ge 0$，令 $w_i = -$乘子，故 $w_i \le 0$；$\ge$ 约束的乘子自然 $\ge 0$（形成下界）；等式无松紧方向，乘子可正可负。变量侧：$x_j \ge 0$ 要求对偶约束取 $\le$（不等号与变量符号\emph{相反}）；$x_j \le 0$ 取 $\ge$；自由变量取等式。
 
 \medskip
 \emph{记忆规律（考试直接用）：}
@@ -123,16 +145,29 @@ n \text{ 个变量} & \longrightarrow n \text{ 个约束}
 
 当原问题从 $\min$ 变成 $\max$ 时，\textbf{这两条关系恰好都反过来}：
 
-\textbf{原问题 $\max$ $\to$ 对偶 $\min$ 的对应规则：}
-\begin{itemize}
-  \item 原约束 $\le$ $\to$ $w\ge0$，原约束 $\ge$ $\to$ $w\le0$\quad（关系一：\emph{反向}）
-  \item $x\ge0$ $\to$ 约束 $\ge$，$x\le0$ $\to$ 约束 $\le$\quad（关系二：\emph{同向}）
-\end{itemize}
+\medskip
+\textbf{表 3.2：原问题 $\max$ $\to$ 对偶 $\min$ 的对应规则}
 
-\textit{怎么记？} 背住 $\min\to\max$ 那张表就够了。遇到 $\max$ 时，有两种等价做法：
+\medskip
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{原问题（$\max$）} & \textbf{对偶问题（$\min$）} \\
+\midrule
+约束 $i$：$a_i^T x \le b_i$ & 变量 $w_i \ge 0$ \\
+约束 $i$：$a_i^T x \ge b_i$ & 变量 $w_i \le 0$ \\
+约束 $i$：$a_i^T x = b_i$  & 变量 $w_i$ 自由 \\[3pt]
+变量 $x_j \ge 0$  & 约束 $j$：$w^T A_j \ge c_j$ \\
+变量 $x_j \le 0$  & 约束 $j$：$w^T A_j \le c_j$ \\
+变量 $x_j$ 自由   & 约束 $j$：$w^T A_j = c_j$ \\
+\bottomrule
+\end{tabular}
 
-\textbf{做法一（查反向规则）：} 两条关系都反过来。\\
-\textbf{做法二（考试推荐自检）：} 原 $\max\ c^T x \iff \min\ -c^T x$。用 $\min$ 表写出对偶后，把对偶目标方向翻转回来。不会出错。
+\medskip
+\textit{怎么记？} 背住 $\min\to\max$ 那张表（表 3.1）就够了。遇到 $\max$ 时，有两种等价做法：
+
+\textbf{做法一（查表 3.2）：} 两条关系都反过来。检验：原 $\max$ 约束 $\le \to w_1\ge0$（反向）；$x_j\ge0 \to$ 约束 $\ge$（同向）。
+
+\textbf{做法二（考试推荐自检）：} 原 $\max\ c^T x \iff \min\ -c^T x$。用 $\min$ 表（表 3.1）写出对偶后，把对偶目标方向从 $\max$ 翻转为 $\min$。不会出错。
 
 \medskip
 \subsubsection{完整示例：逐步构造}
@@ -153,7 +188,7 @@ A^T = \begin{pmatrix}2&1\\1&-3\end{pmatrix}
 \]
 （此例 $A$ 恰好对称，但转置步骤不能跳过。）
 
-\textbf{第2步：查表定符号和不等号。}
+\textbf{第2步：查表 3.1 定符号和不等号。}
 \begin{itemize}
   \item 约束1 $2x_1+x_2\le10$（$\le$） $\to$ $w_1 \le 0$
   \item 约束2 $x_1-3x_2\ge4$（$\ge$） $\to$ $w_2 \ge 0$
@@ -171,17 +206,17 @@ A^T = \begin{pmatrix}2&1\\1&-3\end{pmatrix}
 \end{aligned}
 \]
 
-\emph{验算：} 对偶的目标函数用了原右端 $(10,4)$ $\checkmark$；对偶约束右端用了原目标系数 $(3,5)$ $\checkmark$；矩阵是 $A^T$ $\checkmark$；符号和不等号按表逐条对照 $\checkmark$。
+\emph{验算：} 对偶的目标函数用了原右端 $(10,4)$ $\checkmark$；对偶约束右端用了原目标系数 $(3,5)$ $\checkmark$；矩阵是 $A^T$ $\checkmark$；符号和不等号按表 3.1 逐条对照 $\checkmark$。
 
 \medskip
 （课件 p6.4 展示了对称和非对称形式的标准写法，p6.8 的对偶关系表是考试构造对偶的核心工具——建议先默写"搬家三步"（$b\to$目标、$c\to$右端、$A\to A^T$），再逐条查符号。）
 
-\textbf{对偶的对偶是原问题}：将已写出的对偶问题再套一次对偶关系表（注意此时原问题是 $\max$，行对应关系要反过去），会回到最初的原问题。考试中若怀疑写错了对偶，可以用这个性质自检。（课件 p6.9）
+\textbf{对偶的对偶是原问题}：将已写出的对偶问题再套一次对偶关系表（注意此时"原问题"是 $\max$，需用表 3.2），会回到最初的原问题。即：若 $(P) \to (D)$，则 $(D)$ 的对偶 $=(P)$。考试中若怀疑写错了对偶，可以用这个性质自检。（课件 p6.9）
 
 \medskip
 \textbf{查表的常见陷阱：}
 \begin{itemize}
-  \item 原问题是 $\max$ 时两条对应关系\emph{都反过来}：原约束 $\le$ $\to$ $w\ge0$（不再 $\le0$）；$x\ge0$ $\to$ 约束 $\ge$（不再 $\le$）。见上文 $\max\to\min$ 规则
+  \item 原问题是 $\max$ 时两条对应关系\emph{都反过来}：原约束 $\le$ $\to$ $w\ge0$（不再 $\le0$）；$x\ge0$ $\to$ 约束 $\ge$（不再 $\le$）。见上文表 3.2
   \item 自由变量的对偶约束是等式——很多人写成不等式
   \item 约束带等号（$=$）时，对应的对偶变量无符号限制——不要漏写"自由"
   \item 三个符号方向检查：原目标方向 $\to$ 对偶目标方向 / 原约束 $\to$ 对偶变量符号 / 原变量符号 $\to$ 对偶约束不等号
@@ -191,7 +226,7 @@ A^T = \begin{pmatrix}2&1\\1&-3\end{pmatrix}
 
 \textbf{定理 3.1（弱对偶定理）}
 
-设 $x$ 是原问题（$\min\ c^T x$，约束 $Ax\ge b,\ x\ge 0$）的任意可行解，$w$ 是对偶问题（$\max\ b^T w$，约束 $A^T w\le c,\ w\ge 0$）的任意可行解。则恒有：
+设 $x$ 是原问题 $(P)$（$\min\ c^T x$，约束 $Ax\ge b,\ x\ge 0$）的任意可行解，$w$ 是对偶问题 $(D)$（$\max\ b^T w$，约束 $A^T w\le c,\ w\ge 0$）的任意可行解。则恒有：
 \[
 c^T x \ge b^T w
 \]
@@ -205,23 +240,30 @@ c^T x \ge (A^T w)^T x = w^T A x \ge w^T b = b^T w
 （第一步用对偶约束 $A^T w \le c$ 且 $x\ge 0$；第二步用原约束 $Ax \ge b$ 且 $w\ge 0$。不需要任何额外条件——只要各自可行就成立。）
 
 \medskip
-\textbf{推论}：
-\begin{itemize}
-  \item 若原问题无下界（$\min \to -\infty$），则对偶必无可行解
-  \item 若对偶无上界（$\max \to +\infty$），则原问题必无可行解
-  \item 若找到 $c^T x^* = b^T w^*$，则 $x^*$ 和 $w^*$ 分别是原问题和对偶的最优解（最优性的\emph{充分条件}，无需检验 KKT）
-\end{itemize}
-
-\medskip
 \textbf{弱对偶的几何直觉}：对偶问题的最优值是从"下方"逼近原问题最优值的。原最优值 $\ge$ 对偶最优值，这个差值称为\emph{对偶间隙}。对于线性规划，强对偶定理告诉我们间隙总是零——这是 LP 的独特性质。对于非线性规划，间隙可能为正，需要凸性 + 约束规格才能消除。
 
-（课件 p6.10 陈述了对偶定理体系：弱对偶 $\to$ 强对偶 $\to$ 互补松弛，及其推论——包括原-对偶可行性关系表：原无界 $\to$ 对偶不可行；原不可行 + 对偶不可行可同时发生等。）
+\medskip
+\textbf{推论——原-对偶可行性关系：}
+\[
+\begin{array}{c|c}
+\text{原问题 }(P) & \text{对偶问题 }(D) \\
+\hline
+\text{有最优解} & \text{有最优解（且 } z_P^* = z_D^*\text{）} \\
+\text{无界（}\min\to -\infty\text{）} & \text{不可行} \\
+\text{不可行} & \text{无界（}\max\to +\infty\text{）} \\
+\text{不可行} & \text{不可行（可能同时发生）} \\
+\end{array}
+\]
+
+此外，若找到某对可行解满足 $c^T x^* = b^T w^*$，则 $x^*$ 和 $w^*$ 分别是原问题和对偶的最优解——这是最优性的\emph{充分条件}，无需检验 KKT。
+
+（课件 p6.10 陈述了对偶定理体系：弱对偶 $\to$ 强对偶 $\to$ 互补松弛，及其推论。）
 
 \subsection{3.4 强对偶定理}
 
 \textbf{定理 3.2（强对偶定理）}
 
-设原问题和对偶问题均可行。则两者都存在最优解，且最优目标值相等：
+设原问题 $(P)$ 和对偶问题 $(D)$ 均可行。则两者都存在最优解，且最优目标值相等：
 \[
 \min\ c^T x = \max\ b^T w
 \]
@@ -230,7 +272,7 @@ c^T x \ge (A^T w)^T x = w^T A x \ge w^T b = b^T w
 \textbf{为什么重要？} 强对偶定理是线性规划的核心定理。它意味着：
 \begin{itemize}
   \item 求解原问题等同于求解对偶——选哪个更容易就解哪个
-  \item 单纯形法的最优表同时给出原最优解和对偶最优解：检验数行 $c_B^T B^{-1}$ 就是对偶最优解
+  \item 单纯形法的最优表同时给出原最优解和对偶最优解：检验数行 $c_B^T B^{-1}$ 就是对偶最优解 $w^*$
   \item 互补松弛条件作为最优性的\emph{充要条件}，正是建立在强对偶之上
 \end{itemize}
 
@@ -238,7 +280,7 @@ c^T x \ge (A^T w)^T x = w^T A x \ge w^T b = b^T w
 
 \textbf{定理 3.3（互补松弛条件）}
 
-设 $x^*$ 和 $w^*$ 分别是原问题（$\min\ c^T x,\ Ax\ge b,\ x\ge0$）和对偶问题（$\max\ b^T w,\ A^T w\le c,\ w\ge0$）的可行解。它们是各自最优解的\emph{充要条件}是：
+设 $x^*$ 和 $w^*$ 分别是原问题 $(P)$（$\min\ c^T x,\ Ax\ge b,\ x\ge0$）和对偶问题 $(D)$（$\max\ b^T w,\ A^T w\le c,\ w\ge0$）的可行解。它们是各自最优解的\emph{充要条件}是：
 \[
 \begin{aligned}
 &\text{(1)}\quad w_i^* \cdot (a_i^T x^* - b_i) = 0 \quad \forall i \\
@@ -285,6 +327,7 @@ z^* = c_B^T B^{-1} b = w^{*T} b = \sum w_i^* b_i \quad\Rightarrow\quad \frac{\pa
   \item 判断哪种资源是瓶颈（$w_i$ 大 $\to$ 稀缺）——应优先增加
   \item 判断购入额外资源是否划算（市价 $<$ 影子价格 $\to$ 买入有利）
   \item 灵敏度分析中，$b$ 在小范围内变化时，最优基不变，影子价格不变，可直接计算新最优值
+  \item 对偶问题的最优目标值 $z_D^* = b^T w^* = \sum b_i w_i^*$——总资源按影子价格的总估值
 \end{itemize}
 
 \subsection{3.7 对偶单纯形法}
@@ -336,10 +379,12 @@ z^* = c_B^T B^{-1} b = w^{*T} b = \sum w_i^* b_i \quad\Rightarrow\quad \frac{\pa
 \subsection{本章速查}
 
 \begin{itemize}
-  \item \textbf{对称对偶}：$\min\ c^T x,\ Ax\ge b,\ x\ge0 \;\longleftrightarrow\; \max\ b^T w,\ A^T w\le c,\ w\ge0$
-  \item \textbf{构造对偶步骤}：判原方向 $\to$ 定对偶方向 $\to$ 逐约束查对偶变量符号（同向）$\to$ 逐变量查对偶约束方向（反向）$\to$ 转置矩阵写系数 $\to$ 汇总。若原问题 $\max$，两条关系都反过来
-  \item \textbf{对偶关系表（$\min\to\max$）}：原 $\le \to w\le0$，原 $\ge \to w\ge0$，原 $= \to w$ 自由；$x\ge0 \to$ 约束 $\le$，$x\le0 \to$ 约束 $\ge$，$x$ 自由 $\to$ 约束 $=$
+  \item \textbf{对称对偶}：$(P)\;\min\ c^T x,\ Ax\ge b,\ x\ge0 \;\longleftrightarrow\; (D)\;\max\ b^T w,\ A^T w\le c,\ w\ge0$
+  \item \textbf{构造对偶步骤}：判原方向 $\to$ 定对偶方向 $\to$ 逐约束查对偶变量符号（同向）$\to$ 逐变量查对偶约束方向（反向）$\to$ 转置矩阵写系数 $\to$ 汇总。若原问题 $\max$，两条关系都反过来（用表 3.2 或化为 $\min$）
+  \item \textbf{对偶关系表（$\min\to\max$，表 3.1）}：原 $\le \to w\le0$，原 $\ge \to w\ge0$，原 $= \to w$ 自由；$x\ge0 \to$ 约束 $\le$，$x\le0 \to$ 约束 $\ge$，$x$ 自由 $\to$ 约束 $=$
+  \item \textbf{对偶关系表（$\max\to\min$，表 3.2）}：原 $\le \to w\ge0$，原 $\ge \to w\le0$，原 $= \to w$ 自由；$x\ge0 \to$ 约束 $\ge$，$x\le0 \to$ 约束 $\le$，$x$ 自由 $\to$ 约束 $=$
   \item \textbf{弱对偶}：$c^T x \ge b^T w$（对任意可行解恒成立，不需任何条件）。推论：若 $c^T x^* = b^T w^*$ 则均为最优解
+  \item \textbf{原-对偶可行性}：原无界 $\Rightarrow$ 对偶不可行；对偶无界 $\Rightarrow$ 原不可行；两者可同时不可行
   \item \textbf{强对偶}：原和对偶均可行 $\to$ 最优值相等 $c^T x^* = b^T w^*$（LP 特有，是互补松弛的基础）
   \item \textbf{互补松弛}：$w_i^*(a_i^Tx^*-b_i)=0$ 且 $x_j^*(c_j-w^{*T}a_j)=0$——最优性的\emph{充要条件}。用法：已知一侧最优解，用互补松弛联立等式反推另一侧
   \item \textbf{影子价格}：$w_i = \partial z^*/\partial b_i$——资源的边际价值，用于灵敏度分析和资源配置决策
