@@ -1,0 +1,60 @@
+% !TeX program = xelatex
+% ============================================================
+%  最优化理论与算法 — 考场课堂笔记（A4 打印版）
+%  内容：纯方法参考（定义/定理/公式/算法步骤）
+%  不含例题、真题、证明
+% ============================================================
+\documentclass[10pt,a4paper,twocolumn]{ctexart}
+
+% === 页面设置 ===
+\usepackage[margin=14mm,columnsep=8mm]{geometry}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% === 宏包 ===
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*}
+
+% === 标题格式 ===
+\ctexset{
+  section = {
+    format = \large\bfseries,
+    beforeskip = 4pt,
+    afterskip = 2pt,
+  },
+  subsection = {
+    format = \bfseries,
+    beforeskip = 3pt,
+    afterskip = 1pt,
+  },
+}
+
+% === 允许公式稍微溢出 ===
+\setlength{\emergencystretch}{1.5em}
+
+\begin{document}
+
+% === 封面标题 ===
+\begin{center}
+{\Large 最优化理论与算法 —— 课堂笔记}
+
+\vspace{2pt}
+{\small 仅含定义、定理、公式、算法步骤。不含例题与真题。}
+\end{center}
+
+\vspace{6pt}
+
+% === 各章内容 ===
+\input{notes/notes-ch01.tex}
+\input{notes/notes-ch02.tex}
+\input{notes/notes-ch03.tex}
+\input{notes/notes-ch04.tex}
+\input{notes/notes-ch05.tex}
+\input{notes/notes-ch06.tex}
+\input{notes/notes-ch07.tex}
+\input{notes/notes-ch08.tex}
+\input{notes/notes-ch09.tex}
+
+\end{document}
