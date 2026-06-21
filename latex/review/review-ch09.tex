@@ -544,9 +544,9 @@ L_A(x, \lambda, \sigma) = x_1^2 + x_2^2 + \lambda(x_1+x_2-1) + \frac{1}{2}(x_1+x
 
 序列 $x^{(k)} \to (0.5, 0.5)^T$，$\lambda^{(k)} \to -1$（真实乘子），而 $\sigma = 1$ 从未改变。对比外点法：外点法需要 $\sigma \to \infty$ 才能逼近精确解，乘子法用固定 $\sigma$ 配合乘子更新即可。
 
-\begin{notebox}
-\textbf{乘子更新公式的直觉}：$\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。如果 $h > 0$（$x$ 超出约束），加大 $\lambda$ 使下一轮增广 Lagrange 函数更“惩罚”正的 $h$，把 $x$ 拉回来。如果 $h < 0$，减小 $\lambda$ 把 $x$ 推回去。这就是“乘子自适应调整”的因果机制。
-\end{notebox}
+\reviewonly{\begin{notebox}
+\textbf{乘子更新公式的直觉}：$\lambda^{(k+1)} = \lambda^{(k)} + \sigma h(x^{(k)})$。如果 $h > 0$（$x$ 超出约束），加大 $\lambda$ 使下一轮增广 Lagrange 函数更”惩罚”正的 $h$，把 $x$ 拉回来。如果 $h < 0$，减小 $\lambda$ 把 $x$ 推回去。这就是”乘子自适应调整”的因果机制。
+\end{notebox}}
 
 PPT第13.30页展示了乘子法的收敛性质：乘子序列收敛到真实乘子，这是乘子法优于纯外点法的理论保障。
 
