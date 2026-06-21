@@ -1,0 +1,77 @@
+% ============================================================
+%  第3章：对偶理论
+% ============================================================
+\section{第3章 \quad 对偶理论}
+
+\subsection{对偶问题的构造}
+
+\textbf{对称形式（$\min$ 原问题，$\le$ 约束）：}
+\begin{center}
+\begin{tabular}{c|c}
+\textbf{原问题 (P)} & \textbf{对偶问题 (D)} \\
+\hline
+$\min\ c^T x$ & $\max\ b^T y$ \\
+$\text{s.t.}\ Ax \ge b$ & $\text{s.t.}\ A^T y \le c$ \\
+$x \ge 0$ & $y \ge 0$ \\
+\end{tabular}
+\end{center}
+
+\textbf{一般构造规则：}
+\begin{itemize}
+  \item 原问题 $\min$ $\to$ 对偶问题 $\max$
+  \item 原问题第 $i$ 约束的右端 $b_i$ $\to$ 对偶变量 $y_i$
+  \item 原问题第 $j$ 变量的系数 $c_j$ $\to$ 对偶约束的右端
+  \item 等式约束 $\to$ 对偶变量无符号限制
+  \item $\ge$ 约束（对 $\min$ 问题）$\to$ 对偶变量 $\le 0$
+  \item 自由变量 $\to$ 对偶等式约束
+\end{itemize}
+
+\subsection{对偶定理}
+
+\textbf{定理 3.1（弱对偶定理）}
+设 $x$ 和 $y$ 分别是 (P) 和 (D) 的可行解，则 $c^T x \ge b^T y$。
+推论：若 $c^T x = b^T y$，则 $x$ 和 $y$ 分别是各自问题的最优解。
+
+\textbf{定理 3.2（强对偶定理）}
+若 (P) 有有限最优解 $x^*$，则 (D) 也有最优解 $y^*$，且 $c^T x^* = b^T y^*$。
+
+\subsection{互补松弛条件}
+
+\textbf{定理 3.3（互补松弛）}
+设 $x^*$ 和 $y^*$ 分别是 (P) 和 (D) 的可行解。它们同时为最优的充要条件是：
+\[
+(y^*)^T(Ax^* - b) = 0,\qquad (c - A^T y^*)^T x^* = 0
+\]
+即：
+\begin{itemize}
+  \item 若 $x_j^* > 0$，则对应对偶约束取等号
+  \item 若对偶约束严格不取等，则 $x_j^* = 0$
+  \item 若 $y_i^* > 0$，则对应原约束取等号
+  \item 若原约束严格不取等，则 $y_i^* = 0$
+\end{itemize}
+
+\subsection{对偶单纯形法}
+
+\textbf{适用场景：} 原始不可行但对偶可行（检验数全 $\ge 0$ 但 $B^{-1}b$ 有负分量）。
+
+\textbf{算法步骤：}
+\begin{enumerate}
+  \item 确定出基变量：选 $B^{-1}b$ 中最负的分量对应行
+  \item 确定进基变量：在该行负系数列中，取 $\displaystyle \min\left\{\frac{\sigma_j}{|a_{rj}|} \;\middle|\; a_{rj} < 0\right\}$
+  \item 转轴运算（同单纯形法）
+  \item 重复直至 $B^{-1}b \ge 0$（原始可行）
+\end{enumerate}
+
+\subsection{影子价格}
+
+\textbf{定义：} 对偶变量 $y_i^*$ 的经济含义——第 $i$ 种资源增加 1 单位时，最优目标值的边际变化量。$y_i^* = \frac{\partial z^*}{\partial b_i}$。
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{对称对偶}：$\min\ c^Tx,\ Ax\ge b,\ x\ge0 \;\longleftrightarrow\; \max\ b^Ty,\ A^Ty\le c,\ y\ge0$
+  \item \textbf{弱对偶}：$c^Tx \ge b^Ty$；\textbf{强对偶}：最优值相等
+  \item \textbf{互补松弛}：$(y^*)^T(Ax^*-b)=0$，$(c-A^Ty^*)^T x^*=0$
+  \item \textbf{对偶单纯形法}：原始不可行但对偶可行时使用
+  \item \textbf{影子价格}：$y_i^* = \partial z^* / \partial b_i$
+\end{itemize}
