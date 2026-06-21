@@ -1,0 +1,86 @@
+% ============================================================
+%  第1章：LP标准型与基本性质
+% ============================================================
+\section{第1章 \quad LP标准型与基本性质}
+
+\subsection{标准型LP}
+
+\textbf{定义 1.1（线性规划的一般形式）}
+\[
+\begin{aligned}
+\min\ (\text{或}\max)\ & \sum_{j=1}^n c_j x_j \\
+\text{s.t.}\ & \sum_{j=1}^n a_{ij} x_j \le b_i,\quad i\in I_1 \\
+& \sum_{j=1}^n a_{ij} x_j \ge b_i,\quad i\in I_2 \\
+& \sum_{j=1}^n a_{ij} x_j = b_i,\quad i\in I_3 \\
+& x_j \ge 0,\quad j\in J
+\end{aligned}
+\]
+
+\textbf{定义 1.2（标准型LP的四条要求）}
+\begin{enumerate}
+  \item[(1)] 目标函数为极小化（$\min$）
+  \item[(2)] 所有约束为等式（$=$）
+  \item[(3)] 所有右端常数非负（$b_i \ge 0$）
+  \item[(4)] 所有变量非负（$x_j \ge 0$）
+\end{enumerate}
+矩阵形式：$\min\ c^T x,\ \text{s.t.}\ Ax = b,\ x \ge 0,\ b \ge 0$。
+
+（课件 p4.1, p4.3）
+
+\subsection{化标准型四步法}
+
+\textbf{方法 1.1（化标准型）}
+\begin{enumerate}
+  \item $\max \to \min$：目标函数乘 $-1$，最优解不变，最优值变号
+  \item $\le$ 约束：左端加松弛变量 $s \ge 0$。$a^T x \le b \to a^T x + s = b$
+  \item $\ge$ 约束：左端减剩余变量 $s \ge 0$。$a^T x \ge b \to a^T x - s = b$
+  \item 自由变量：拆成两个非负变量的差 $x_j = x_j^+ - x_j^-$，$x_j^+, x_j^- \ge 0$
+  \item $b_i < 0$：约束两端乘 $-1$（不等式需翻转不等号）
+\end{enumerate}
+
+\subsection{基、基本解、基本可行解}
+
+\textbf{定义 1.3（基、基变量、非基变量）}
+设 $A$ 为 $m\times n$ 矩阵（$m<n$）。选出 $m$ 个线性无关的列组成 $m\times m$ 可逆方阵 $B$，称为一个基。对应变量为基变量 $x_B$，其余为非基变量 $x_N$。
+
+\textbf{定义 1.4（基本解与基本可行解）}
+令 $x_N = 0$，解 $Bx_B = b$ 得 $x_B = B^{-1}b$。$x = \begin{pmatrix}x_B \\ 0\end{pmatrix}$ 称为基本解。若 $x_B \ge 0$，则为基本可行解（BFS）。若某基变量恰好为 $0$，称此 BFS 为退化的。
+
+\textbf{基本解个数上限：} $\le \binom{n}{m}$，有限个。（课件 p4.16）
+
+\subsection{BFS与极点的等价性}
+
+\textbf{定理 1.1（BFS $\Leftrightarrow$ 极点）}
+设可行域 $S = \{x \mid Ax = b,\ x \ge 0\}$ 非空，$\mathrm{rank}(A)=m$。点 $\bar{x} \in S$ 是 $S$ 的极点当且仅当 $\bar{x}$ 是一个基本可行解。
+
+（课件 p4.17）
+
+\subsection{最优BFS的存在性}
+
+\textbf{定理 1.2（最优BFS的存在性）}
+若可行域非空且目标函数在可行域上有下界（最优值有限），则存在一个基本可行解是最优解。
+
+（课件 p4.6, p4.23）
+
+\subsection{表示定理（选读）}
+
+\textbf{定理 1.3（表示定理）}
+设 $S = \{x \mid Ax = b,\ x \ge 0\}$。$S$ 中任意点 $x$ 可表示为：
+\[
+x = \sum_{i=1}^{k} \lambda_i v_i + \sum_{j=1}^{\ell} \mu_j d_j
+\]
+其中 $v_i$ 是全部极点（BFS），$d_j$ 是全部极方向，$\lambda_i \ge 0$，$\sum\lambda_i = 1$，$\mu_j \ge 0$。
+若某 $d_j$ 满足 $c^T d_j < 0$，则最优值无下界。
+
+（课件 p4.7, p4.24）
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{标准型四要素}：$\min$、$=$、$b\ge 0$、$x\ge 0$
+  \item \textbf{化标准型}：$\max\to\min$（乘$-1$）、$\le$（加松弛）、$\ge$（减剩余）、自由变量 $x=x^+-x^-$、$b<0$（乘$-1$）
+  \item \textbf{基 $\to$ 基本解 $\to$ BFS}：选 $m$ 列 $\to$ 基 $B$ $\to$ $x_B=B^{-1}b$ $\to$ 若 $\ge 0$ 则为 BFS
+  \item \textbf{BFS $\Leftrightarrow$ 极点}（定理 1.1）：代数与几何的统一
+  \item \textbf{最优值有限 $\Rightarrow$ 存在最优 BFS}（定理 1.2）
+  \item \textbf{表示定理}（定理 1.3）：可行域 = 极点凸组合 + 极方向锥组合
+\end{itemize}
