@@ -1,0 +1,60 @@
+% ============================================================
+%  第5章：凸集与凸函数
+% ============================================================
+\section{第5章 \quad 凸集与凸函数}
+
+\subsection{凸集}
+
+\textbf{定义 5.1（凸集）}
+集合 $C \subseteq \mathbb{R}^n$ 称为凸集，若对任意 $x,y \in C$ 和 $\lambda \in [0,1]$，有 $\lambda x + (1-\lambda)y \in C$。
+
+\textbf{常见凸集：} 多面体 $\{x\mid Ax\le b\}$、单位圆盘、半空间 $\{x\mid a^Tx\le b\}$、LP可行域 $\{x\mid Ax=b,\ x\ge 0\}$。
+
+\textbf{反例：} 圆环（有洞）、坐标轴十字（不实心）、整数点集（不连通）。
+
+（课件 p3.1, p3.2）
+
+\subsection{凸函数}
+
+\textbf{定义 5.2（凸函数）}
+函数 $f: C\to\mathbb{R}$（$C$ 为凸集）称为凸函数，若对任意 $x,y\in C$ 和 $\lambda\in[0,1]$：
+\[
+f(\lambda x + (1-\lambda)y) \le \lambda f(x) + (1-\lambda) f(y)
+\]
+
+\subsection{凸函数的判别——三层递进}
+
+\textbf{第1层：一阶条件（对可微函数）}
+$f$ 凸 $\Longleftrightarrow$ $f(y) \ge f(x) + \nabla f(x)^T(y-x)$，$\forall x,y$。
+几何：函数图像在任一点切线上方。
+
+\textbf{第2层：二阶条件（对二次可微函数）}
+$f$ 凸 $\Longleftrightarrow$ $\nabla^2 f(x) \succeq 0$（半正定），$\forall x$。
+若 $\nabla^2 f(x) \succ 0$（正定），则 $f$ 严格凸。
+
+\textbf{第3层：Hessian 正定性判别}
+\begin{itemize}
+  \item 顺序主子式法：所有顺序主子式 $>0$ $\Rightarrow$ 正定
+  \item 特征值法：所有特征值 $>0$ $\Rightarrow$ 正定
+  \item 对 $2\times 2$ 矩阵：$a_{11}>0$ 且 $\det>0$ $\Rightarrow$ 正定
+\end{itemize}
+
+\subsection{凸规划}
+
+\textbf{定义：} $\min\{f(x)\mid g_i(x)\le 0,\ h_j(x)=0\}$ 中，若 $f$ 凸，$g_i$ 凸（$\le 0$ 约束），$h_j$ 仿射（$=0$ 约束），则为凸规划。
+
+\textbf{定理 5.X（凸规划的最优性）}
+凸规划的局部极小点必为全局极小点。若 $f$ 严格凸，则最优解唯一。
+此外，若 Slater 条件成立，KKT 点即为全局最优解。
+
+\textbf{核心逻辑链：}
+凸集 $\to$ 凸函数 $\to$ 凸规划 $\to$ 局部极小=全局极小 $\to$ KKT充要。
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{凸集判别}：实心、无洞、无凹坑
+  \item \textbf{凸函数判别（三层）}：一阶梯度不等式 $\to$ 二阶 Hessian 半正定 $\to$ 主子式/特征值
+  \item \textbf{凸规划}：$f$ 凸 + $g_i$ 凸 + $h_j$ 仿射 $\to$ 局部=全局
+  \item \textbf{严格凸}：Hessian 正定 $\to$ 最优解唯一
+\end{itemize}
