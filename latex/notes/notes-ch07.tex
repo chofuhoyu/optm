@@ -1,0 +1,53 @@
+% ============================================================
+%  第7章：非线性对偶
+% ============================================================
+\section{第7章 \quad 非线性对偶}
+
+\subsection{Lagrange对偶}
+
+\textbf{原问题 (P)：}
+$\min\ f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。
+
+\textbf{Lagrange函数：}
+$L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p \mu_j h_j(x)$，$\lambda_i \ge 0$。
+
+\textbf{对偶函数：}
+$\theta(\lambda,\mu) = \inf_{x}\ L(x,\lambda,\mu)$。对偶函数对任意 $\lambda\ge 0$ 给出原问题最优值的下界。
+
+\textbf{对偶问题 (D)：}
+$\max\ \theta(\lambda,\mu)$ s.t. $\lambda \ge 0$。
+
+\subsection{对偶定理}
+
+\textbf{定理 7.1（弱对偶）}
+对任意原可行解 $x$ 和 $\lambda\ge 0$：$\theta(\lambda,\mu) \le f(x)$。即对偶最优值 $\le$ 原最优值。
+
+\textbf{定理 7.2（强对偶）}
+若 (P) 为凸规划且 Slater 条件成立，则 $\theta^* = f^*$，且对偶最优解可达。
+
+\textbf{对偶间隙：} $f^* - \theta^* \ge 0$。非凸问题中可能 $>0$。
+
+\subsection{鞍点与KKT}
+
+\textbf{定义（鞍点）}
+$(\bar{x},\bar{\lambda},\bar{\mu})$（$\bar{\lambda}\ge 0$）称为 $L$ 的鞍点，若
+$L(\bar{x},\lambda,\mu) \le L(\bar{x},\bar{\lambda},\bar{\mu}) \le L(x,\bar{\lambda},\bar{\mu})$，$\forall x,\lambda\ge 0,\mu$。
+即 $\bar{x}$ 极小化 $L(\cdot,\bar{\lambda},\bar{\mu})$，$(\bar{\lambda},\bar{\mu})$ 极大化 $L(\bar{x},\cdot,\cdot)$。
+
+\textbf{定理：} 鞍点存在 $\Longleftrightarrow$ 强对偶成立且原/对偶最优解可达。
+
+\subsection{Wolfe对偶（二次规划）}
+
+对二次规划 $\min\ \frac{1}{2}x^TQx + c^Tx$ s.t. $Ax\le b$（$Q\succ 0$）：
+Wolfe对偶为 $\max\ -\frac{1}{2}y^TQy + b^T\lambda$ s.t. $Qy + c + A^T\lambda = 0$，$\lambda\ge 0$。
+最优解满足 $x^* = y^*$。
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{对偶函数}：$\theta(\lambda,\mu) = \inf_x L(x,\lambda,\mu)$
+  \item \textbf{弱对偶}：$\theta^* \le f^*$；\textbf{强对偶}：凸+Slater $\Rightarrow \theta^* = f^*$
+  \item \textbf{对偶间隙}：$f^* - \theta^*$，非凸时可 $>0$
+  \item \textbf{鞍点}：$\Longleftrightarrow$ 强对偶成立且解可达
+  \item \textbf{Wolfe对偶}：二次规划的特化对偶形式
+\end{itemize}
