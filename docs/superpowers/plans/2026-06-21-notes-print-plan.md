@@ -4,7 +4,7 @@
 
 **Goal:** 创建考场用 A4 课堂笔记 PDF——从 review 材料中提取纯方法内容（定义/定理/公式/算法），删除所有例题和真题。
 
-**Architecture:** 新建 `latex/notes/` 目录，一个主入口 `notes-print.tex`（A4 双栏布局）+ 9 个章节文件 `notes-ch01.tex` ~ `notes-ch09.tex`，通过 `\input` 引入。Makefile 新增 `make notes` target。
+**Architecture:** 新建 `latex/notes/` 目录，一个主入口 `notes-print.tex`（A4 双栏布局）+ 9 个章节文件 `notes-ch01.tex` ~ `notes-ch09.tex`，通过 `\input` 引入。Makefile 新增 `make notes-print` target。
 
 **Tech Stack:** XeLaTeX + ctexart + amsmath + booktabs
 
@@ -25,7 +25,7 @@ latex/notes/
 ├── notes-ch08.tex           ← 新建：第8章 无约束优化方法
 └── notes-ch09.tex           ← 新建：第9章 约束优化方法
 
-Makefile                     ← 修改：新增 make notes + 扩展 make clean
+Makefile                     ← 修改：新增 make notes-print + 扩展 make clean
 CLAUDE.md                    ← 修改：新增 notes-print 章节说明
 ```
 
@@ -993,21 +993,21 @@ git commit -m "feat: notes-ch09 约束优化方法"
 **Files:**
 - Modify: `Makefile`
 
-- [ ] **Step 1: 新增 `make notes` target + 扩展 `make clean`**
+- [ ] **Step 1: 新增 `make notes-print` target + 扩展 `make clean`**
 
-在 `Makefile` 的 `.PHONY` 行末尾追加 `notes`：
+在 `Makefile` 的 `.PHONY` 行末尾追加 `notes-print`：
 
 ```makefile
-.PHONY: all print reader review generate extract-exam push push-review push-slides notes clean
+.PHONY: all slides slides-print slides-reader review-reader notes-print generate extract-exam push push-slides push-review clean
 ```
 
-在 `review` target 之后、`generate` target 之前加入：
+在 `review-reader` target 之后、`generate` target 之前加入：
 
 ```makefile
 # === 考场课堂笔记（A4 打印版）===
-notes: latex/notes-print.pdf
+notes-print: latex/notes-print.pdf
 
-NOTES_SRCS := $(wildcard latex/notes/notes-ch*.tex)
+NOTES_SRCS := $(wildcard latex/review/review-ch*.tex)
 latex/notes-print.pdf: latex/notes/notes-print.tex $(NOTES_SRCS)
 	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
 	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
@@ -1023,7 +1023,7 @@ latex/notes-print.pdf: latex/notes/notes-print.tex $(NOTES_SRCS)
 
 ```bash
 git add Makefile
-git commit -m "build: 新增 make notes target（考场课堂笔记）"
+git commit -m "build: 新增 make notes-print target（考场课堂笔记）"
 ```
 
 ---
@@ -1031,13 +1031,13 @@ git commit -m "build: 新增 make notes target（考场课堂笔记）"
 ### Task 12: 编译 + 检查 Overfull 警告
 
 **Files:**
-- 编译: `make notes`
+- 编译: `make notes-print`
 - 日志: `latex/notes-print.log`
 
 - [ ] **Step 1: 首次编译**
 
 ```bash
-make notes
+make notes-print
 ```
 
 - [ ] **Step 2: 检查 Overfull/Underfull 警告**
@@ -1054,7 +1054,7 @@ grep -n "Overfull\|Underfull" latex/notes-print.log
 - [ ] **Step 3: 若需修复，二次编译后确认零警告**
 
 ```bash
-make notes
+make notes-print
 grep -c "Overfull" latex/notes-print.log  # 预期: 0
 ```
 
@@ -1079,7 +1079,7 @@ git commit -m "fix: notes-print 编译通过，修复Overfull警告"
 ```markdown
 ### 考场课堂笔记（notes-print）
 
-`latex/notes/` 目录存放考场用的 A4 课堂笔记，由 `make notes` 编译输出 `latex/notes-print.pdf`。
+`latex/notes/` 目录存放考场用的 A4 课堂笔记，由 `make notes-print` 编译输出 `latex/notes-print.pdf`。
 
 **用途**：开卷考试带入考场，作为"课堂笔记"使用。
 
@@ -1097,7 +1097,7 @@ git commit -m "fix: notes-print 编译通过，修复Overfull警告"
 **与 review 的关系**：
 - `notes-chXX.tex` 是 `review-chXX.tex` 的严格子集——只删不增
 - **修改 review 某章后，必须同步检查对应 notes 章是否需要更新**
-- 编译：`make notes`（不纳入 `make all`）
+- 编译：`make notes-print`（纳入 `make all`）
 ```
 
 - [ ] **Step 2: 提交**

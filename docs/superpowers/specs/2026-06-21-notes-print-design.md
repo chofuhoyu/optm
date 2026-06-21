@@ -15,7 +15,7 @@
 
 **`latex/notes-print.pdf`** — A4 双栏打印版，15-25 页，纯方法速查。
 
-由 `make notes` 编译。
+由 `make notes-print` 编译。
 
 ## 3. 文件结构
 
@@ -96,8 +96,8 @@ latex/notes-print.pdf: latex/notes/notes-print.tex $(wildcard latex/notes/notes-
 	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
 ```
 
-- `make notes` 编译 notes-print.pdf
-- `make all` **不**包含 notes（保持 all = print + reader + review）
+- `make notes-print` 编译 notes-print.pdf
+- `make all` 包含 notes-print（all = slides-print + slides-reader + review-reader + notes-print）
 - `make clean` 加入 `latex/notes/*.aux` 等辅助文件清理
 
 ## 8. CLAUDE.md 补充
@@ -107,11 +107,11 @@ latex/notes-print.pdf: latex/notes/notes-print.tex $(wildcard latex/notes/notes-
 - 说明用途：开卷考试课堂笔记，A4 打印版
 - 列出内容边界（保留/删除清单）
 - 强调与 review 的同步规则：改 review 必须检查 notes
-- 编译命令：`make notes`
+- 编译命令：`make notes-print`
 
 ## 9. 验收标准
 
-1. `make notes` 编译零错误
+1. `make notes-print` 编译零错误
 2. `latex/notes-print.log` 无 Overfull hbox 警告（双栏窄宽度下特别注意长公式）
 3. 输出 15-25 页
 4. 逐章核对：不含任何例题、真题、证明
@@ -122,7 +122,7 @@ latex/notes-print.pdf: latex/notes/notes-print.tex $(wildcard latex/notes/notes-
 
 1. 创建 `notes-print.tex` 主入口（双栏布局 + 宏包）
 2. 逐章创建 `notes-ch01.tex` ~ `notes-ch09.tex`（从 review 提取）
-3. 更新 Makefile（`make notes` + `make clean`）
+3. 更新 Makefile（`make notes-print` + `make clean`）
 4. 编译 → 检查 Overfull → 修复
 5. 更新 CLAUDE.md
 6. `git add -A && git commit`
