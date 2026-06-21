@@ -3,89 +3,222 @@
 % ============================================================
 \section{第8章 \quad 无约束优化方法}
 
-\subsection{下降算法通用框架}
+\subsection{8.1 下降算法通用框架}
 
-\textbf{迭代格式：} $x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$
+非线性规划的求解分两大战场：\emph{无约束}问题和\emph{有约束}问题。无约束优化 $\min f(x)$ 是一切的基础——罚函数法（将在第9章详述）、乘子法等约束方法的本质，就是把带约束问题转化为一系列无约束子问题。
+
+无约束优化的共同骨架是\emph{迭代下降}：从初始点出发，每步沿下降方向走一段步长，函数值严格递减，直到梯度趋于零。
+
+\textbf{迭代格式：}
+\[
+x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}
+\]
+其中：
 \begin{itemize}
-  \item $d^{(k)}$：搜索方向，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$
-  \item $\lambda_k > 0$：步长，使 $f(x^{(k+1)}) < f(x^{(k)})$
-  \item 终止：$\|\nabla f(x^{(k)})\| \le \varepsilon$
+  \item $d^{(k)}$ 是\emph{搜索方向}，满足 $\nabla f(x^{(k)})^T d^{(k)} < 0$（与负梯度成锐角，保证局部下降）
+  \item $\lambda_k > 0$ 是\emph{步长}，使 $f(x^{(k+1)}) < f(x^{(k)})$
 \end{itemize}
+终止准则：$\|\nabla f(x^{(k)})\| \le \varepsilon$ 时停止。
+
+\textbf{为什么梯度为零是停机信号？} 无约束问题的一阶必要条件就是 $\nabla f(x^*) = 0$。当我们走到梯度“足够小”的点，说明已经接近某个驻点。对于凸函数（凸函数的判别方法见第5章），这就是全局最优。
+
+本章所有方法的区别仅在于\emph{怎么选方向}和\emph{怎么定步长}。
+
 （课件 p10.1）
 
-\subsection{最速下降法}
+\subsection{8.2 最速下降法——局部最快，全局最慢}
 
-\textbf{方向：} $d^{(k)} = -\nabla f(x^{(k)})$（负梯度，局部下降最快）。
+最速下降法取\emph{负梯度方向}为搜索方向。为什么负梯度是“最速下降”方向？考虑任意单位方向向量 $d$（$\|d\|=1$），$f$ 沿 $d$ 的瞬时变化率为方向导数 $D_d f(x)=\nabla f(x)^T d$。由 Cauchy-Schwarz 不等式：
+\[
+|\nabla f(x)^T d| \le \|\nabla f(x)\| \cdot \|d\| = \|\nabla f(x)\|
+\]
+当且仅当 $d = \nabla f(x)/\|\nabla f(x)\|$ 时取等号——此时方向导数取最大值（增长率最大），即梯度方向是增长最快的方向。反之，取 $d = -\nabla f(x)/\|\nabla f(x)\|$ 时方向导数最小（$= -\|\nabla f(x)\|$），即负梯度方向是局部下降最快的方向。
 
-\textbf{锯齿现象：} 精确线搜索下 $d^{(k)} \perp d^{(k+1)}$。Hessian条件数大时严重，收敛慢。
+\textbf{方向：} $d^{(k)} = -\nabla f(x^{(k)})$
 
-\subsection{牛顿法}
+\textbf{步长：} $\lambda_k = \displaystyle\operatorname*{argmin}_{\lambda \ge 0}\ f(x^{(k)} + \lambda d^{(k)})$（精确线搜索）
 
-\textbf{方向：} $d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1} \nabla f(x^{(k)})$，步长 $\lambda_k = 1$。
+\textbf{锯齿现象的根源：} 精确线搜索下，$d^{(k)} \perp d^{(k+1)}$（连续两方向正交）。因为 $\phi'(\lambda_k) = \nabla f(x^{(k+1)})^T d^{(k)} = 0$，即 $\nabla f^{(k+1)} \perp d^{(k)}$，而 $d^{(k+1)} = -\nabla f^{(k+1)}$，所以 $d^{(k+1)} \perp d^{(k)}$。在狭长的“山谷”地形（Hessian矩阵条件数大；Hessian的概念与判定见第5章）中，它在山谷两侧反复横跳，而不是沿谷底前进——这就是“局部最快，全局最慢”的根源。
 
-\textbf{二次收敛：} $\|x^{(k+1)}-x^*\| \le C\|x^{(k)}-x^*\|^2$。对正定二次函数一步收敛。
-代价：需算 Hessian 逆 $O(n^3)$。
+（课件 p10.1）
 
-\subsection{线搜索（步长确定）}
+\subsection{8.3 牛顿法——一步到位的理想}
 
-\textbf{精确线搜索：} 解 $\phi'(\lambda)=0$ 得 $\lambda_k = \operatorname{argmin}_{\lambda\ge 0} f(x+\lambda d)$。
+牛顿法利用目标函数的二阶泰勒展开，在局部用二次函数逼近 $f$，然后直接跳到该二次逼近的极小点。
 
-\textbf{Armijo准则（非精确）：}
-从 $\lambda=1$ 开始回溯（缩半 $\beta\in(0,1)$），直至：
-$f(x+\lambda d) \le f(x) + \alpha\lambda \nabla f(x)^T d$，
-其中 $\alpha\in(0,1)$（常取 $10^{-4}$），$\beta$ 常取 $0.5$。
+\textbf{牛顿方向的推导：} 在 $x=x^{(k)}$ 处对 $f$ 做二阶 Taylor 展开：
+\[
+f(x^{(k)}+d) \approx f(x^{(k)}) + \nabla f(x^{(k)})^T d + \frac{1}{2} d^T \nabla^2 f(x^{(k)}) d
+\]
+右边是关于 $d$ 的二次函数（假设 $\nabla^2 f(x^{(k)})$ 正定）。对 $d$ 求梯度并令为零。用到两条梯度规则：$\nabla_d(d^T b)=b$，$\nabla_d(d^T H d)=2Hd$（$H$ 对称）：
+\begin{align*}
+\nabla_d\bigl[f(x^{(k)}) + \nabla f(x^{(k)})^T d + \tfrac12 d^T \nabla^2 f(x^{(k)}) d\bigr] &= 0 \\
+\nabla f(x^{(k)}) + \nabla^2 f(x^{(k)}) d &= 0
+\end{align*}
+\[
+\boxed{d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1}\, \nabla f(x^{(k)})}
+\]
+这就是牛顿方向——二次逼近的精确极小点。对正定二次函数 $f(x)=\frac12 x^T Q x + c^T x$，二阶逼近就是 $f$ 本身，故牛顿方向直接指向全局极小点。
 
-（课件 p9.8, p9.9）
+\textbf{方向：} $d^{(k)} = -[\nabla^2 f(x^{(k)})]^{-1}\, \nabla f(x^{(k)})$
 
-\subsection{FR共轭梯度法}
+\textbf{步长：} $\lambda_k = 1$（纯牛顿法，不搜索）
 
-\textbf{方向：}
-$\beta_k = \frac{\|\nabla f^{(k)}\|^2}{\|\nabla f^{(k-1)}\|^2}$，
-$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$
-（初始 $d^{(0)} = -\nabla f^{(0)}$）。
+牛顿法的收敛速度是\emph{二次收敛}：误差平方级递减（$\|x^{(k+1)}-x^*\| \le C\|x^{(k)}-x^*\|^2$），远快于最速下降法的线性收敛。但代价高昂——需要计算 Hessian 逆矩阵。
 
-\textbf{性质：} $O(n)$ 存储，对正定二次函数至多 $n$ 步收敛。方向满足 $(d^{(i)})^T Q d^{(j)} = 0$（$Q$-共轭）。
+\textbf{为什么速度差异这么大？} 最速下降法只用一阶导数（梯度），相当于在每点用\emph{线性模型}近似目标函数——它只知道“往哪个方向走最快”，不知道曲面的弯曲程度。如果等高线很扁（Hessian 条件数大），最速下降方向会和真正指向极小点的方向严重偏离，导致锯齿式慢速逼近。
+
+牛顿法则用二阶导数（Hessian），在每点构造一个\emph{二次模型}来近似目标函数。如果 $f$ 本身就是正定二次函数，二次模型\emph{完全精确}——这就是为什么牛顿法对二次函数一步到位。对一般函数，在 $x^*$ 附近用 Taylor 展开：$f(x) \approx f(x^*) + \frac{1}{2}(x-x^*)^T \nabla^2 f(x^*)(x-x^*)$，二次模型越来越准，因此误差是平方级下降（二次收敛）。
+
+\textbf{启示：} 如果能把“牛顿的准”和“梯度的省”结合起来，该多好？这就是拟牛顿法的出发点。
+
+\subsection{8.4 线搜索——步长怎么定}
+
+无论在哪个方向下行，步长必须保证“走得足够远但不过头”。
+
+\subsubsection{精确线搜索}
+
+给定方向 $d$，求 $\min_{\lambda \ge 0}\ \phi(\lambda) = f(x + \lambda d)$。将 $x+\lambda d$ 代入 $f$ 得 $\phi(\lambda)$（一元函数），解 $\phi'(\lambda) = 0$ 即得最优步长。
+
+（课件 p9.8）
+
+\subsubsection{Armijo 准则（非精确线搜索）}
+
+实际计算中，每次迭代精确求解 $\min_\lambda \phi(\lambda)$ 代价太高。Armijo准则用“回溯法”找一个“足够好”的步长：从 $\lambda = 1$ 开始，不断缩小 $\lambda$（乘以 $\beta \in (0,1)$，常用 $\beta = 0.5$），直到满足充分下降条件：
+\[
+f(x + \lambda d) \le f(x) + \alpha \lambda \nabla f(x)^T d
+\]
+其中 $\alpha \in (0,1)$（常用 $\alpha = 10^{-4}$）。右边是沿方向 $d$ 的线性下降预期——如果实际下降达不到这个预期，说明步长太大，需要缩步。
+
+（课件 p9.9）
+
+\textbf{精确 vs 非精确线搜索的选择：} 考试中手算题用\emph{精确线搜索}（因为函数简单，可手解 $\phi'(\lambda)=0$）。实际软件中Armijo准则更常见——省时，且对DFP/BFGS的收敛性理论保证已完备。
+
+\subsection{8.5 FR共轭梯度法——不存矩阵，用巧劲}
+
+\subsubsection{核心动机}
+
+最速下降法的锯齿因连续方向正交而低效，牛顿法虽好但存 Hessian 太贵（$O(n^2)$ 存储，$O(n^3)$ 求逆）。共轭梯度法在两者之间取平衡：\emph{不存矩阵，$n$ 步收敛}——对正定二次函数，至多 $n$ 轮精确收敛到极小点。
+
+\textbf{FR 共轭梯度法公式：}
+\begin{itemize}
+  \item 初始：$d^{(0)} = -\nabla f(x^{(0)})$
+  \item 对 $k \ge 1$：
+  \[
+  \beta_k = \frac{\|\nabla f^{(k)}\|^2}{\|\nabla f^{(k-1)}\|^2},\qquad
+  d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}
+  \]
+\end{itemize}
+
+方向 $d^{(k)}$ 与 $d^{(k-1)}$ 关于 Hessian $Q$ 共轭：$(d^{(k)})^T Q d^{(k-1)} = 0$。\emph{共轭不等于正交}——共轭考虑了目标函数的曲率（通过 $Q$ 加权），使每一步方向在 $Q$-内积意义下互不干扰。
+
+\textbf{共轭的几何直觉（为什么它能消除锯齿）：} 对于正定二次函数 $f(x)=\frac12 x^T Q x + c^T x$，做变量变换 $y = Q^{1/2}x$（$Q^{1/2}$ 是 $Q$ 的平方根矩阵）。在新坐标下，目标函数变成 $\frac12\|y\|^2 + \text{const}$——等高线从“椭圆”变成“正圆”。而 $Q$-共轭性 $d_i^T Q d_j = 0$ 变换后变成 $(Q^{1/2}d_i)^T (Q^{1/2}d_j) = 0$——恰恰是普通正交！换句话说，共轭梯度法在原始空间中处理的是“歪曲”坐标系下的正交搜索。因为每一步都沿（变换后的）正交方向搜索，不会重复之前的工作，所以 $n$ 步必到极小点。
+
+\textbf{共轭梯度法的优势：} 存储量 $O(n)$（只需存上一轮梯度），每次迭代只需算梯度（无需Hessian），对大规模问题（$n$ 成千上万）是唯一可行的选择。
 
 （课件 p10.7）
 
-\subsection{拟牛顿法}
+\subsection{8.6 拟牛顿法——用梯度变化“猜”曲率}
+
+\subsubsection{8.6.1 牛顿法的三大软肋}
+
+牛顿法方向 $d = -[\nabla^2 f]^{-1}\nabla f$ 好在哪里？好在方向精确——它直接指向二次模型的极小点。但它有三个实际障碍：
+\begin{enumerate}
+  \item \textbf{Hessian 矩阵计算贵}：$\nabla^2 f$ 有 $n(n+1)/2$ 个独立二阶偏导数
+  \item \textbf{求逆更贵}：矩阵求逆是 $O(n^3)$ 量级
+  \item \textbf{不一定正定}：牛顿方向可能不是下降方向（若 Hessian 有负特征值）
+\end{enumerate}
+
+\textbf{核心洞察：} 我们其实不需要直接知道 Hessian 的全部信息——只需要从迭代过程中观察到的\emph{梯度变化}来\emph{推断}曲率。就像盲人用拐杖探路：每走一步感知一次坡度变化，走得多了自然摸清地形轮廓。
+
+\subsubsection{8.6.2 拟牛顿条件（割线方程）的由来}
+
+观察一个关键事实。对二次函数 $f(x) = \tfrac{1}{2}x^T Q x + c^T x$，有 $\nabla f(x) = Qx + c$。因此相邻两点 $x^{(k)}$ 与 $x^{(k-1)}$ 的梯度差满足：
+\[
+\nabla f^{(k)} - \nabla f^{(k-1)} = Q(x^{(k)} - x^{(k-1)})
+\]
+记 $s_{k-1} = x^{(k)} - x^{(k-1)}$（位移差），$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$（梯度差），则：
+\[
+y_{k-1} = Q s_{k-1}\quad\Longrightarrow\quad s_{k-1} = Q^{-1} y_{k-1}
+\]
+注意：$Q^{-1}$ 就是 Hessian 的逆！对于一般的非二次函数，我们要求近似 Hessian 逆矩阵 $H_k$ 也满足同样的关系：
 
 \textbf{拟牛顿条件（割线方程）：}
-$s_{k-1} = x^{(k)} - x^{(k-1)}$，$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$。
-$H_k y_{k-1} = s_{k-1}$（$H_k \approx [\nabla^2 f]^{-1}$）。
-
-\textbf{DFP公式（校 $H$ = Hessian逆近似）：}
 \[
-H_k = H_{k-1}
-    + \frac{s_{k-1}s_{k-1}^T}{s_{k-1}^T y_{k-1}}
-    - \frac{H_{k-1}y_{k-1}y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}
+\boxed{H_k\, y_{k-1} = s_{k-1}}
 \]
+
+解读：在方向 $y_{k-1}$ 上，$H_k$ 把“梯度变化”映射为“位移变化”——这和真正的 Hessian 逆的行为一致。$H_k$ 不能仅由此式唯一确定（$n$ 个方程 vs $n^2$ 个未知数），不同补充条件导出不同的拟牛顿公式。
+
+\subsubsection{8.6.3 DFP 校正公式——两项的含义}
+
+DFP（Davidon-Fletcher-Powell）方法维护 $H_k \approx [\nabla^2 f]^{-1}$（Hessian \textbf{逆}的近似）。每步从 $H_{k-1}$ 出发，加上两个秩1修正：
+
+\textbf{DFP 校正公式：}
+\begin{multline*}
+H_k = H_{k-1}
+      + \underbrace{\frac{s_{k-1} s_{k-1}^T}{s_{k-1}^T y_{k-1}}}_{\text{正定修正}}
+      - \underbrace{\frac{H_{k-1} y_{k-1} y_{k-1}^T H_{k-1}}{y_{k-1}^T H_{k-1} y_{k-1}}}_{\text{擦除修正}}
+\end{multline*}
+
 搜索方向：$d^{(k)} = -H_k \nabla f^{(k)}$。初始化 $H_0 = I$。
 
-\textbf{BFGS公式（校 $B$ = Hessian近似）：}
+\textbf{两项的因果逻辑：}
+\begin{itemize}
+  \item \textbf{第一项（正定修正）}：用位移差 $s_{k-1}$ 构造秩1矩阵。这一项保证了 $H_k y_{k-1} = s_{k-1}$ 在 $H_{k-1}=0$ 的极端情况下也成立——它“塞入”了方向 $s_{k-1}$ 上的新曲率信息。分子 $ss^T$ 是外积，分母 $s^Ty$ 做归一化。
+  \item \textbf{第二项（擦除修正）}：减去 $H_{k-1}$ 在 $y_{k-1}$ 方向上的“投影”。$H_{k-1}$ 中存储的旧曲率可能不准确——这一项把 $H_{k-1}$ 沿 $y_{k-1}$ 方向上的分量“擦掉”，给第一项新信息腾位置。代入检验可知：若无第二项，$H_k y_{k-1} \neq s_{k-1}$。
+  \item \textbf{遗传正定性}：若 $H_{k-1} \succ 0$ 且 $s_{k-1}^T y_{k-1} > 0$，则 $H_k \succ 0$ 也正定——每一步都保持 Hessian 逆近似的正定性。
+\end{itemize}
+
+（课件 p10.52, p10.53）
+
+\subsubsection{8.6.4 BFGS 校正公式——DFP 的互补兄弟}
+
+BFGS不是维护 $H_k$（逆的近似），而是维护 $B_k \approx \nabla^2 f$（Hessian \textbf{本身}的近似）。将 DFP 公式中所有 $s$ 与 $y$ 互换，$H$ 换成 $B$，就得到 BFGS：
+
+\textbf{BFGS 校正公式：}
 \[
 B_k = B_{k-1}
-    + \frac{y_{k-1}y_{k-1}^T}{y_{k-1}^T s_{k-1}}
-    - \frac{B_{k-1}s_{k-1}s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
+    + \frac{y_{k-1} y_{k-1}^T}{y_{k-1}^T s_{k-1}}
+    - \frac{B_{k-1} s_{k-1} s_{k-1}^T B_{k-1}}{s_{k-1}^T B_{k-1} s_{k-1}}
 \]
-拟牛顿条件：$B_k s_{k-1} = y_{k-1}$。搜索方向：解 $B_k d^{(k)} = -\nabla f^{(k)}$。
 
-\textbf{DFP vs BFGS：} DFP校 $H$（逆），BFGS校 $B$（Hessian本身）。公式对称（$s \leftrightarrow y$互换）。考试以DFP为主。
+拟牛顿条件对应为 $B_k s_{k-1} = y_{k-1}$（$B_k$ 把位移映射为梯度变化）。搜索方向：解 $B_k d^{(k)} = -\nabla f^{(k)}$。
 
-\textbf{二次终止性：} DFP/BFGS/共轭梯度对正定二次函数至多 $n$ 步收敛，产生的方向关于 $Q$ 共轭。
+\textbf{DFP 与 BFGS 的对偶关系：}
+\begin{itemize}
+  \item DFP 校 $H$（逆）$\;\longleftrightarrow\;$ BFGS 校 $B$（Hessian本身）
+  \item DFP：$H_k y = s$ $\;\longleftrightarrow\;$ BFGS：$B_k s = y$
+  \item 记忆口诀：DFP 公式中分子是 $ss^T$ 和 $Hyy^T H$，BFGS 公式中分子是 $yy^T$ 和 $Bss^T B$
+\end{itemize}
 
-（课件 p10.52--p10.63）
+\textbf{考试以 DFP 为主。} BFGS 在实际计算中通常更鲁棒（对非精确线搜索不敏感），但公式结构完全对称，理解了一个就理解了另一个。
+
+（课件 p10.56, p10.57, p10.63）
+
+\subsubsection{8.6.5 二次终止性}
+
+\textbf{二次终止性：} 对正定二次函数，DFP法、BFGS法和共轭梯度法至多 $n$ 步收敛到精确极小点。且若每步精确线搜索，则产生的方向 $d^{(0)},\dots,d^{(n-1)}$ 关于 $Q$ 相互共轭。
+
+\textbf{为什么恰好 $n$ 步？} 共轭方向的核心定理：对 $\mathbb{R}^n$ 中的正定二次函数，若沿 $n$ 个相互 $Q$-共轭的方向各做一次精确线搜索，则第 $n$ 步必定到达全局极小点。共轭梯度法和 DFP 法在迭代中\emph{自动生成}共轭方向——前者通过 Gram-Schmidt 型修正从梯度生成，后者通过拟牛顿方程 $H_k y_{k-1} = s_{k-1}$ 保证矩阵的共轭性——因此继承了 $n$ 步收敛的性质。这不是巧合——它是共轭方向理论保证的必然结果。
+
+\textbf{遗传正定性：} 在 $s^Ty > 0$ 条件下（精确线搜索或 Armijo 准则均可保证），DFP/BFGS 保持近似矩阵的正定性，确保每一步的搜索方向都是下降方向。
 
 \subsection{本章速查}
 
 \begin{itemize}
-  \item \textbf{最速下降}：$d = -\nabla f$，锯齿正交，收敛慢
-  \item \textbf{牛顿法}：$d = -H^{-1}\nabla f$，二次收敛，$O(n^3)$贵
-  \item \textbf{精确线搜索}：解 $\phi'(\lambda)=0$；\textbf{Armijo}：回溯缩步
-  \item \textbf{FR共轭梯度}：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$O(n)$存储，$n$步收敛
-  \item \textbf{DFP}：$H_k = H_{k-1} + \frac{ss^T}{s^Ty} - \frac{Hyy^TH}{y^THy}$（校Hessian逆）
-  \item \textbf{BFGS}：$B_k = B_{k-1} + \frac{yy^T}{y^Ts} - \frac{Bss^TB}{s^TBs}$（校Hessian本身）
-  \item \textbf{拟牛顿条件}：$H_k y_{k-1} = s_{k-1}$（DFP）/ $B_k s_{k-1} = y_{k-1}$（BFGS）
-  \item \textbf{二次终止性}：对正定二次函数至多$n$步收敛
-  \item \textbf{遗传正定性}：$s^Ty > 0$时DFP/BFGS保持矩阵正定性
+  \item \textbf{下降算法框架}：$x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$，$\nabla f^T d < 0$，停机 $\|\nabla f\| \le \varepsilon$
+  \item \textbf{最速下降法}：$d = -\nabla f$，局部最快但全局锯齿，$d^{(k)} \perp d^{(k+1)}$；Hessian条件数大时收敛极慢
+  \item \textbf{牛顿法}：$d = -[\nabla^2 f]^{-1}\nabla f$，二次收敛 $\|x^{(k+1)}-x^*\| \le C\|x^{(k)}-x^*\|^2$；对正定二次函数一步到位；代价 $O(n^3)$
+  \item \textbf{精确线搜索}：解 $\phi'(\lambda)=0$，$\phi(\lambda) = f(x+\lambda d)$
+  \item \textbf{Armijo准则}：回溯缩步（$\lambda \leftarrow \beta\lambda$），$f(x+\lambda d) \le f(x) + \alpha\lambda\nabla f^T d$；参数 $\alpha\in(0,1)$、$\beta\in(0,1)$
+  \item \textbf{FR共轭梯度法}：$\beta_k = \|\nabla f^{(k)}\|^2 / \|\nabla f^{(k-1)}\|^2$，$d^{(k)} = -\nabla f^{(k)} + \beta_k d^{(k-1)}$；$O(n)$ 存储，$n$ 步收敛
+  \item \textbf{共轭 vs 正交}：共轭 $(d^{(i)})^T Q d^{(j)} = 0$ 经 $Q^{1/2}$ 变换后等价于正交——每步在“歪曲”坐标系中沿正交方向搜索
+  \item \textbf{拟牛顿条件（割线方程）}：$H_k y_{k-1} = s_{k-1}$（$s_{k-1} = x^{(k)} - x^{(k-1)}$，$y_{k-1} = \nabla f^{(k)} - \nabla f^{(k-1)}$）
+  \item \textbf{DFP公式}（校 $H$，Hessian逆近似）：两项秩1修正——正定修正 $ss^T/s^Ty$ $+$ 擦除修正 $Hyy^TH/y^THy$；初始化 $H_0 = I$，方向 $d = -H\nabla f$
+  \item \textbf{BFGS公式}（校 $B$，Hessian本身近似）：DFP的 $s \leftrightarrow y$ 对偶互换；$B_k s_{k-1} = y_{k-1}$；方向解 $B d = -\nabla f$
+  \item \textbf{二次终止性}：对正定二次函数，DFP/BFGS/共轭梯度法至多 $n$ 步收敛，产生的方向关于 $Q$ 相互共轭
+  \item \textbf{遗传正定性}：在 $s^Ty > 0$ 条件下，DFP/BFGS保持近似矩阵的正定性，确保搜索方向为下降方向
 \end{itemize}
+
+\endinput

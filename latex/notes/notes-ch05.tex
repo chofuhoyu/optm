@@ -201,22 +201,17 @@ f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y)
 \textbf{几何解释（弦在曲线上方）：} 任取定义域内两点 $x,y$，连接 $(x,f(x))$ 与 $(y,f(y))$ 的直线段整个在函数图像上方。凹函数则反过来——弦在图像下方。
 
 \textbf{常见凸函数速查：}
-
-\begin{tabular}{@{}lll@{}}
-\toprule
-\textbf{函数} & \textbf{定义域} & \textbf{凸性} \\
-\midrule
-$a^T x+b$（仿射） & $\mathbb{R}^n$ & 既凸又凹 \\
-$x^2$    & $\mathbb{R}$   & 严格凸 \\
-$e^{ax}$ & $\mathbb{R}$   & 凸 \\
-$|x|$    & $\mathbb{R}$   & 凸（$x=0$不可微，但仍凸） \\
-$x\ln x$ & $(0,\infty)$   & 凸（负熵） \\
-$\|x\|$（任意范数）& $\mathbb{R}^n$ & 凸（三角不等式+齐次性）\\
-$x_1^2+x_2^2$ & $\mathbb{R}^2$ & 严格凸 \\
-$x_1^2-x_2^2$ & $\mathbb{R}^2$ & 非凸非凹（鞍面） \\
-$x^3$    & $\mathbb{R}$   & 非凸非凹（$x>0$凸，$x<0$凹）\\
-\bottomrule
-\end{tabular}
+\begin{itemize}[leftmargin=*]
+  \item 仿射 $a^T x+b$：既凸又凹
+  \item $x^2$：严格凸
+  \item $e^{ax}$：凸
+  \item $|x|$：凸（$x=0$ 不可微，但仍凸）
+  \item $x\ln x$（$(0,\infty)$）：凸（负熵）
+  \item $\|x\|$（任意范数）：凸（三角不等式 $+$ 齐次性）
+  \item $x_1^2+x_2^2$：严格凸
+  \item $x_1^2-x_2^2$：非凸非凹（鞍面）
+  \item $x^3$（$\mathbb{R}$ 上）：非凸非凹（$x>0$ 凸，$x<0$ 凹）
+\end{itemize}
 
 % ============================================================
 \subsection{5.4 凸函数的判别方法}
@@ -225,7 +220,7 @@ $x^3$    & $\mathbb{R}$   & 非凸非凹（$x>0$凸，$x<0$凹）\\
 
 \begin{center}
 \fbox{%
-\begin{minipage}{0.90\textwidth}
+\begin{minipage}{\columnwidth}
 \small
 \textbf{方法I：定义法}（无需可微假设，适合理论证明与简单函数）\\[2pt]
 $\Big\Downarrow$ \quad 加上 $f$ 一阶可微\\[2pt]
