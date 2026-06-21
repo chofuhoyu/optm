@@ -1,0 +1,73 @@
+% ============================================================
+%  第2章：单纯形法
+% ============================================================
+\section{第2章 \quad 单纯形法}
+
+\subsection{单纯形法基本思想}
+
+在顶点间沿棱跳跃，每一步目标值严格下降（对 $\min$ 问题）。BFS 总数有限且目标严格单调，算法必然有限步终止。
+（课件 p5.1）
+
+\subsection{转轴运算}
+
+\textbf{定义} 从一个 BFS 出发，选择一个非基变量进基（其检验数为负，目标可进一步下降），选择一个基变量出基（保持可行性），通过行变换更新单纯形表。
+
+\textbf{检验数（对 $\min$ 问题）：}
+\[
+\sigma_j = c_j - c_B^T B^{-1} a_j
+\]
+若所有 $\sigma_j \ge 0$，则当前 BFS 为最优解。
+若存在 $\sigma_j < 0$ 但对应列 $B^{-1}a_j \le 0$，则问题无界。
+
+\textbf{换基规则：}
+\begin{itemize}
+  \item \textbf{进基变量选择：} 取最小 $\sigma_j < 0$ 对应的列（也可选任意负检验数）
+  \item \textbf{出基变量选择（最小比值规则）：} $\displaystyle \min\left\{\frac{(B^{-1}b)_i}{(B^{-1}a_j)_i} \;\middle|\; (B^{-1}a_j)_i > 0\right\}$
+\end{itemize}
+
+\subsection{单纯形表}
+
+\textbf{标准表结构（$\min$ 问题）：}
+\begin{center}
+\begin{tabular}{c|cccc|c}
+& $x_1$ & $x_2$ & $\cdots$ & $x_n$ & RHS \\
+\hline
+$z$ & $\sigma_1$ & $\sigma_2$ & $\cdots$ & $\sigma_n$ & $-z^*$ \\
+\hline
+$x_{B_1}$ & & & & & \\
+$\vdots$ & & $B^{-1}A$ & & & $B^{-1}b$ \\
+$x_{B_m}$ & & & & & \\
+\end{tabular}
+\end{center}
+$c_B$ 列在最优表中给出对偶变量（影子价格）。
+
+\subsection{初始基本可行解的构造}
+
+\textbf{两阶段法：}
+\begin{enumerate}
+  \item 阶段I：引入人工变量，构造辅助问题 $\min\ \sum$人工变量，求初始 BFS
+  \item 阶段II：用阶段I得到的 BFS 作为初始解，求解原问题
+\end{enumerate}
+
+\textbf{大M法：} 在原目标中加入 $M\cdot\sum$人工变量（$M$ 为充分大正数），一次求解。
+
+\subsection{单纯形法的有限终止性}
+
+\textbf{Bland规则（避免循环）：}
+\begin{itemize}
+  \item 进基：选下标最小的负检验数对应变量
+  \item 出基：在比值最小的候选者中选下标最小的
+\end{itemize}
+
+\textbf{退化：} 若某个基变量取值为 $0$，称当前 BFS 退化。退化可能导致循环（Bland规则可避免）。
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{检验数}：$\sigma_j = c_j - c_B^T B^{-1} a_j$。$\min$ 问题中全部 $\ge 0$ 即最优
+  \item \textbf{换基}：进基取 $\sigma_j<0$，出基取最小比值
+  \item \textbf{两阶段法}：阶段I构造初始BFS，阶段II求解
+  \item \textbf{大M法}：添加惩罚项一次性求解
+  \item \textbf{Bland规则}：选最小下标，防止循环
+  \item \textbf{退化BFS}：基变量含零值
+\end{itemize}
