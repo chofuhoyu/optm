@@ -40,7 +40,7 @@ latex/review-reader.pdf: latex/review/review-reader.tex $(REVIEW_SRCS)
 # === 考场课堂笔记（A4 打印版）===
 notes: latex/notes-print.pdf
 
-NOTES_SRCS := $(wildcard latex/notes/notes-ch*.tex)
+NOTES_SRCS := $(wildcard latex/review/review-ch*.tex)
 latex/notes-print.pdf: latex/notes/notes-print.tex $(NOTES_SRCS)
 	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex
 	cd latex && xelatex -interaction=nonstopmode notes/notes-print.tex

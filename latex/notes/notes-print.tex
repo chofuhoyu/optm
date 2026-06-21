@@ -1,8 +1,8 @@
 % !TeX program = xelatex
 % ============================================================
 %  最优化理论与算法 — 考场课堂笔记（A4 打印版）
-%  内容：纯方法参考（定义/定理/公式/算法步骤）
-%  不含例题、真题、证明
+%  直接 \input review 源文件，通过重定义宏/环境过滤内容
+%  不含例题、真题、证明——仅保留定义、定理、公式、算法步骤
 % ============================================================
 \documentclass[10pt,a4paper,twocolumn]{ctexart}
 
@@ -16,6 +16,8 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{environ}
 \setlist{nosep, leftmargin=*}
 
 % === 标题格式 ===
@@ -35,6 +37,37 @@
 % === 允许公式稍微溢出 ===
 \setlength{\emergencystretch}{1.5em}
 
+% ============================================================
+%  条件编译：覆盖 review 中的环境和宏
+% ============================================================
+
+% --- reviewonly 命令：review 中的例题/真题/因果解释用 \reviewonly{...} 包裹，notes 中吞掉 ---
+\newcommand{\reviewonly}[1]{}
+
+% --- defbox 环境：review 用 tcolorbox，notes 中重定义为简单间距 ---
+\newenvironment{defbox}{%
+  \medskip
+}{%
+  \smallskip
+}
+
+% --- notebox 环境：notes 中吞掉 ---
+\newenvironment{notebox}{}{}
+
+% --- examquestion 环境：notes 中吞掉 ---
+\newenvironment{examquestion}[1]{}{}
+
+% --- tikzpicture 环境：用 environ 吞掉全部内容（含嵌套 scope 等） ---
+\NewEnviron{tikzpicture}{}
+
+% --- \refslide：review 显示 PPT 缩略图，notes 中只显示小字页码 ---
+\newcommand{\refslide}[3]{%
+  {\small （课件 p#2.#3）}%
+}
+
+% --- 禁用 tikz 相关命令（避免未定义错误） ---
+\newcommand{\usetikzlibrary}[1]{}
+
 \begin{document}
 
 % === 封面标题 ===
@@ -47,15 +80,17 @@
 
 \vspace{6pt}
 
-% === 各章内容 ===
-\input{notes/notes-ch01.tex}
-\input{notes/notes-ch02.tex}
-\input{notes/notes-ch03.tex}
-\input{notes/notes-ch04.tex}
-\input{notes/notes-ch05.tex}
-\input{notes/notes-ch06.tex}
-\input{notes/notes-ch07.tex}
-\input{notes/notes-ch08.tex}
-\input{notes/notes-ch09.tex}
+% ============================================================
+%  各章内容：直接从 review 源文件 \input
+% ============================================================
+\input{review/review-ch01.tex}
+\input{review/review-ch02.tex}
+\input{review/review-ch03.tex}
+\input{review/review-ch04.tex}
+\input{review/review-ch05.tex}
+\input{review/review-ch06.tex}
+\input{review/review-ch07.tex}
+\input{review/review-ch08.tex}
+\input{review/review-ch09.tex}
 
 \end{document}
