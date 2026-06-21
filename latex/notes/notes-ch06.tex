@@ -11,6 +11,8 @@
 
 \textbf{二阶充分条件：} 若 $\nabla f(x^*)=0$ 且 $\nabla^2 f(x^*)$ 正定，则 $x^*$ 严格局部极小。
 
+加上约束后，最优解可能落在边界上，$\nabla f(x^*)\neq 0$ 是常态——只需沿可行方向无法进一步下降即可。
+
 \subsection{基本概念}
 
 \textbf{可行方向：} 设 $x^*\in\Omega$。向量 $d$ 是 $x^*$ 处的可行方向，若 $\exists\bar{t}>0$ 使 $\forall t\in[0,\bar{t}]$，$x^*+td\in\Omega$。
@@ -20,7 +22,7 @@
 
 \textbf{积极约束：} 在 $x^*$ 处取等号的不等式约束（$g_i(x^*)=0$）。$g_i(x^*)<0$ 为非积极约束，局部可忽略。
 
-\textbf{锥：} 集合 $K$ 是锥，若 $d\in K \Rightarrow \alpha d\in K$（$\forall\alpha\ge0$）。向量组生成的凸锥 $=\{\sum\alpha_i v_i \mid \alpha_i\ge 0\}$。
+\textbf{锥：} 集合 $K$ 是锥，若 $d\in K \Rightarrow \alpha d\in K$（$\forall\alpha\ge0$）。向量组 $\{v_1,\dots,v_k\}$ 生成的凸锥 $=\{\sum\alpha_i v_i \mid \alpha_i\ge 0\}$——所有非负系数线性组合的集合。
 
 \textbf{切空间（等式约束）：} 所有满足 $\nabla h_j(x^*)^T d = 0$ 的方向 $d$ 的集合。沿切向移动不违反约束（一阶意义上）。
 
@@ -29,17 +31,22 @@
 (I) $Ax=b,\ x\ge 0$；\quad (II) $A^T y \ge 0,\ b^T y < 0$。
 该引理是「不存在可行下降方向 $\Rightarrow$ 梯度在约束梯度锥中」的代数依据，是 FJ/KKT 条件的理论基础。
 
-\textbf{乘子 $\mu_j$ 的经济含义：} $\frac{\partial f^*}{\partial b_j} = -\mu_j^*$（约束右端项的影子价格）。
+\textbf{乘子 $\mu_j$ 的经济含义：} $\frac{\partial f^*}{\partial b_j} = -\mu_j^*$（约束右端项的影子价格，与第3章LP对偶完全平行）。
 
 \subsection{Lagrange乘子法（仅等式约束）}
 
-考虑 $\min f(x)$ s.t. $h_i(x)=0$。Lagrange函数 $L(x,\mu)=f(x)+\sum\mu_i h_i(x)$。
-若 $x^*$ 局部极小且 $\nabla h_i(x^*)$ 线性无关，则存在乘子使 $\nabla_x L(x^*,\mu^*)=0$。
-几何：$-\nabla f(x^*)$ 落在约束法向量张成的子空间中。
+\textbf{几何来源——为什么这样构造 $L(x,\mu)=f(x)+\mu h(x)$？}
+
+受约束的 $x$ 不能自由移动，必须待在约束曲面 $h(x)=0$ 上。在局部极小点 $x^*$ 处，沿约束切平面的任意方向 $d$（满足 $\nabla h^T d=0$），$f$ 的一阶变化必须为零（否则可以沿切向移动使 $f$ 下降）。这要求 $\nabla f(x^*)$ 和约束法向量 $\nabla h(x^*)$ 平行——即存在 $\mu$ 使 $\nabla f(x^*)+\mu\nabla h(x^*)=0$。构造 $L(x,\mu)=f(x)+\mu h(x)$，则 $\nabla_x L=0$ 恰好就是这个几何条件。
+
+\textbf{定理（等式约束Lagrange）：}
+$\min f(x)$ s.t. $h_i(x)=0$。若 $x^*$ 局部极小且 $\nabla h_i(x^*)$ 线性无关，则存在唯一乘子使
+$\nabla f(x^*) + \sum\mu_i^*\nabla h_i(x^*)=0$。
+几何：$-\nabla f(x^*)$ 落在约束法向量张成的子空间中，即 $\nabla f$ 在切空间上的投影为零。
 
 \subsection{FJ条件（Fritz John, 1948）}
 
-\textbf{定理 6.2（FJ条件）}
+\textbf{定理（FJ条件）}
 对一般约束问题 $\min f(x)$ s.t. $g_i(x)\le 0$，$h_j(x)=0$。若 $x^*$ 局部极小且函数连续可微，则存在\textbf{不全为零}的乘子 $\lambda_0,\lambda_1,\dots,\lambda_m,\mu_1,\dots,\mu_p$：
 \[
 \boxed{\lambda_0 \nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0}
@@ -47,15 +54,65 @@
 \[
 \lambda_i \ge 0\ (i=0,1,\dots,m),\qquad \lambda_i g_i(x^*) = 0\ (i=1,\dots,m)
 \]
-$\mu_j$ 无符号约束。
+$\mu_j$ 无符号约束（等式约束无方向限制）。
 
-\textbf{注意 $\lambda_0$ 的特殊性：} $\lambda_0$ 可为 $0$——此时目标梯度完全消失，FJ退化为仅约束梯度的线性相关。这是FJ条件的"软肋"，也是引入约束规格的动机。
+（课件 p7.17）
 
-（课件 p7.17, p7.26）
+\subsubsection{FJ条件的几何推导：从"不存在可行下降方向"到代数方程}
+
+FJ条件源于一个几何事实：局部极小点处\emph{不存在可行下降方向}。具体四步推导：
+
+\textbf{Step 1：可行方向的线性化条件。} 在 $x^*$ 处一阶Taylor展开：
+\begin{itemize}
+  \item 积极不等式约束 $g_i(x^*)=0$：$g_i(x^*+td)\approx t\nabla g_i(x^*)^T d$。要保证 $\le 0$，须 $\nabla g_i(x^*)^T d \le 0$（不能指向 $g_i>0$ 的方向）。
+  \item 等式约束 $h_j(x^*)=0$：$h_j(x^*+td)\approx t\nabla h_j(x^*)^T d$。要保证 $=0$（一阶），须 $\nabla h_j(x^*)^T d = 0$（必须沿切平面）。
+\end{itemize}
+以上称为\emph{线性化可行方向}的条件。
+
+\textbf{Step 2：无下降条件。} $-\nabla f(x^*)$ 是最速下降方向。不存在可行下降方向，意味着所有满足 Step 1 条件的方向 $d$ 都满足 $\nabla f(x^*)^T d \ge 0$（即 $-\nabla f(x^*)^T d \le 0$）。
+
+\textbf{Step 3：Farkas引理——从几何"不存在"到代数"存在"。} 设矩阵 $A$ 的列由积极约束梯度 $\nabla g_i(x^*)$ 和 $\pm\nabla h_j(x^*)$ 组成，$b=-\nabla f(x^*)$。若不存在满足 $\nabla g_i^T d\le0$、$\nabla h_j^T d=0$、$\nabla f^T d<0$ 的 $d$，则由Farkas引理，$-\nabla f(x^*)$ 落在这些梯度向量生成的凸锥中。
+
+\textbf{Step 4：写成代数方程。}「$-\nabla f$ 落在约束梯度锥中」$\Longleftrightarrow$ 存在非负系数 $\lambda_i\ge0$（对 $\nabla g_i$）和自由系数 $\mu_j$（对 $\pm\nabla h_j$），使：
+\[
+-\nabla f(x^*) = \sum_{i\in\mathcal{A}} \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*)
+\]
+移项并引入 $\lambda_0\ge0$ 即得FJ方程。对非积极约束令 $\lambda_i=0$（互补松弛 $\lambda_i g_i=0$ 自动满足）。
+
+\textbf{几何小结：} FJ条件本质是说——在最优点，目标函数的负梯度方向不能独立于约束梯度锥；它是约束法向量锥中的一个成员。
+
+\subsubsection{为什么 $\lambda_0$ 可以为零？——FJ条件的"软肋"}
+
+当 $\lambda_0=0$ 时：
+\[
+\sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0
+\]
+目标函数的梯度\textbf{完全消失}。FJ退化为仅涉及约束梯度的线性依赖——它不携带任何关于 $f(x)$ 的信息。
+
+\textbf{何时触发？}最常见的退化场景：某个积极约束在 $x^*$ 处的梯度为零向量（$\nabla g_i(x^*)=0$）。
+此时令 $\lambda_0=0$、该 $\lambda_i\neq0$、其余乘子为零，FJ方程自动成立——\emph{无论 $x^*$ 对目标函数是好是坏}。一阶Taylor展开在此失效（约束局部至少二阶平坦），一阶信息不足以描述约束的走向。
+
+\textbf{一句话：} FJ条件"太松了"——不加额外假设时，它可能标记出与目标函数毫无关系的点。这正是引入约束规格的动机。
+
+（课件 p7.26）
+
+\subsubsection{FJ $\to$ KKT 的逻辑链}
+
+这是理解两者关系的核心链条：
+\begin{center}
+FJ无条件成立
+$\;\xrightarrow{\lambda_0\text{可能}=0}\;$
+目标信息可能丢失
+$\;\xrightarrow{\text{加CQ}}\;$
+$\lambda_0\neq 0$
+$\;\xrightarrow{\text{归一化}\lambda_0=1}\;$
+KKT
+\end{center}
+FJ 是"总成立但太松"的必要条件；KKT 是"需要前提但足够紧"的必要条件。CQ 正是那个"前提"——它排除了 $\lambda_0=0$ 的可能。
 
 \subsection{KKT条件}
 
-\textbf{定理 6.3（KKT条件）}
+\textbf{定理（KKT条件）}
 在FJ基础上\textbf{加上约束规格}，强制 $\lambda_0 \neq 0$，归一化 $\lambda_0=1$：
 \[
 \nabla f(x^*) + \sum_{i=1}^m \lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) = 0
@@ -63,19 +120,21 @@ $\mu_j$ 无符号约束。
 加上：$g_i(x^*)\le 0$，$h_j(x^*)=0$，$\lambda_i\ge 0$，$\lambda_i g_i(x^*)=0$。
 
 Lagrange函数 $L(x,\lambda,\mu)=f(x)+\sum\lambda_i g_i(x)+\sum\mu_j h_j(x)$。
-则条件等价于 $\nabla_x L=0$ + $\lambda_i g_i=0$。
+则条件等价于 $\nabla_x L=0$ + $\lambda_i g_i=0$ + 原始可行性 + 对偶可行性。
 
 （课件 p7.19, p7.20, p7.27）
 
 \subsection{约束规格（CQ）}
 
-\textbf{作用：} 保证约束梯度的线性化与真实可行域局部几何一致，使KKT必要条件成立。
+\textbf{CQ解决了什么问题？} 保证\emph{约束梯度的线性化描述与真实可行域的局部几何一致}。没有CQ时，可能出现：某方向 $d$ 满足线性化条件 $\nabla g_i^T d\le0$（看似可行），但实际上不存在沿该方向的可行弧（一阶信息欺骗我们）。基于线性化的KKT条件因此可能出错——漏掉极小点或接纳伪极小点。
+
+\textbf{LICQ的几何直觉：} 积极约束的梯度向量集合线性无关。每个积极约束在 $x^*$ 处定义一条曲线/曲面，其梯度 $\nabla g_i(x^*)$ 是法向量。LICQ要求这些法向量互不共线/共面——没有哪个法向量可写成其他法向量的线性组合。满足LICQ意味着每个约束在 $x^*$ 附近都是"独立的"（去掉任何一个都会改变可行域形状）。若LICQ失败（如 $\nabla g_i(x^*)=0$），该约束在 $x^*$ 附近至少二阶平坦——一阶信息不足以描述。
 
 \textbf{常用约束规格：}
 \begin{itemize}
-  \item \textbf{LICQ}：积极约束梯度线性无关（最强，验证简单）
+  \item \textbf{LICQ}：积极约束梯度线性无关（最强，验证简单，最常用）
   \item \textbf{MFCQ}：积极约束梯度正线性相关（较LICQ稍弱）
-  \item \textbf{Slater}：凸问题中存在严格可行点 $g_i(x)<0$
+  \item \textbf{Slater}：凸问题中存在严格可行点 $g_i(x)<0$（验证方便）
   \item \textbf{线性约束}：CQ自动成立，无需验证
 \end{itemize}
 
@@ -91,18 +150,28 @@ $\lambda_0$ & $\ge0$，可为0 & 归一化 $=1$ \\
 \midrule
 适用范围 & 所有局部极小点 & 仅满足CQ的局部极小点 \\
 \midrule
-$\lambda_0=0$时 & 目标梯度消失 & 不存在此退化 \\
+$\lambda_0=0$时 & 目标梯度消失，仅剩约束梯度线性相关 & 不存在此退化情形 \\
 \midrule
-解题方法 & 分$\lambda_0=0/\neq0$讨论 & 分互补松弛讨论 \\
+解题方法 & 分$\lambda_0=0/\neq0$讨论 & 分互补松弛情形讨论 \\
 \bottomrule
 \end{tabular}
+
+\medskip
+\textbf{考试解题要点：}
+\begin{itemize}
+  \item FJ题：分 $\lambda_0=0$ 与 $\lambda_0\neq0$ 讨论；$\lambda_0=0$ 时用「不全为零」确定候选点
+  \item KKT题：设 $\lambda_0=1$，写Lagrange函数，分互补松弛情形逐一验证
+  \item 关键检查：积极约束梯度是否退化（零向量）——退化点是考FJ vs KKT差异的经典载体
+  \item 退化点处LICQ失败，KKT前提被破坏；此时须用FJ寻解
+\end{itemize}
 
 \subsection{本章速查}
 
 \begin{itemize}
   \item \textbf{FJ}：$\lambda_0\nabla f + \sum\lambda_i\nabla g_i + \sum\mu_j\nabla h_j = 0$，$\lambda_0,\lambda_i\ge0$，$\lambda_i g_i=0$，乘子不全为零
   \item \textbf{KKT}：同上但 $\lambda_0=1$，需要CQ
-  \item \textbf{核心区别}：FJ允许$\lambda_0=0$，KKT不允许
+  \item \textbf{核心区别}：FJ允许$\lambda_0=0$（目标信息可能丢失），KKT不允许
+  \item \textbf{逻辑链}：FJ无条件 $\to$ $\lambda_0$可能=0 $\to$ 加CQ $\to$ $\lambda_0\neq0$ $\to$ 归一化 $\to$ KKT
   \item \textbf{LICQ}：积极约束梯度线性无关——最常用
   \item \textbf{FJ解题}：分$\lambda_0=0$和$\lambda_0\neq0$；\textbf{KKT解题}：分互补松弛情形
   \item \textbf{退化判断}：检查积极约束梯度是否为零向量
