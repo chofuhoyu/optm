@@ -1,0 +1,86 @@
+% ============================================================
+%  第9章：约束优化方法
+% ============================================================
+\section{第9章 \quad 约束优化方法}
+
+\subsection{两大流派}
+
+\begin{itemize}
+  \item \textbf{可行方向法}：始终在可行域内，每步找下降可行方向。代表：Zoutendijk、Rosen梯度投影。
+  \item \textbf{罚函数法}：转化为一系列无约束子问题，逐轮加大惩罚。代表：外点法（SUMT）、内点法（障碍法）、乘子法。
+\end{itemize}
+
+（课件 p12.1, p12.2）
+
+\subsection{可行方向法通用框架}
+
+\begin{enumerate}
+  \item 初始可行点 $x^{(0)}$，$k=0$
+  \item 确定积极约束集 $I_k$（当前取等号的不等式约束）
+  \item 求解子问题得下降可行方向 $d^{(k)}$
+  \item 沿 $d^{(k)}$ 一维搜索，保持可行性
+  \item $x^{(k+1)} = x^{(k)} + \lambda_k d^{(k)}$
+  \item 满足KKT则停止，否则 $k\leftarrow k+1$ 回第2步
+\end{enumerate}
+
+\textbf{可行方向条件：}
+\begin{itemize}
+  \item 积极不等式约束：$\nabla g_i(x)^T d \le 0$（不指向域外）
+  \item 等式约束：$\nabla h_j(x)^T d = 0$（沿切向）
+  \item 非积极约束：局部可忽略
+\end{itemize}
+
+\subsection{Rosen梯度投影法}
+
+\textbf{投影矩阵（线性约束）：}
+$P = I - M^T(MM^T)^{-1}M$，
+其中 $M$ 为积极约束系数矩阵（每行一个 $\nabla g_i^T$）。
+
+\textbf{搜索方向：} $d = -P\nabla f$（负梯度在切空间上的正交投影）。
+
+\textbf{算法步骤：}
+\begin{enumerate}
+  \item 识别当前积极约束，构造 $M$
+  \item 计算 $P = I - M^T(MM^T)^{-1}M$
+  \item $d = -P\nabla f(x)$
+  \item 若 $d \neq 0$：沿 $d$ 线搜索，更新 $x$，回到1
+  \item 若 $d = 0$：计算 $w = -(MM^T)^{-1}M\nabla f(x)$
+  \begin{itemize}
+    \item 若 $w$ 全 $\ge 0$ $\to$ KKT点，停止
+    \item 若 $w$ 有负分量 $\to$ 去掉对应约束行，重新计算 $P$
+  \end{itemize}
+\end{enumerate}
+
+\subsection{Zoutendijk法}
+
+解LP子问题求下降可行方向：
+\[
+\min\ \nabla f(x)^T d,\quad
+\text{s.t.}\ \nabla g_i(x)^T d + g_i(x) \le 0,\quad -1 \le d_j \le 1
+\]
+最优值 $< 0$ $\Rightarrow$ 得下降可行方向；$= 0$ $\Rightarrow$ FJ/KKT点。
+
+\subsection{罚函数法}
+
+\textbf{外点法（外罚函数）：}
+$\min\ P(x,\sigma) = f(x) + \sigma\sum[\max(0,g_i(x))]^2 + \sigma\sum h_j(x)^2$。
+$\sigma_k \to \infty$ 逐轮增大惩罚，无约束子问题的解趋向原约束解。
+
+\textbf{内点法（障碍法，$\le$ 约束）：}
+$\min\ B(x,r) = f(x) - r\sum\ln(-g_i(x))$ 或 $f(x) + r\sum 1/(-g_i(x))$。
+$r_k \to 0$，从可行域内部逼近边界。
+
+\textbf{乘子法（增广Lagrange）：}
+外罚函数 + Lagrange乘子项的混合，惩罚力度不需要 $\to\infty$，避免病态。
+$\min\ L_A(x,\lambda,\sigma) = f(x) + \sum\lambda_i g_i(x) + \frac{\sigma}{2}\sum g_i(x)^2$。
+
+\subsection{本章速查}
+
+\begin{itemize}
+  \item \textbf{可行方向法}：$d$ 满足 $\nabla f^T d < 0$ 且 $\nabla g_i^T d \le 0$（积极约束）
+  \item \textbf{Rosen投影}：$P = I - M^T(MM^T)^{-1}M$，$d = -P\nabla f$。$d=0$时计算$w$判断KKT
+  \item \textbf{Zoutendijk}：解LP子问题求方向
+  \item \textbf{外点法}：加惩罚项，$\sigma_k\to\infty$，从域外逼近
+  \item \textbf{内点法}：障碍项，$r_k\to 0$，从域内逼近
+  \item \textbf{乘子法}：外罚+乘子混合，$\sigma$无需$\to\infty$
+\end{itemize}
